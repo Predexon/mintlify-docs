@@ -222,8 +222,8 @@
         "tags": ["Wallet"],
         "parameters": [
           {"name": "wallet_address", "in": "path", "required": true, "schema": {"type": "string"}},
-          {"name": "include_closed", "in": "query", "schema": {"type": "boolean", "default": false}},
-          {"name": "min_shares", "in": "query", "schema": {"type": "number", "default": 1}},
+          {"name": "include_closed", "in": "query", "schema": {"type": "boolean", "default": true}},
+          {"name": "min_shares", "in": "query", "schema": {"type": "number", "default": 0}},
           {"name": "condition_id", "in": "query", "schema": {"type": "string"}},
           {"name": "sort_by", "in": "query", "schema": {"type": "string", "enum": ["value", "unrealized_pnl", "realized_pnl", "cost"], "default": "value"}},
           {"name": "order", "in": "query", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "desc"}},
