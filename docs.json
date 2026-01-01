@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "quill",
+  "theme": "maple",
   "name": "Predexon API",
   "colors": {
     "primary": "#6366F1",
@@ -140,11 +140,6 @@
       "x": "https://x.com/predexon",
       "github": "https://github.com/predexon",
       "linkedin": "https://linkedin.com/company/predexon"
-    }
-  },
-  "analytics": {
-    "posthog": {
-      "apiKey": ""
     }
   },
   "seo": {
