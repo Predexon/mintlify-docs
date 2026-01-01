@@ -1,6 +1,6 @@
 ---
 title: "Candlesticks"
-api: "GET /v1/polymarket/candlesticks/{condition_id}"
+openapi: "GET /v1/polymarket/candlesticks/{condition_id}"
 description: "Get historical OHLCV candlestick data for a market"
 ---
 
@@ -54,14 +54,14 @@ Fetch historical candlestick (OHLCV) data for charting and analysis. Data is nor
 
 <RequestExample>
 ```bash cURL
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/candlesticks/0x1234...?interval=60&start_time=1704067200&end_time=1704153600"
+curl "https://api.predexon.com/v1/polymarket/candlesticks/0x1234...?interval=60&start_time=1704067200&end_time=1704153600"
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/candlesticks/{condition_id}",
+    f"https://api.predexon.com/v1/polymarket/candlesticks/{condition_id}",
     params={
         "interval": 60,
         "start_time": 1704067200,
@@ -73,7 +73,7 @@ candlesticks = response.json()["candlesticks"]
 
 ```typescript TypeScript
 const response = await fetch(
-  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/candlesticks/${conditionId}?interval=60&start_time=1704067200&end_time=1704153600`
+  `https://api.predexon.com/v1/polymarket/candlesticks/${conditionId}?interval=60&start_time=1704067200&end_time=1704153600`
 );
 const { candlesticks } = await response.json();
 ```

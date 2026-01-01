@@ -8,7 +8,7 @@ description: "How to authenticate with the Predexon API"
 The Predexon API is currently in **public beta** and does not require authentication for most endpoints. You can start making requests immediately.
 
 ```bash
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets?limit=10"
+curl "https://api.predexon.com/v1/polymarket/markets?limit=10"
 ```
 
 ## Rate Limiting
@@ -97,7 +97,7 @@ The API supports CORS for browser-based applications. All origins are currently 
 
 ```javascript
 // This works from any domain
-fetch("https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets")
+fetch("https://api.predexon.com/v1/polymarket/markets")
   .then(res => res.json())
   .then(data => console.log(data));
 ```
@@ -107,6 +107,6 @@ fetch("https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarke
 Use the health endpoint to verify API availability:
 
 ```bash
-curl "https://predexon-data-service-8970529761.us-central1.run.app/health"
+curl "https://api.predexon.com/health"
 # Returns: {"status": "healthy"}
 ```

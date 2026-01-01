@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://predexon-data-service-8970529761.us-central1.run.app",
+      "url": "https://api.predexon.com",
       "description": "Production API"
     }
   ],

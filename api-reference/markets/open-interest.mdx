@@ -1,6 +1,6 @@
 ---
 title: "Open Interest Time Series"
-api: "GET /v1/polymarket/markets/{condition_id}/open_interest"
+openapi: "GET /v1/polymarket/markets/{condition_id}/open_interest"
 description: "Get historical open interest data for a market"
 ---
 
@@ -53,14 +53,14 @@ Fetch historical time series of open interest for a market. Open interest repres
 
 <RequestExample>
 ```bash cURL
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/0x1234.../open_interest?granularity=day"
+curl "https://api.predexon.com/v1/polymarket/markets/0x1234.../open_interest?granularity=day"
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/{condition_id}/open_interest",
+    f"https://api.predexon.com/v1/polymarket/markets/{condition_id}/open_interest",
     params={
         "granularity": "week",
         "start_time": 1704067200,
@@ -72,7 +72,7 @@ oi_data = response.json()["open_interest_over_time"]
 
 ```typescript TypeScript
 const response = await fetch(
-  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/${conditionId}/open_interest?granularity=week`
+  `https://api.predexon.com/v1/polymarket/markets/${conditionId}/open_interest?granularity=week`
 );
 const { open_interest_over_time } = await response.json();
 ```

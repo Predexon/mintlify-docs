@@ -1,6 +1,6 @@
 ---
 title: "Batch Matching"
-api: "GET /v1/matching-markets/batch"
+openapi: "GET /v1/matching-markets/batch"
 description: "Find matches for multiple markets at once"
 ---
 
@@ -26,7 +26,7 @@ Provide **either** `polymarket_market_slugs` **or** `kalshi_market_tickers`, not
 
 <RequestExample>
 ```bash cURL
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets/batch?polymarket_market_slugs=will-trump-win-2024&polymarket_market_slugs=will-fed-cut-rates-january&polymarket_market_slugs=will-btc-hit-100k"
+curl "https://api.predexon.com/v1/matching-markets/batch?polymarket_market_slugs=will-trump-win-2024&polymarket_market_slugs=will-fed-cut-rates-january&polymarket_market_slugs=will-btc-hit-100k"
 ```
 
 ```python Python
@@ -41,7 +41,7 @@ slugs = [
 ]
 
 response = requests.get(
-    "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets/batch",
+    "https://api.predexon.com/v1/matching-markets/batch",
     params={"polymarket_market_slugs": slugs}
 )
 
@@ -64,7 +64,7 @@ const params = new URLSearchParams();
 slugs.forEach(slug => params.append("polymarket_market_slugs", slug));
 
 const response = await fetch(
-  `https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets/batch?${params}`
+  `https://api.predexon.com/v1/matching-markets/batch?${params}`
 );
 const { markets } = await response.json();
 ```

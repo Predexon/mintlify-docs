@@ -1,6 +1,6 @@
 ---
 title: "Activity"
-api: "GET /v1/polymarket/activity"
+openapi: "GET /v1/polymarket/activity"
 description: "Fetch trading activity (merges, splits, redeems) for a user"
 ---
 
@@ -80,14 +80,14 @@ Only one of `market_slug` or `condition_id` can be provided.
 
 <RequestExample>
 ```bash cURL
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/activity?user=0x1234...&limit=50"
+curl "https://api.predexon.com/v1/polymarket/activity?user=0x1234...&limit=50"
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/activity",
+    "https://api.predexon.com/v1/polymarket/activity",
     params={
         "user": "0x1234567890abcdef...",
         "start_time": 1704067200,
@@ -109,7 +109,7 @@ for activity in activities:
 
 ```typescript TypeScript
 const response = await fetch(
-  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/activity?user=${walletAddress}&limit=50`
+  `https://api.predexon.com/v1/polymarket/activity?user=${walletAddress}&limit=50`
 );
 const { activities } = await response.json();
 ```

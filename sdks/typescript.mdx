@@ -46,7 +46,7 @@ interface MarketsResponse {
 class PredexonClient {
   private baseUrl: string;
 
-  constructor(baseUrl = "https://predexon-data-service-8970529761.us-central1.run.app") {
+  constructor(baseUrl = "https://api.predexon.com") {
     this.baseUrl = baseUrl;
   }
 
@@ -259,7 +259,7 @@ try {
 // With response details
 async function fetchWithErrorHandling() {
   const response = await fetch(
-    "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets"
+    "https://api.predexon.com/v1/polymarket/markets"
   );
 
   if (!response.ok) {
@@ -277,7 +277,7 @@ Works directly in the browser with no build step:
 
 ```html
 <script type="module">
-  const BASE_URL = "https://predexon-data-service-8970529761.us-central1.run.app";
+  const BASE_URL = "https://api.predexon.com";
 
   const response = await fetch(`${BASE_URL}/v1/polymarket/markets?status=open&limit=5`);
   const { markets } = await response.json();

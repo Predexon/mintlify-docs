@@ -1,6 +1,6 @@
 ---
 title: "Find Matching Markets"
-api: "GET /v1/matching-markets"
+openapi: "GET /v1/matching-markets"
 description: "Find equivalent markets across Polymarket and Kalshi"
 ---
 
@@ -62,10 +62,10 @@ Provide **exactly one** of `polymarket_market_slug` or `kalshi_market_ticker`, n
 <RequestExample>
 ```bash cURL
 # From Polymarket to Kalshi
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets?polymarket_market_slug=will-trump-win-2024"
+curl "https://api.predexon.com/v1/matching-markets?polymarket_market_slug=will-trump-win-2024"
 
 # From Kalshi to Polymarket
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets?kalshi_market_ticker=PRES-2024-DJT"
+curl "https://api.predexon.com/v1/matching-markets?kalshi_market_ticker=PRES-2024-DJT"
 ```
 
 ```python Python
@@ -73,7 +73,7 @@ import requests
 
 # Find Kalshi equivalents for a Polymarket market
 response = requests.get(
-    "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets",
+    "https://api.predexon.com/v1/matching-markets",
     params={"polymarket_market_slug": "will-trump-win-2024"}
 )
 
@@ -89,7 +89,7 @@ for match in data["matches"]["KALSHI"]["exact"]:
 
 ```typescript TypeScript
 const response = await fetch(
-  "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets?polymarket_market_slug=will-trump-win-2024"
+  "https://api.predexon.com/v1/matching-markets?polymarket_market_slug=will-trump-win-2024"
 );
 const { matches, summary } = await response.json();
 

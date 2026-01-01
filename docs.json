@@ -120,10 +120,7 @@
     }
   },
   "api": {
-    "baseUrl": "https://predexon-data-service-8970529761.us-central1.run.app",
-    "playground": {
-      "mode": "simple"
-    }
+    "baseUrl": "https://api.predexon.com"
   },
   "openapi": "/api-reference/openapi.json",
   "contextual": {

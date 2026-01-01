@@ -1,6 +1,6 @@
 ---
 title: "Volume Time Series"
-api: "GET /v1/polymarket/markets/{token_id}/volume"
+openapi: "GET /v1/polymarket/markets/{token_id}/volume"
 description: "Get historical cumulative volume data for a market"
 ---
 
@@ -53,14 +53,14 @@ Fetch historical time series of cumulative trading volume for a specific token. 
 
 <RequestExample>
 ```bash cURL
-curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/21742633.../volume?granularity=day"
+curl "https://api.predexon.com/v1/polymarket/markets/21742633.../volume?granularity=day"
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/{token_id}/volume",
+    f"https://api.predexon.com/v1/polymarket/markets/{token_id}/volume",
     params={
         "granularity": "day",
         "start_time": 1704067200,
@@ -75,7 +75,7 @@ for point in volume_data:
 
 ```typescript TypeScript
 const response = await fetch(
-  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/${tokenId}/volume?granularity=day`
+  `https://api.predexon.com/v1/polymarket/markets/${tokenId}/volume?granularity=day`
 );
 const { volume_over_time } = await response.json();
 ```

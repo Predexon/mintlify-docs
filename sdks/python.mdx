@@ -20,7 +20,7 @@ from typing import Optional, List, Dict, Any
 class PredexonClient:
     """Simple Python client for the Predexon API."""
 
-    BASE_URL = "https://predexon-data-service-8970529761.us-central1.run.app"
+    BASE_URL = "https://api.predexon.com"
 
     def __init__(self, base_url: Optional[str] = None):
         self.base_url = base_url or self.BASE_URL
@@ -201,7 +201,7 @@ import asyncio
 async def get_markets_async():
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets",
+            "https://api.predexon.com/v1/polymarket/markets",
             params={"status": "open", "limit": 10}
         )
         return response.json()
