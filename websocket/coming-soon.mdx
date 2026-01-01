@@ -1,0 +1,68 @@
+---
+title: "WebSocket API"
+description: "Real-time streaming data for prediction markets"
+---
+
+<Info>
+The WebSocket API is coming soon. Sign up to be notified when it launches.
+</Info>
+
+## What's Coming
+
+The WebSocket API will provide real-time streaming for:
+
+- **Price Updates** - Live price changes as they happen
+- **Orderbook Streams** - Real-time orderbook depth updates
+- **Trade Feed** - Stream of executed trades
+- **Market Events** - Resolution announcements and status changes
+
+## Planned Channels
+
+<CardGroup cols={2}>
+  <Card title="Price Stream" icon="chart-line">
+    Subscribe to real-time price updates for any market
+  </Card>
+  <Card title="Orderbook Stream" icon="book-open">
+    Live orderbook updates with configurable depth
+  </Card>
+  <Card title="Trades Stream" icon="arrow-right-arrow-left">
+    Real-time feed of all executed trades
+  </Card>
+  <Card title="Events Stream" icon="bell">
+    Market resolutions, status changes, and announcements
+  </Card>
+</CardGroup>
+
+## Example Usage
+
+```javascript
+// Coming soon
+const ws = new WebSocket('wss://ws.predexon.com');
+
+ws.onopen = () => {
+  ws.send(JSON.stringify({
+    action: 'subscribe',
+    channel: 'prices',
+    markets: ['will-trump-win-2024']
+  }));
+};
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Price update:', data);
+};
+```
+
+## Get Notified
+
+<Card
+  title="Join the Waitlist"
+  icon="bell"
+  href="https://predexon.com/waitlist"
+>
+  Be the first to know when the WebSocket API launches
+</Card>
+
+## Questions?
+
+Contact us at [support@predexon.com](mailto:support@predexon.com) for early access inquiries.

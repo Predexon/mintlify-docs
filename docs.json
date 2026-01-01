@@ -32,7 +32,7 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "Data API",
         "groups": [
           {
             "group": "Overview",
@@ -41,66 +41,51 @@
             ]
           },
           {
-            "group": "Markets",
+            "group": "Polymarket",
             "pages": [
               "api-reference/markets/list-markets",
               "api-reference/markets/candlesticks",
               "api-reference/markets/market-price",
               "api-reference/markets/volume",
               "api-reference/markets/open-interest",
-              "api-reference/markets/orderbooks"
-            ]
-          },
-          {
-            "group": "Trading",
-            "pages": [
+              "api-reference/markets/orderbooks",
               "api-reference/trading/orders",
-              "api-reference/trading/activity"
-            ]
-          },
-          {
-            "group": "Wallet",
-            "pages": [
+              "api-reference/trading/activity",
               "api-reference/wallet/positions",
               "api-reference/wallet/pnl"
             ]
           },
           {
-            "group": "Cross-Platform",
+            "group": "Market Matching",
             "pages": [
-              "api-reference/matching/find-matches",
-              "api-reference/matching/batch-matches"
+              "api-reference/matching/find-matches"
             ]
           }
         ]
       },
       {
-        "tab": "SDKs",
+        "tab": "Trading API",
         "groups": [
           {
-            "group": "Client Libraries",
+            "group": "Trading API",
             "pages": [
-              "sdks/python",
-              "sdks/typescript"
+              "trading-api/coming-soon"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "WebSocket",
+        "groups": [
+          {
+            "group": "WebSocket",
+            "pages": [
+              "websocket/coming-soon"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "API Status",
-          "href": "https://status.predexon.com",
-          "icon": "signal"
-        },
-        {
-          "anchor": "GitHub",
-          "href": "https://github.com/predexon",
-          "icon": "github"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -123,19 +108,9 @@
     "baseUrl": "https://api.predexon.com"
   },
   "openapi": "/api-reference/openapi.json",
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "cursor"
-    ]
-  },
   "footer": {
     "socials": {
       "x": "https://x.com/predexon",
-      "github": "https://github.com/predexon",
       "linkedin": "https://linkedin.com/company/predexon"
     }
   },
