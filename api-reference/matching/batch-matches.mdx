@@ -1,0 +1,187 @@
+---
+title: "Batch Matching"
+api: "GET /v1/matching-markets/batch"
+description: "Find matches for multiple markets at once"
+---
+
+## Overview
+
+Find matching markets for multiple identifiers in a single request. More efficient than making individual requests when you need to check many markets.
+
+<ParamField query="polymarket_market_slugs" type="array">
+  List of Polymarket market slugs
+</ParamField>
+
+<ParamField query="kalshi_market_tickers" type="array">
+  List of Kalshi market tickers
+</ParamField>
+
+<Warning>
+Provide **either** `polymarket_market_slugs` **or** `kalshi_market_tickers`, not both.
+</Warning>
+
+<ResponseField name="markets" type="object">
+  Dictionary mapping each input identifier to its match results. Each value has the same structure as the single match endpoint response.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets/batch?polymarket_market_slugs=will-trump-win-2024&polymarket_market_slugs=will-fed-cut-rates-january&polymarket_market_slugs=will-btc-hit-100k"
+```
+
+```python Python
+import requests
+
+# Batch lookup for multiple Polymarket markets
+slugs = [
+    "will-trump-win-2024",
+    "will-fed-cut-rates-january",
+    "will-btc-hit-100k",
+    "will-nvidia-beat-earnings"
+]
+
+response = requests.get(
+    "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets/batch",
+    params={"polymarket_market_slugs": slugs}
+)
+
+results = response.json()["markets"]
+
+for slug, data in results.items():
+    exact = data["summary"]["exact_matches"]
+    related = data["summary"]["related_matches"]
+    print(f"{slug}: {exact} exact, {related} related")
+```
+
+```typescript TypeScript
+const slugs = [
+  "will-trump-win-2024",
+  "will-fed-cut-rates-january",
+  "will-btc-hit-100k"
+];
+
+const params = new URLSearchParams();
+slugs.forEach(slug => params.append("polymarket_market_slugs", slug));
+
+const response = await fetch(
+  `https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets/batch?${params}`
+);
+const { markets } = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "markets": {
+    "will-trump-win-2024": {
+      "query": {
+        "platform": "POLYMARKET",
+        "market_slug": "will-trump-win-2024",
+        "title": "Will Donald Trump win the 2024 Presidential Election?",
+        "status": "open"
+      },
+      "matches": {
+        "KALSHI": {
+          "exact": [
+            {
+              "market_ticker": "PRES-2024-DJT",
+              "title": "Will Trump win the 2024 presidential election?",
+              "status": "open"
+            }
+          ],
+          "related": []
+        }
+      },
+      "summary": {
+        "total_matches": 1,
+        "exact_matches": 1,
+        "related_matches": 0,
+        "platforms": ["KALSHI"]
+      }
+    },
+    "will-btc-hit-100k": {
+      "query": {
+        "platform": "POLYMARKET",
+        "market_slug": "will-btc-hit-100k",
+        "title": "Will Bitcoin hit $100,000 in 2024?",
+        "status": "open"
+      },
+      "matches": {
+        "KALSHI": {
+          "exact": [],
+          "related": [
+            {
+              "market_ticker": "BTC-24DEC-100000",
+              "title": "Will Bitcoin close above $100,000 on Dec 31?",
+              "status": "open"
+            }
+          ]
+        }
+      },
+      "summary": {
+        "total_matches": 1,
+        "exact_matches": 0,
+        "related_matches": 1,
+        "platforms": ["KALSHI"]
+      }
+    },
+    "nonexistent-market": {
+      "error": "Market not found",
+      "query": null,
+      "matches": {},
+      "summary": {
+        "total_matches": 0,
+        "exact_matches": 0,
+        "related_matches": 0,
+        "platforms": []
+      }
+    }
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid parameter combination",
+  "message": "Cannot provide both polymarket_market_slugs and kalshi_market_tickers"
+}
+```
+</ResponseExample>
+
+## Error Handling
+
+When a market isn't found, its entry in the response will include an `error` field while other markets continue to be processed:
+
+```json
+{
+  "markets": {
+    "valid-market": { /* normal response */ },
+    "invalid-market": {
+      "error": "Market not found",
+      "query": null,
+      "matches": {},
+      "summary": {
+        "total_matches": 0,
+        "exact_matches": 0,
+        "related_matches": 0,
+        "platforms": []
+      }
+    }
+  }
+}
+```
+
+## Performance Tips
+
+<AccordionGroup>
+  <Accordion title="Batch size">
+    There's no hard limit on batch size, but we recommend batches of 50 or fewer for optimal response times.
+  </Accordion>
+  <Accordion title="Caching">
+    Match results change infrequently. Cache results for at least 1 hour.
+  </Accordion>
+  <Accordion title="Error handling">
+    Always check for the `error` field in each market's response, as individual lookups can fail while the batch succeeds.
+  </Accordion>
+</AccordionGroup>

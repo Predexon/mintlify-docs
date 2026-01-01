@@ -1,0 +1,241 @@
+---
+title: "Positions & P&L"
+description: "Understanding wallet positions and profit/loss calculations"
+---
+
+## Overview
+
+Predexon provides comprehensive wallet analytics, allowing you to track positions and calculate profit & loss for any Polymarket wallet address.
+
+## Positions
+
+A **position** represents a wallet's holdings in a specific market outcome (Yes or No token).
+
+### Position Structure
+
+```json
+{
+  "market": {
+    "condition_id": "0x1234...",
+    "market_slug": "will-btc-hit-100k",
+    "title": "Will Bitcoin hit $100k by end of 2024?",
+    "side": "YES",
+    "token_id": "12345...",
+    "status": "open"
+  },
+  "position": {
+    "shares": 1500.0,
+    "avg_entry_price": 0.42,
+    "total_cost_usd": 630.0
+  },
+  "current": {
+    "price": 0.55,
+    "value_usd": 825.0
+  },
+  "pnl": {
+    "unrealized_usd": 195.0,
+    "unrealized_pct": 30.95,
+    "realized_usd": 0.0
+  }
+}
+```
+
+### Position Status
+
+| Status | Description |
+|--------|-------------|
+| `open` | Market is still trading |
+| `resolved_win` | Market resolved in favor of this position |
+| `resolved_loss` | Market resolved against this position |
+
+## Fetching Positions
+
+### Basic Query
+
+```python
+import requests
+
+BASE_URL = "https://predexon-data-service-8970529761.us-central1.run.app"
+
+wallet = "0x1234567890abcdef..."
+
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet}"
+)
+
+data = response.json()
+print(f"Total positions: {data['summary']['total_positions']}")
+print(f"Portfolio value: ${data['summary']['total_value_usd']:,.2f}")
+```
+
+### Filtering Options
+
+```python
+# Only open positions
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet}",
+    params={"include_closed": False}
+)
+
+# Positions with at least 100 shares
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet}",
+    params={"min_shares": 100}
+)
+
+# Positions in a specific market
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet}",
+    params={"condition_id": "0x1234..."}
+)
+```
+
+### Sorting Options
+
+| Sort By | Description |
+|---------|-------------|
+| `value` | Current position value (default) |
+| `unrealized_pnl` | Unrealized profit/loss |
+| `realized_pnl` | Realized profit/loss |
+| `cost` | Total cost basis |
+
+```python
+# Sort by unrealized P&L, descending
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet}",
+    params={
+        "sort_by": "unrealized_pnl",
+        "order": "desc"
+    }
+)
+```
+
+## Portfolio Summary
+
+Every positions response includes a summary:
+
+```json
+{
+  "summary": {
+    "total_positions": 15,
+    "total_value_usd": 12500.00,
+    "total_cost_usd": 10000.00,
+    "total_unrealized_pnl_usd": 2500.00,
+    "total_realized_pnl_usd": 1200.00
+  }
+}
+```
+
+## P&L Over Time
+
+Track how a wallet's P&L has evolved:
+
+```python
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/pnl/{wallet}",
+    params={
+        "granularity": "day",
+        "start_time": 1704067200,  # Jan 1, 2024
+        "end_time": 1735689600     # Dec 31, 2024
+    }
+)
+
+for point in response.json()["pnl_over_time"]:
+    date = datetime.fromtimestamp(point["timestamp"])
+    print(f"{date.date()}: ${point['pnl_to_date']:,.2f}")
+```
+
+### Granularity Options
+
+| Granularity | Description |
+|-------------|-------------|
+| `day` | Daily data points |
+| `week` | Weekly aggregation |
+| `month` | Monthly aggregation |
+| `year` | Yearly aggregation |
+| `all` | Single lifetime value |
+
+### Token-Specific P&L
+
+Track P&L for a specific position:
+
+```python
+response = requests.get(
+    f"{BASE_URL}/v1/polymarket/wallet/pnl/{wallet}",
+    params={
+        "granularity": "day",
+        "token_id": "12345..."
+    }
+)
+```
+
+## Understanding P&L Calculations
+
+### Realized P&L
+
+Realized P&L comes from:
+- **Selling shares** at a different price than purchase
+- **Redeeming winning shares** after market resolution ($1 per share)
+- **Redeeming losing shares** after market resolution ($0 per share)
+
+### Unrealized P&L
+
+Unrealized P&L is calculated as:
+
+```
+unrealized_pnl = (current_price - avg_entry_price) × shares
+```
+
+For resolved markets:
+- **Winner**: current_price = 1.0
+- **Loser**: current_price = 0.0
+
+## Example: Portfolio Analysis
+
+```python
+def analyze_portfolio(wallet_address: str):
+    """Analyze a wallet's Polymarket portfolio."""
+
+    # Get all positions
+    response = requests.get(
+        f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet_address}",
+        params={"limit": 500}
+    )
+    data = response.json()
+
+    summary = data["summary"]
+    positions = data["positions"]
+
+    print(f"Portfolio Analysis for {wallet_address[:10]}...")
+    print(f"{'='*50}")
+    print(f"Total Positions: {summary['total_positions']}")
+    print(f"Portfolio Value: ${summary['total_value_usd']:,.2f}")
+    print(f"Total Cost: ${summary['total_cost_usd']:,.2f}")
+    print(f"Unrealized P&L: ${summary['total_unrealized_pnl_usd']:,.2f}")
+    print(f"Realized P&L: ${summary['total_realized_pnl_usd']:,.2f}")
+
+    # Top winners
+    print(f"\nTop 5 Winners:")
+    sorted_positions = sorted(
+        positions,
+        key=lambda x: x["pnl"]["unrealized_usd"],
+        reverse=True
+    )[:5]
+
+    for p in sorted_positions:
+        print(f"  {p['market']['title'][:40]}...")
+        print(f"    Side: {p['market']['side']}, P&L: ${p['pnl']['unrealized_usd']:,.2f}")
+
+analyze_portfolio("0x1234567890abcdef...")
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Positions Endpoint" icon="wallet" href="/api-reference/wallet/positions">
+    Full API reference for positions
+  </Card>
+  <Card title="P&L Endpoint" icon="chart-line" href="/api-reference/wallet/pnl">
+    Full API reference for P&L
+  </Card>
+</CardGroup>

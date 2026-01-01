@@ -1,0 +1,184 @@
+---
+title: "Orderbooks"
+api: "GET /v1/polymarket/orderbooks"
+description: "Get historical orderbook snapshots for a token"
+---
+
+## Overview
+
+Fetch historical orderbook snapshots for a specific token. Returns bids and asks at each point in time, useful for analyzing market depth and liquidity.
+
+<Warning>
+Orderbook data history starts from **October 14th, 2024**. Earlier data is not available.
+</Warning>
+
+<ParamField query="token_id" type="string" required>
+  The token ID (asset) for the Polymarket market
+</ParamField>
+
+<ParamField query="start_time" type="integer" required>
+  Start time in Unix timestamp (**milliseconds**)
+</ParamField>
+
+<ParamField query="end_time" type="integer" required>
+  End time in Unix timestamp (**milliseconds**)
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+  Maximum number of snapshots to return (1-200)
+</ParamField>
+
+<ParamField query="pagination_key" type="string">
+  Pagination key for fetching the next page of results
+</ParamField>
+
+<ResponseField name="snapshots" type="array">
+  <Expandable title="Orderbook snapshot">
+    <ResponseField name="assetId" type="string">
+      Token ID for this orderbook
+    </ResponseField>
+    <ResponseField name="market" type="string">
+      Market condition ID
+    </ResponseField>
+    <ResponseField name="timestamp" type="integer">
+      Snapshot timestamp in milliseconds
+    </ResponseField>
+    <ResponseField name="indexedAt" type="integer">
+      When snapshot was indexed (milliseconds)
+    </ResponseField>
+    <ResponseField name="hash" type="string">
+      Orderbook state hash
+    </ResponseField>
+    <ResponseField name="tickSize" type="string">
+      Minimum price increment
+    </ResponseField>
+    <ResponseField name="bids" type="array">
+      Bid levels ordered by price (highest first)
+      <Expandable>
+        <ResponseField name="price" type="string">Price level (0-1)</ResponseField>
+        <ResponseField name="size" type="string">Size at this level</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="asks" type="array">
+      Ask levels ordered by price (lowest first)
+      <Expandable>
+        <ResponseField name="price" type="string">Price level (0-1)</ResponseField>
+        <ResponseField name="size" type="string">Size at this level</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
+    <ResponseField name="count" type="integer">Number of items returned</ResponseField>
+    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orderbooks?token_id=21742633...&start_time=1704067200000&end_time=1704153600000&limit=50"
+```
+
+```python Python
+import requests
+
+# Note: timestamps are in MILLISECONDS
+response = requests.get(
+    "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orderbooks",
+    params={
+        "token_id": token_id,
+        "start_time": 1704067200000,  # ms
+        "end_time": 1704153600000,    # ms
+        "limit": 50
+    }
+)
+snapshots = response.json()["snapshots"]
+
+# Paginate through all results
+pagination_key = response.json()["pagination"]["pagination_key"]
+while pagination_key:
+    response = requests.get(
+        "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orderbooks",
+        params={
+            "token_id": token_id,
+            "start_time": 1704067200000,
+            "end_time": 1704153600000,
+            "pagination_key": pagination_key
+        }
+    )
+    snapshots.extend(response.json()["snapshots"])
+    pagination_key = response.json()["pagination"]["pagination_key"]
+```
+
+```typescript TypeScript
+const response = await fetch(
+  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orderbooks?token_id=${tokenId}&start_time=1704067200000&end_time=1704153600000`
+);
+const { snapshots, pagination } = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "snapshots": [
+    {
+      "assetId": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+      "market": "0x1a2b3c4d...",
+      "timestamp": 1704067200000,
+      "indexedAt": 1704067201234,
+      "hash": "abc123...",
+      "tickSize": "0.01",
+      "bids": [
+        {"price": "0.55", "size": "10000"},
+        {"price": "0.54", "size": "25000"},
+        {"price": "0.53", "size": "50000"}
+      ],
+      "asks": [
+        {"price": "0.56", "size": "8000"},
+        {"price": "0.57", "size": "20000"},
+        {"price": "0.58", "size": "35000"}
+      ]
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "count": 50,
+    "pagination_key": "eyJhc3NldElkIjoiMjE3NDI2MzMuLi4iLCJ0aW1lc3RhbXAiOjE3MDQwNjcyMDAwMDB9",
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid time range",
+  "message": "start_time must be less than end_time"
+}
+```
+</ResponseExample>
+
+<Note>
+**Timestamps are in milliseconds** for this endpoint, unlike other endpoints that use seconds.
+</Note>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Liquidity Analysis" icon="water">
+    Analyze market depth and liquidity over time
+  </Card>
+  <Card title="Spread Tracking" icon="arrows-left-right">
+    Monitor bid-ask spreads historically
+  </Card>
+  <Card title="Market Making" icon="scale-balanced">
+    Backtest market making strategies
+  </Card>
+  <Card title="Slippage Estimation" icon="chart-area">
+    Estimate execution slippage for large orders
+  </Card>
+</CardGroup>

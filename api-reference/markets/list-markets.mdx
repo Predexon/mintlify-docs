@@ -1,0 +1,190 @@
+---
+title: "List Markets"
+api: "GET /v1/polymarket/markets"
+description: "Query markets with filtering, sorting, and pagination"
+---
+
+## Overview
+
+Fetch a list of prediction markets with comprehensive filtering options. This is the primary endpoint for discovering markets on Polymarket.
+
+<ParamField query="status" type="string" default="none">
+  Filter by market status: `open` or `closed`
+</ParamField>
+
+<ParamField query="min_price" type="number">
+  Minimum price filter (0-1). Filters based on side A (Yes) price.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+  Maximum price filter (0-1). Filters based on side A (Yes) price.
+</ParamField>
+
+<ParamField query="min_open_interest" type="number">
+  Minimum open interest in USD.
+</ParamField>
+
+<ParamField query="min_volume" type="number">
+  Minimum total volume in USD.
+</ParamField>
+
+<ParamField query="tags" type="array">
+  Filter by tag(s). Example: `tags=politics&tags=elections`
+</ParamField>
+
+<ParamField query="event_slug" type="array">
+  Filter by event slug(s).
+</ParamField>
+
+<ParamField query="search" type="string">
+  Search in market title (min 2 characters).
+</ParamField>
+
+<ParamField query="condition_id" type="array">
+  Filter by specific condition ID(s).
+</ParamField>
+
+<ParamField query="market_slug" type="array">
+  Filter by specific market slug(s).
+</ParamField>
+
+<ParamField query="sort" type="string" default="volume">
+  Sort by: `volume`, `open_interest`, `price_desc`, `price_asc`
+</ParamField>
+
+<ParamField query="limit" type="integer" default="20">
+  Number of markets to return (1-100).
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of markets to skip for pagination.
+</ParamField>
+
+<ResponseField name="markets" type="array">
+  <Expandable title="Market object">
+    <ResponseField name="condition_id" type="string">
+      Unique condition hash for this market
+    </ResponseField>
+    <ResponseField name="market_slug" type="string">
+      URL-friendly market identifier
+    </ResponseField>
+    <ResponseField name="title" type="string">
+      Market question/title
+    </ResponseField>
+    <ResponseField name="description" type="string">
+      Detailed market description
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Market status: `open` or `closed`
+    </ResponseField>
+    <ResponseField name="outcomes" type="array">
+      Array of two outcome objects with `label`, `token_id`, and `price`
+    </ResponseField>
+    <ResponseField name="total_volume_usd" type="number">
+      Total trading volume in USD
+    </ResponseField>
+    <ResponseField name="liquidity_usd" type="number">
+      Current liquidity in USD
+    </ResponseField>
+    <ResponseField name="tags" type="array">
+      Category tags for this market
+    </ResponseField>
+    <ResponseField name="event_slug" type="string">
+      Event this market belongs to
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">
+      Requested limit
+    </ResponseField>
+    <ResponseField name="offset" type="integer">
+      Current offset
+    </ResponseField>
+    <ResponseField name="total" type="integer">
+      Total matching markets
+    </ResponseField>
+    <ResponseField name="has_more" type="boolean">
+      Whether more results are available
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets?status=open&sort=volume&limit=10"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets",
+    params={
+        "status": "open",
+        "sort": "volume",
+        "limit": 10
+    }
+)
+data = response.json()
+```
+
+```typescript TypeScript
+const response = await fetch(
+  "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets?status=open&sort=volume&limit=10"
+);
+const data = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "markets": [
+    {
+      "condition_id": "0x1a2b3c4d...",
+      "market_id": "12345",
+      "market_slug": "will-trump-win-2024",
+      "title": "Will Donald Trump win the 2024 Presidential Election?",
+      "description": "This market resolves to Yes if...",
+      "status": "open",
+      "winning_side": null,
+      "start_time": "2024-01-01T00:00:00Z",
+      "end_time": "2024-11-06T00:00:00Z",
+      "outcomes": [
+        {
+          "label": "Yes",
+          "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+          "price": 0.62
+        },
+        {
+          "label": "No",
+          "token_id": "48331043336612883890938759509493159234755048973500640148014422747788308965732",
+          "price": 0.38
+        }
+      ],
+      "total_volume_usd": 1500000000.00,
+      "liquidity_usd": 25000000.00,
+      "tags": ["politics", "elections"],
+      "event_slug": "2024-presidential-election",
+      "event_title": "2024 Presidential Election"
+    }
+  ],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 1234,
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid price range",
+  "message": "min_price cannot be greater than max_price"
+}
+```
+</ResponseExample>

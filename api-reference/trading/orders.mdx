@@ -1,0 +1,159 @@
+---
+title: "Orders"
+api: "GET /v1/polymarket/orders"
+description: "Fetch historical trade/order data"
+---
+
+## Overview
+
+Query historical trade data with flexible filtering by market, token, user, and time range.
+
+<ParamField query="market_slug" type="string">
+  Filter by market slug
+</ParamField>
+
+<ParamField query="condition_id" type="string">
+  Filter by condition ID
+</ParamField>
+
+<ParamField query="token_id" type="string">
+  Filter by specific token ID
+</ParamField>
+
+<ParamField query="user" type="string">
+  Filter by user wallet address
+</ParamField>
+
+<ParamField query="start_time" type="integer">
+  Unix timestamp (seconds) for start of range
+</ParamField>
+
+<ParamField query="end_time" type="integer">
+  Unix timestamp (seconds) for end of range
+</ParamField>
+
+<ParamField query="order" type="string" default="desc">
+  Sort order: `asc` or `desc` by timestamp
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+  Number of orders to return (1-1000)
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of orders to skip
+</ParamField>
+
+<Warning>
+At least one of `market_slug`, `condition_id`, `token_id`, or `user` is required.
+Only one of `market_slug`, `condition_id`, or `token_id` can be provided.
+</Warning>
+
+<ResponseField name="orders" type="array">
+  <Expandable title="Order object">
+    <ResponseField name="token_id" type="string">Token ID that was traded</ResponseField>
+    <ResponseField name="side" type="string">`BUY` or `SELL`</ResponseField>
+    <ResponseField name="market_slug" type="string">Market slug</ResponseField>
+    <ResponseField name="condition_id" type="string">Market condition ID</ResponseField>
+    <ResponseField name="shares" type="number">Number of shares traded</ResponseField>
+    <ResponseField name="shares_normalized" type="number">Shares normalized (raw / 1,000,000)</ResponseField>
+    <ResponseField name="price" type="number">Trade price (0-1)</ResponseField>
+    <ResponseField name="tx_hash" type="string">Transaction hash</ResponseField>
+    <ResponseField name="title" type="string">Market title</ResponseField>
+    <ResponseField name="timestamp" type="integer">Unix timestamp</ResponseField>
+    <ResponseField name="order_hash" type="string">Order hash</ResponseField>
+    <ResponseField name="user" type="string">Maker wallet address</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Standard pagination object with `limit`, `offset`, `total`, `has_more`
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+# Orders for a specific market
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orders?market_slug=will-trump-win-2024&limit=50"
+
+# Orders for a specific user
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orders?user=0x1234...&limit=100"
+```
+
+```python Python
+import requests
+
+# Get recent orders for a market
+response = requests.get(
+    "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orders",
+    params={
+        "market_slug": "will-trump-win-2024",
+        "order": "desc",
+        "limit": 50
+    }
+)
+
+for order in response.json()["orders"]:
+    side_emoji = "📈" if order["side"] == "BUY" else "📉"
+    print(f"{side_emoji} {order['side']} {order['shares']:.2f} @ {order['price']:.4f}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/orders?user=0x1234...&limit=100"
+);
+const { orders } = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "orders": [
+    {
+      "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+      "side": "BUY",
+      "market_slug": "will-trump-win-2024",
+      "condition_id": "0x1a2b3c4d...",
+      "shares": 500.0,
+      "shares_normalized": 500.0,
+      "price": 0.62,
+      "tx_hash": "0xabc123...",
+      "title": "Will Donald Trump win the 2024 Presidential Election?",
+      "timestamp": 1704153600,
+      "order_hash": "0xdef456...",
+      "user": "0x9876543210..."
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "offset": 0,
+    "total": 12345,
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid filter combination",
+  "message": "Only one of market_slug, token_id, or condition_id can be provided"
+}
+```
+</ResponseExample>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Trade History" icon="clock-rotate-left">
+    Get complete trade history for a market or user
+  </Card>
+  <Card title="Volume Analysis" icon="chart-bar">
+    Analyze trading patterns and flow
+  </Card>
+  <Card title="Whale Tracking" icon="fish">
+    Monitor large trades by filtering on shares
+  </Card>
+  <Card title="User Analytics" icon="user-chart">
+    Analyze a specific trader's activity
+  </Card>
+</CardGroup>

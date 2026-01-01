@@ -1,0 +1,165 @@
+---
+title: "Candlesticks"
+api: "GET /v1/polymarket/candlesticks/{condition_id}"
+description: "Get historical OHLCV candlestick data for a market"
+---
+
+## Overview
+
+Fetch historical candlestick (OHLCV) data for charting and analysis. Data is normalized to the YES side perspective - NO prices are converted as (1 - price).
+
+<ParamField path="condition_id" type="string" required>
+  The condition ID for the market
+</ParamField>
+
+<ParamField query="start_time" type="integer">
+  Unix timestamp (seconds) for start of time range. Defaults to earliest available data.
+</ParamField>
+
+<ParamField query="end_time" type="integer">
+  Unix timestamp (seconds) for end of time range. Defaults to latest available data.
+</ParamField>
+
+<ParamField query="interval" type="integer" default="1">
+  Candlestick interval in minutes:
+  - `1` - 1 minute (max 1 week range)
+  - `60` - 1 hour (max 1 month range)
+  - `1440` - 1 day (max 1 year range)
+</ParamField>
+
+<ResponseField name="candlesticks" type="array">
+  Array of candlestick data with token metadata
+  <Expandable title="Candlestick structure">
+    <ResponseField name="end_period_ts" type="integer">
+      Unix timestamp for end of this candle period
+    </ResponseField>
+    <ResponseField name="price" type="object">
+      <Expandable>
+        <ResponseField name="open" type="number">Opening price (0-1)</ResponseField>
+        <ResponseField name="high" type="number">Highest price</ResponseField>
+        <ResponseField name="low" type="number">Lowest price</ResponseField>
+        <ResponseField name="close" type="number">Closing price</ResponseField>
+        <ResponseField name="mean" type="number">Mean price for period</ResponseField>
+        <ResponseField name="previous" type="number">Previous candle's close</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="volume" type="number">
+      USD notional volume for this period
+    </ResponseField>
+    <ResponseField name="trades_count" type="integer">
+      Number of trades in this period
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/candlesticks/0x1234...?interval=60&start_time=1704067200&end_time=1704153600"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/candlesticks/{condition_id}",
+    params={
+        "interval": 60,
+        "start_time": 1704067200,
+        "end_time": 1704153600
+    }
+)
+candlesticks = response.json()["candlesticks"]
+```
+
+```typescript TypeScript
+const response = await fetch(
+  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/candlesticks/${conditionId}?interval=60&start_time=1704067200&end_time=1704153600`
+);
+const { candlesticks } = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "candlesticks": [
+    [
+      [
+        {
+          "end_period_ts": 1704070800,
+          "price": {
+            "open": 0.5500,
+            "high": 0.5650,
+            "low": 0.5480,
+            "close": 0.5620,
+            "open_dollars": "0.5500",
+            "high_dollars": "0.5650",
+            "low_dollars": "0.5480",
+            "close_dollars": "0.5620",
+            "mean": 0.5560,
+            "mean_dollars": "0.5560",
+            "previous": 0.5480,
+            "previous_dollars": "0.5480"
+          },
+          "volume": 125000.50,
+          "trades_count": 847
+        },
+        {
+          "end_period_ts": 1704074400,
+          "price": {
+            "open": 0.5620,
+            "high": 0.5700,
+            "low": 0.5590,
+            "close": 0.5680,
+            "open_dollars": "0.5620",
+            "high_dollars": "0.5700",
+            "low_dollars": "0.5590",
+            "close_dollars": "0.5680",
+            "mean": 0.5640,
+            "mean_dollars": "0.5640",
+            "previous": 0.5620,
+            "previous_dollars": "0.5620"
+          },
+          "volume": 98500.25,
+          "trades_count": 623
+        }
+      ],
+      {
+        "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455"
+      }
+    ]
+  ]
+}
+```
+
+```json 400
+{
+  "error": "Invalid interval",
+  "message": "interval must be one of 1, 60, or 1440 minutes"
+}
+```
+
+```json 404
+{
+  "error": "Not found",
+  "message": "Condition 0x1234... not found"
+}
+```
+</ResponseExample>
+
+## Usage Notes
+
+<AccordionGroup>
+  <Accordion title="Time range limits">
+    To ensure reasonable response sizes, each interval has a maximum time range:
+    - 1-minute: 1 week
+    - 1-hour: 1 month
+    - 1-day: 1 year
+  </Accordion>
+  <Accordion title="Price normalization">
+    All prices are normalized to the YES perspective. This means if you're tracking the NO side, the displayed prices show (1 - actual_no_price).
+  </Accordion>
+  <Accordion title="Volume aggregation">
+    Volume is the combined USD notional from both YES and NO token trades within each period.
+  </Accordion>
+</AccordionGroup>

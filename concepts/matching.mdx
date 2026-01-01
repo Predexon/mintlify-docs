@@ -1,0 +1,257 @@
+---
+title: "Cross-Platform Matching"
+description: "Find equivalent markets across Polymarket and Kalshi"
+---
+
+## Overview
+
+Predexon's market matching API helps you discover equivalent or related markets across different prediction market platforms. This is invaluable for:
+
+- **Arbitrage detection**: Find price discrepancies for the same event
+- **Portfolio diversification**: Spread risk across platforms
+- **Research**: Compare market efficiency across platforms
+- **Liquidity analysis**: Find the best platform for a given market
+
+## How Matching Works
+
+Our matching algorithm uses a knowledge graph built from:
+- Event metadata and descriptions
+- Resolution criteria
+- Time constraints
+- Semantic similarity
+
+### Match Types
+
+| Type | Description |
+|------|-------------|
+| **Exact** | Same underlying event with identical resolution criteria |
+| **Related** | Similar events or correlated outcomes |
+
+## Finding Matches
+
+### From Polymarket to Kalshi
+
+```python
+import requests
+
+BASE_URL = "https://predexon-data-service-8970529761.us-central1.run.app"
+
+response = requests.get(
+    f"{BASE_URL}/v1/matching-markets",
+    params={"polymarket_market_slug": "will-trump-win-2024"}
+)
+
+data = response.json()
+
+print(f"Query: {data['query']['title']}")
+print(f"Total matches: {data['summary']['total_matches']}")
+
+for match in data['matches']['KALSHI']['exact']:
+    print(f"  Exact: {match['title']}")
+    print(f"    Ticker: {match['market_ticker']}")
+
+for match in data['matches']['KALSHI']['related']:
+    print(f"  Related: {match['title']}")
+```
+
+### From Kalshi to Polymarket
+
+```python
+response = requests.get(
+    f"{BASE_URL}/v1/matching-markets",
+    params={"kalshi_market_ticker": "PRES-2024-DJT"}
+)
+
+data = response.json()
+
+for match in data['matches']['POLYMARKET']['exact']:
+    print(f"  {match['title']}")
+    print(f"    Slug: {match['market_slug']}")
+```
+
+## Response Structure
+
+```json
+{
+  "query": {
+    "platform": "POLYMARKET",
+    "market_slug": "will-trump-win-2024",
+    "title": "Will Donald Trump win the 2024 Presidential Election?",
+    "status": "open"
+  },
+  "matches": {
+    "KALSHI": {
+      "exact": [
+        {
+          "market_ticker": "PRES-2024-DJT",
+          "title": "Will Trump win the 2024 presidential election?",
+          "yes_subtitle": "Donald Trump wins",
+          "status": "open",
+          "explanation": "Same underlying event with identical resolution criteria"
+        }
+      ],
+      "related": [
+        {
+          "market_ticker": "PRES-2024-REP",
+          "title": "Will a Republican win the 2024 presidential election?",
+          "status": "open",
+          "explanation": "Correlated outcome - Republican win includes Trump"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_matches": 5,
+    "exact_matches": 1,
+    "related_matches": 4,
+    "platforms": ["KALSHI"]
+  }
+}
+```
+
+## Batch Matching
+
+For efficiency, query multiple markets at once:
+
+```python
+response = requests.get(
+    f"{BASE_URL}/v1/matching-markets/batch",
+    params={
+        "polymarket_market_slugs": [
+            "will-trump-win-2024",
+            "will-fed-cut-rates-january",
+            "will-btc-hit-100k"
+        ]
+    }
+)
+
+data = response.json()
+
+for slug, result in data['markets'].items():
+    print(f"\n{slug}:")
+    print(f"  Matches: {result['summary']['total_matches']}")
+```
+
+## Arbitrage Detection Example
+
+```python
+def find_arbitrage_opportunities():
+    """Find markets with significant price differences across platforms."""
+
+    # Get top Polymarket markets
+    pm_response = requests.get(
+        f"{BASE_URL}/v1/polymarket/markets",
+        params={"status": "open", "sort": "volume", "limit": 50}
+    )
+
+    opportunities = []
+
+    for market in pm_response.json()["markets"]:
+        # Find Kalshi matches
+        match_response = requests.get(
+            f"{BASE_URL}/v1/matching-markets",
+            params={"polymarket_market_slug": market["market_slug"]}
+        )
+
+        matches = match_response.json()
+
+        if matches["summary"]["exact_matches"] > 0:
+            pm_price = market["outcomes"][0]["price"]  # Yes price
+
+            # Compare with Kalshi prices (would need Kalshi price API)
+            for kalshi_match in matches["matches"]["KALSHI"]["exact"]:
+                # Calculate price difference
+                # Note: You'd need to fetch Kalshi prices separately
+                opportunities.append({
+                    "polymarket_slug": market["market_slug"],
+                    "polymarket_price": pm_price,
+                    "kalshi_ticker": kalshi_match["market_ticker"],
+                    "title": market["title"]
+                })
+
+    return opportunities
+```
+
+## Use Cases
+
+### Portfolio Hedging
+
+```python
+def find_hedging_options(polymarket_slug: str):
+    """Find related markets that could hedge a position."""
+
+    response = requests.get(
+        f"{BASE_URL}/v1/matching-markets",
+        params={"polymarket_market_slug": polymarket_slug}
+    )
+
+    matches = response.json()
+
+    # Related matches might offer hedging opportunities
+    hedges = []
+    for match in matches["matches"]["KALSHI"]["related"]:
+        hedges.append({
+            "ticker": match["market_ticker"],
+            "title": match["title"],
+            "explanation": match.get("explanation", "")
+        })
+
+    return hedges
+```
+
+### Market Coverage Analysis
+
+```python
+def analyze_market_coverage(category: str):
+    """Analyze which markets exist on both platforms."""
+
+    # Get Polymarket markets in category
+    pm_response = requests.get(
+        f"{BASE_URL}/v1/polymarket/markets",
+        params={"status": "open", "tags": [category], "limit": 100}
+    )
+
+    coverage = {
+        "polymarket_only": 0,
+        "both_platforms": 0,
+        "markets": []
+    }
+
+    for market in pm_response.json()["markets"]:
+        match_response = requests.get(
+            f"{BASE_URL}/v1/matching-markets",
+            params={"polymarket_market_slug": market["market_slug"]}
+        )
+
+        if match_response.json()["summary"]["exact_matches"] > 0:
+            coverage["both_platforms"] += 1
+        else:
+            coverage["polymarket_only"] += 1
+
+    return coverage
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use batch endpoints for multiple lookups">
+    Instead of making individual requests for each market, use the batch endpoint to reduce latency and API calls.
+  </Accordion>
+  <Accordion title="Cache match results">
+    Market matches don't change frequently. Cache results for at least 1 hour to reduce API usage.
+  </Accordion>
+  <Accordion title="Handle missing matches gracefully">
+    Not all markets have cross-platform equivalents. Your code should handle empty match results.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Matching API" icon="link" href="/api-reference/matching/find-matches">
+    Full API reference
+  </Card>
+  <Card title="Batch Matching" icon="layer-group" href="/api-reference/matching/batch-matches">
+    Query multiple markets at once
+  </Card>
+</CardGroup>

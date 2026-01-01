@@ -1,0 +1,100 @@
+---
+title: "Market Price"
+api: "GET /v1/polymarket/market-price/{token_id}"
+description: "Get the current or historical price for a specific token"
+---
+
+## Overview
+
+Fetch the current or historical market price for a specific token. The price is calculated using a weighted average of recent trades when prices are stable, or the last trade price when volatile.
+
+<ParamField path="token_id" type="string" required>
+  The token ID to get the price for
+</ParamField>
+
+<ParamField query="at_time" type="integer">
+  Unix timestamp (seconds) for historical price lookup. Defaults to current time.
+</ParamField>
+
+<ResponseField name="price" type="number">
+  The market price (0-1 range)
+</ResponseField>
+
+<ResponseField name="at_time" type="integer">
+  Unix timestamp when this price was recorded
+</ResponseField>
+
+## Price Calculation
+
+The API uses a smart pricing algorithm:
+
+1. Fetches the last 5 trades across both YES and NO tokens
+2. Normalizes NO prices as (1 - price) for consistency
+3. If all prices are within $0.10 of each other:
+   - Returns a USD-weighted average
+4. Otherwise:
+   - Returns the most recent trade price
+
+This approach provides stability during normal trading while still reflecting rapid price movements.
+
+<RequestExample>
+```bash cURL
+# Current price
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/market-price/21742633143463906290569050155826241533067272736897614950488156847949938836455"
+
+# Historical price
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/market-price/21742633143463906290569050155826241533067272736897614950488156847949938836455?at_time=1704067200"
+```
+
+```python Python
+import requests
+
+# Current price
+response = requests.get(
+    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/market-price/{token_id}"
+)
+price = response.json()["price"]
+
+# Historical price
+response = requests.get(
+    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/market-price/{token_id}",
+    params={"at_time": 1704067200}
+)
+historical_price = response.json()["price"]
+```
+
+```typescript TypeScript
+// Current price
+const response = await fetch(
+  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/market-price/${tokenId}`
+);
+const { price } = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "price": 0.6234,
+  "at_time": 1704153600
+}
+```
+
+```json 404
+{
+  "error": "Not found",
+  "message": "Market with token_id 12345... not found"
+}
+```
+</ResponseExample>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Portfolio Valuation" icon="calculator">
+    Calculate current value of positions by multiplying shares by price
+  </Card>
+  <Card title="Historical Analysis" icon="clock">
+    Track price at specific points in time for backtesting
+  </Card>
+</CardGroup>

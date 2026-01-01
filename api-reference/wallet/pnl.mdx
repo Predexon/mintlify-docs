@@ -1,0 +1,161 @@
+---
+title: "Wallet P&L"
+api: "GET /v1/polymarket/wallet/pnl/{wallet_address}"
+description: "Get realized P&L time series for a wallet"
+---
+
+## Overview
+
+Fetch realized profit and loss over time for a wallet address. Returns cumulative P&L at each time period based on actual closed trades and redemptions.
+
+<Note>
+This endpoint returns **realized P&L only** - from confirmed sells and redeems. For unrealized P&L, use the [Positions endpoint](/api-reference/wallet/positions).
+</Note>
+
+<ParamField path="wallet_address" type="string" required>
+  Wallet address to fetch P&L for
+</ParamField>
+
+<ParamField query="granularity" type="string" required>
+  Time granularity: `day`, `week`, `month`, `year`, or `all`
+</ParamField>
+
+<ParamField query="start_time" type="integer">
+  Unix timestamp (seconds) for start of range
+</ParamField>
+
+<ParamField query="end_time" type="integer">
+  Unix timestamp (seconds) for end of range
+</ParamField>
+
+<ParamField query="token_id" type="string">
+  Optional token ID to filter P&L for a single position
+</ParamField>
+
+<ResponseField name="wallet_address" type="string">
+  The queried wallet address
+</ResponseField>
+
+<ResponseField name="granularity" type="string">
+  The time granularity used
+</ResponseField>
+
+<ResponseField name="start_time" type="integer">
+  Start of returned data range
+</ResponseField>
+
+<ResponseField name="end_time" type="integer">
+  End of returned data range
+</ResponseField>
+
+<ResponseField name="pnl_over_time" type="array">
+  <Expandable title="P&L data point">
+    <ResponseField name="timestamp" type="integer">
+      Unix timestamp for this data point
+    </ResponseField>
+    <ResponseField name="pnl_to_date" type="number">
+      Cumulative realized P&L up to this point in USD
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/wallet/pnl/0x1234...?granularity=day"
+```
+
+```python Python
+import requests
+from datetime import datetime
+
+wallet = "0x1234567890abcdef..."
+
+response = requests.get(
+    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/wallet/pnl/{wallet}",
+    params={
+        "granularity": "week",
+        "start_time": 1704067200,  # Jan 1, 2024
+        "end_time": 1735689600     # Dec 31, 2024
+    }
+)
+
+pnl_data = response.json()["pnl_over_time"]
+
+print("Weekly P&L:")
+for point in pnl_data:
+    date = datetime.fromtimestamp(point["timestamp"]).strftime("%Y-%m-%d")
+    pnl = point["pnl_to_date"]
+    emoji = "📈" if pnl >= 0 else "📉"
+    print(f"  {date}: {emoji} ${pnl:,.2f}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/wallet/pnl/${walletAddress}?granularity=month`
+);
+const { pnl_over_time } = await response.json();
+
+// Chart the P&L
+pnl_over_time.forEach(point => {
+  console.log(`${new Date(point.timestamp * 1000).toLocaleDateString()}: $${point.pnl_to_date.toFixed(2)}`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "wallet_address": "0x1234567890abcdef...",
+  "granularity": "week",
+  "start_time": 1704067200,
+  "end_time": 1735689600,
+  "pnl_over_time": [
+    {
+      "timestamp": 1704067200,
+      "pnl_to_date": 0.0
+    },
+    {
+      "timestamp": 1704672000,
+      "pnl_to_date": 250.50
+    },
+    {
+      "timestamp": 1705276800,
+      "pnl_to_date": 180.25
+    },
+    {
+      "timestamp": 1705881600,
+      "pnl_to_date": 425.75
+    }
+  ]
+}
+```
+
+```json 400
+{
+  "error": "Invalid time range",
+  "message": "start_time must be before end_time"
+}
+```
+</ResponseExample>
+
+## Granularity Options
+
+| Granularity | Data Points | Best For |
+|-------------|-------------|----------|
+| `day` | One per day | Short-term tracking |
+| `week` | One per week | Medium-term analysis |
+| `month` | One per month | Quarterly reviews |
+| `year` | One per year | Multi-year analysis |
+| `all` | Single value | Lifetime P&L |
+
+## Understanding Realized P&L
+
+Realized P&L is confirmed profit or loss from:
+
+1. **Selling shares** - Difference between sell price and average entry price
+2. **Redeeming winners** - $1.00 per share minus cost basis
+3. **Losing positions** - $0.00 per share (full loss of cost basis)
+
+<Note>
+The P&L values are cumulative. Each data point shows total realized P&L **up to** that point in time.
+</Note>

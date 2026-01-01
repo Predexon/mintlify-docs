@@ -1,0 +1,112 @@
+---
+title: "Authentication"
+description: "How to authenticate with the Predexon API"
+---
+
+## Current Access
+
+The Predexon API is currently in **public beta** and does not require authentication for most endpoints. You can start making requests immediately.
+
+```bash
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets?limit=10"
+```
+
+## Rate Limiting
+
+Without authentication, requests are rate-limited based on IP address:
+
+- **60 requests per minute**
+- **10,000 requests per day**
+
+<Warning>
+Exceeding rate limits will result in `429 Too Many Requests` responses. Implement exponential backoff in your applications.
+</Warning>
+
+## API Keys (Coming Soon)
+
+API key authentication will be available soon for:
+
+- Higher rate limits
+- Usage analytics
+- Priority support
+- Access to premium endpoints
+
+<Card
+  title="Join the Waitlist"
+  icon="key"
+  href="https://predexon.com/waitlist"
+>
+  Sign up to be notified when API keys are available.
+</Card>
+
+## Best Practices
+
+### Caching
+
+Many endpoints return data that doesn't change frequently. Implement caching to reduce API calls:
+
+```python
+import requests
+from functools import lru_cache
+from datetime import datetime, timedelta
+
+@lru_cache(maxsize=100)
+def get_market(condition_id: str) -> dict:
+    """Cache market metadata for 5 minutes."""
+    response = requests.get(
+        f"{BASE_URL}/v1/polymarket/markets",
+        params={"condition_id": condition_id}
+    )
+    return response.json()
+```
+
+### Retry Logic
+
+Implement retries with exponential backoff for transient errors:
+
+```python
+import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+session = requests.Session()
+retries = Retry(
+    total=3,
+    backoff_factor=0.5,
+    status_forcelist=[500, 502, 503, 504]
+)
+session.mount("https://", HTTPAdapter(max_retries=retries))
+```
+
+### Connection Pooling
+
+Reuse connections for better performance:
+
+```python
+# Create a session once
+session = requests.Session()
+
+# Use it for all requests
+response = session.get(f"{BASE_URL}/v1/polymarket/markets")
+```
+
+## CORS
+
+The API supports CORS for browser-based applications. All origins are currently allowed during the beta period.
+
+```javascript
+// This works from any domain
+fetch("https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets")
+  .then(res => res.json())
+  .then(data => console.log(data));
+```
+
+## Health Check
+
+Use the health endpoint to verify API availability:
+
+```bash
+curl "https://predexon-data-service-8970529761.us-central1.run.app/health"
+# Returns: {"status": "healthy"}
+```

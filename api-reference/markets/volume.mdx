@@ -1,0 +1,128 @@
+---
+title: "Volume Time Series"
+api: "GET /v1/polymarket/markets/{token_id}/volume"
+description: "Get historical cumulative volume data for a market"
+---
+
+## Overview
+
+Fetch historical time series of cumulative trading volume for a specific token. Useful for analyzing market activity trends over time.
+
+<ParamField path="token_id" type="string" required>
+  The token ID for the market
+</ParamField>
+
+<ParamField query="granularity" type="string" default="day">
+  Time granularity: `day`, `week`, `month`, `year`, or `all`
+</ParamField>
+
+<ParamField query="start_time" type="integer">
+  Unix timestamp (seconds) for start of range
+</ParamField>
+
+<ParamField query="end_time" type="integer">
+  Unix timestamp (seconds) for end of range
+</ParamField>
+
+<ResponseField name="token_id" type="string">
+  The requested token ID
+</ResponseField>
+
+<ResponseField name="granularity" type="string">
+  The time granularity used
+</ResponseField>
+
+<ResponseField name="start_time" type="integer">
+  Actual start time of returned data
+</ResponseField>
+
+<ResponseField name="end_time" type="integer">
+  Actual end time of returned data
+</ResponseField>
+
+<ResponseField name="volume_over_time" type="array">
+  <Expandable title="Volume data point">
+    <ResponseField name="timestamp" type="integer">
+      Unix timestamp for this data point
+    </ResponseField>
+    <ResponseField name="volume" type="number">
+      Cumulative volume up to this point in USD
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/21742633.../volume?granularity=day"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    f"https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/{token_id}/volume",
+    params={
+        "granularity": "day",
+        "start_time": 1704067200,
+        "end_time": 1706745600
+    }
+)
+volume_data = response.json()["volume_over_time"]
+
+for point in volume_data:
+    print(f"{point['timestamp']}: ${point['volume']:,.2f}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  `https://predexon-data-service-8970529761.us-central1.run.app/v1/polymarket/markets/${tokenId}/volume?granularity=day`
+);
+const { volume_over_time } = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+  "granularity": "day",
+  "start_time": 1704067200,
+  "end_time": 1706745600,
+  "volume_over_time": [
+    {
+      "timestamp": 1704067200,
+      "volume": 1250000.00
+    },
+    {
+      "timestamp": 1704153600,
+      "volume": 1450000.00
+    },
+    {
+      "timestamp": 1704240000,
+      "volume": 1680000.00
+    },
+    {
+      "timestamp": 1704326400,
+      "volume": 1920000.00
+    }
+  ]
+}
+```
+
+```json 400
+{
+  "error": "Bad Request",
+  "message": "start_time must be before end_time"
+}
+```
+</ResponseExample>
+
+## Granularity Options
+
+| Granularity | Description | Use Case |
+|-------------|-------------|----------|
+| `day` | Daily data points | Short-term analysis |
+| `week` | Weekly aggregation | Medium-term trends |
+| `month` | Monthly aggregation | Long-term analysis |
+| `year` | Yearly aggregation | Multi-year comparison |
+| `all` | Single lifetime value | Total market volume |

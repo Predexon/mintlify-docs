@@ -1,0 +1,172 @@
+---
+title: "Find Matching Markets"
+api: "GET /v1/matching-markets"
+description: "Find equivalent markets across Polymarket and Kalshi"
+---
+
+## Overview
+
+Find matching markets across prediction market platforms. Given a Polymarket market slug OR a Kalshi market ticker, discover equivalent or related markets on the other platform.
+
+<ParamField query="polymarket_market_slug" type="string">
+  Polymarket market slug to find matches for
+</ParamField>
+
+<ParamField query="kalshi_market_ticker" type="string">
+  Kalshi market ticker to find matches for
+</ParamField>
+
+<Warning>
+Provide **exactly one** of `polymarket_market_slug` or `kalshi_market_ticker`, not both.
+</Warning>
+
+<ResponseField name="query" type="object">
+  Information about the queried market
+  <Expandable>
+    <ResponseField name="platform" type="string">`POLYMARKET` or `KALSHI`</ResponseField>
+    <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
+    <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
+    <ResponseField name="title" type="string">Market title</ResponseField>
+    <ResponseField name="status" type="string">Market status</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="matches" type="object">
+  Matches grouped by platform
+  <Expandable title="Platform matches">
+    <ResponseField name="exact" type="array">
+      Markets representing the same underlying event
+      <Expandable>
+        <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
+        <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
+        <ResponseField name="title" type="string">Market title</ResponseField>
+        <ResponseField name="status" type="string">Market status</ResponseField>
+        <ResponseField name="explanation" type="string">Why this is a match</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="related" type="array">
+      Markets for correlated or similar events
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="summary" type="object">
+  <Expandable>
+    <ResponseField name="total_matches" type="integer">Total number of matches found</ResponseField>
+    <ResponseField name="exact_matches" type="integer">Number of exact matches</ResponseField>
+    <ResponseField name="related_matches" type="integer">Number of related matches</ResponseField>
+    <ResponseField name="platforms" type="array">List of platforms with matches</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+# From Polymarket to Kalshi
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets?polymarket_market_slug=will-trump-win-2024"
+
+# From Kalshi to Polymarket
+curl "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets?kalshi_market_ticker=PRES-2024-DJT"
+```
+
+```python Python
+import requests
+
+# Find Kalshi equivalents for a Polymarket market
+response = requests.get(
+    "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets",
+    params={"polymarket_market_slug": "will-trump-win-2024"}
+)
+
+data = response.json()
+print(f"Found {data['summary']['total_matches']} matches")
+print(f"  Exact: {data['summary']['exact_matches']}")
+print(f"  Related: {data['summary']['related_matches']}")
+
+for match in data["matches"]["KALSHI"]["exact"]:
+    print(f"\nExact match: {match['title']}")
+    print(f"  Ticker: {match['market_ticker']}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  "https://predexon-data-service-8970529761.us-central1.run.app/v1/matching-markets?polymarket_market_slug=will-trump-win-2024"
+);
+const { matches, summary } = await response.json();
+
+console.log(`Found ${summary.total_matches} matches`);
+matches.KALSHI.exact.forEach(match => {
+  console.log(`Exact: ${match.title} (${match.market_ticker})`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "query": {
+    "platform": "POLYMARKET",
+    "market_slug": "will-trump-win-2024",
+    "title": "Will Donald Trump win the 2024 Presidential Election?",
+    "status": "open"
+  },
+  "matches": {
+    "KALSHI": {
+      "exact": [
+        {
+          "market_ticker": "PRES-2024-DJT",
+          "title": "Will Trump win the 2024 presidential election?",
+          "yes_subtitle": "Donald Trump wins",
+          "status": "open",
+          "explanation": "Same underlying event with identical resolution criteria"
+        }
+      ],
+      "related": [
+        {
+          "market_ticker": "PRES-2024-REP",
+          "title": "Will a Republican win the 2024 presidential election?",
+          "status": "open",
+          "explanation": "Correlated outcome - Republican win includes Trump"
+        },
+        {
+          "market_ticker": "EC-2024-DJT-270",
+          "title": "Will Trump get 270+ electoral votes?",
+          "status": "open",
+          "explanation": "Related metric for same event"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_matches": 3,
+    "exact_matches": 1,
+    "related_matches": 2,
+    "platforms": ["KALSHI"]
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid parameter combination",
+  "message": "Cannot provide both polymarket_market_slug and kalshi_market_ticker"
+}
+```
+
+```json 404
+{
+  "error": "Market not found",
+  "message": "No Polymarket market found with slug: nonexistent-market"
+}
+```
+</ResponseExample>
+
+## Match Types
+
+<CardGroup cols={2}>
+  <Card title="Exact Matches" icon="bullseye">
+    Same underlying event with equivalent resolution criteria. Ideal for arbitrage.
+  </Card>
+  <Card title="Related Matches" icon="link">
+    Similar or correlated events. Useful for hedging and research.
+  </Card>
+</CardGroup>
