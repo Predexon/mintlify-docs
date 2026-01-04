@@ -75,7 +75,7 @@
         ]
       },
       {
-        "tab": "Trades",
+        "tab": "WebSocket",
         "groups": [
           {
             "group": "Getting Started",
@@ -102,7 +102,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@predexon.com"
+        "href": "mailto:team@predexon.com"
       }
     ],
     "primary": {

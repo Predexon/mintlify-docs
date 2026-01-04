@@ -5,8 +5,8 @@
     "description": "Prediction market data aggregation and matching API. Access Polymarket data and find cross-platform market matches with Kalshi.",
     "version": "1.0.0",
     "contact": {
-      "name": "Predexon Support",
-      "email": "support@predexon.com"
+      "name": "Predexon Team",
+      "email": "team@predexon.com"
     }
   },
   "servers": [
