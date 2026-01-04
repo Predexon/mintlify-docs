@@ -146,9 +146,9 @@ The complete OpenAPI 3.0 specification is available for generating client SDKs:
 
 ## Rate Limits
 
-| Tier | Requests/minute | Requests/day |
-|------|-----------------|--------------|
-| Free | 60 | 10,000 |
-| Pro | 300 | 100,000 |
+| Tier | Rate | Quota |
+|------|------|-------|
+| Free | 1 req/sec | 100k/month |
+| Pro | 20 req/sec (40 burst) | Unlimited |
 
 Implement exponential backoff when you receive 429 responses.

@@ -38,7 +38,7 @@ BASE_URL = "https://api.predexon.com"
 
 response = requests.get(
     f"{BASE_URL}/v1/matching-markets",
-    params={"polymarket_market_slug": "will-trump-win-2024"}
+    params={"polymarket_market_slug": "will-donald-trump-win-the-2024-us-presidential-election"}
 )
 
 data = response.json()
@@ -75,7 +75,7 @@ for match in data['matches']['POLYMARKET']['exact']:
 {
   "query": {
     "platform": "POLYMARKET",
-    "market_slug": "will-trump-win-2024",
+    "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
     "title": "Will Donald Trump win the 2024 Presidential Election?",
     "status": "open"
   },
@@ -118,7 +118,7 @@ response = requests.get(
     f"{BASE_URL}/v1/matching-markets/batch",
     params={
         "polymarket_market_slugs": [
-            "will-trump-win-2024",
+            "will-donald-trump-win-the-2024-us-presidential-election",
             "will-fed-cut-rates-january",
             "will-btc-hit-100k"
         ]
@@ -247,11 +247,6 @@ def analyze_market_coverage(category: str):
 
 ## Next Steps
 
-<CardGroup cols={2}>
-  <Card title="Matching API" icon="link" href="/api-reference/matching/find-matches">
-    Full API reference
-  </Card>
-  <Card title="Batch Matching" icon="layer-group" href="/api-reference/matching/batch-matches">
-    Query multiple markets at once
-  </Card>
-</CardGroup>
+<Card title="Matching API" icon="link" href="/api-reference/matching/find-matches">
+  Full API reference
+</Card>

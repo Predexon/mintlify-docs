@@ -67,7 +67,7 @@ The Predexon API provides RESTful endpoints for accessing prediction market data
       "markets": [
         {
           "condition_id": "0x1234...",
-          "market_slug": "will-trump-win-2024",
+          "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
           "title": "Will Trump win the 2024 election?",
           "status": "open",
           "outcomes": [
@@ -124,18 +124,16 @@ Discover equivalent markets on Kalshi:
 ```python
 response = requests.get(
     f"{BASE_URL}/v1/matching-markets",
-    params={"polymarket_market_slug": "will-trump-win-2024"}
+    params={"polymarket_market_slug": "will-donald-trump-win-the-2024-us-presidential-election"}
 )
 ```
 
 ## Rate Limits
 
-The API currently has generous rate limits suitable for most use cases:
-
-| Tier | Requests/minute | Requests/day |
-|------|-----------------|--------------|
-| Free | 60 | 10,000 |
-| Pro | 300 | 100,000 |
+| Tier | Rate | Quota |
+|------|------|-------|
+| Free | 1 req/sec | 100k/month |
+| Pro | 20 req/sec (40 burst) | Unlimited |
 
 ## Error Handling
 

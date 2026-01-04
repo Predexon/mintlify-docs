@@ -73,7 +73,7 @@ Only one of `market_slug`, `condition_id`, or `token_id` can be provided.
 <RequestExample>
 ```bash cURL
 # Orders for a specific market
-curl "https://api.predexon.com/v1/polymarket/orders?market_slug=will-trump-win-2024&limit=50"
+curl "https://api.predexon.com/v1/polymarket/orders?market_slug=will-donald-trump-win-the-2024-us-presidential-election&limit=50"
 
 # Orders for a specific user
 curl "https://api.predexon.com/v1/polymarket/orders?user=0x1234...&limit=100"
@@ -86,7 +86,7 @@ import requests
 response = requests.get(
     "https://api.predexon.com/v1/polymarket/orders",
     params={
-        "market_slug": "will-trump-win-2024",
+        "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
         "order": "desc",
         "limit": 50
     }
@@ -112,7 +112,7 @@ const { orders } = await response.json();
     {
       "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
       "side": "BUY",
-      "market_slug": "will-trump-win-2024",
+      "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
       "condition_id": "0x1a2b3c4d...",
       "shares": 500.0,
       "shares_normalized": 500.0,

@@ -4,23 +4,26 @@ description: "How to authenticate with the Predexon API"
 ---
 
 <Info>
-**Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com) to unlock 5x higher rate limits and premium features.
+**Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com) to unlock 20x higher rate limits and premium features.
 </Info>
 
-## Current Access
+## Getting Started
 
-The Predexon API is currently in **public beta** and does not require authentication for most endpoints. You can start making requests immediately.
+The Predexon API requires an API key for all requests. **Signing up is free** at [dashboard.predexon.com](https://dashboard.predexon.com).
 
 ```bash
-curl "https://api.predexon.com/v1/polymarket/markets?limit=10"
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  "https://api.predexon.com/v1/polymarket/markets?limit=10"
 ```
 
-## Rate Limiting
+## Rate Limits
 
-Without authentication, requests are rate-limited based on IP address:
+| Tier | Rate | Quota | Price |
+|------|------|-------|-------|
+| Free | 1 req/sec | 100k/month | Free |
+| Pro | 20 req/sec (40 burst) | Unlimited | Paid |
 
-- **60 requests per minute**
-- **10,000 requests per day**
+Upgrade to Pro for higher rate limits and unlimited requests.
 
 <Warning>
 Exceeding rate limits will result in `429 Too Many Requests` responses. Implement exponential backoff in your applications.
@@ -34,17 +37,30 @@ Many endpoints return data that doesn't change frequently. Implement caching to 
 
 ```python
 import requests
-from functools import lru_cache
-from datetime import datetime, timedelta
+import time
 
-@lru_cache(maxsize=100)
-def get_market(condition_id: str) -> dict:
-    """Cache market metadata for 5 minutes."""
+BASE_URL = "https://api.predexon.com"
+
+# Simple TTL cache
+cache = {}
+CACHE_TTL = 300  # 5 minutes
+
+def get_market(condition_id: str, api_key: str) -> dict:
+    """Fetch market with 5-minute cache."""
+    cache_key = f"market:{condition_id}"
+    now = time.time()
+
+    if cache_key in cache and cache[cache_key]["expires"] > now:
+        return cache[cache_key]["data"]
+
     response = requests.get(
         f"{BASE_URL}/v1/polymarket/markets",
-        params={"condition_id": condition_id}
+        params={"condition_id": condition_id},
+        headers={"Authorization": f"Bearer {api_key}"}
     )
-    return response.json()
+    data = response.json()
+    cache[cache_key] = {"data": data, "expires": now + CACHE_TTL}
+    return data
 ```
 
 ### Retry Logic
@@ -71,8 +87,12 @@ session.mount("https://", HTTPAdapter(max_retries=retries))
 Reuse connections for better performance:
 
 ```python
-# Create a session once
+BASE_URL = "https://api.predexon.com"
+API_KEY = "your_api_key"
+
+# Create a session once with auth header
 session = requests.Session()
+session.headers.update({"Authorization": f"Bearer {API_KEY}"})
 
 # Use it for all requests
 response = session.get(f"{BASE_URL}/v1/polymarket/markets")
@@ -80,11 +100,14 @@ response = session.get(f"{BASE_URL}/v1/polymarket/markets")
 
 ## CORS
 
-The API supports CORS for browser-based applications. All origins are currently allowed during the beta period.
+The API supports CORS for browser-based applications:
 
 ```javascript
-// This works from any domain
-fetch("https://api.predexon.com/v1/polymarket/markets")
+const API_KEY = "your_api_key";
+
+fetch("https://api.predexon.com/v1/polymarket/markets", {
+  headers: { "Authorization": `Bearer ${API_KEY}` }
+})
   .then(res => res.json())
   .then(data => console.log(data));
 ```

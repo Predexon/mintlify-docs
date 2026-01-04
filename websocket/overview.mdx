@@ -7,7 +7,7 @@ description: "Real-time Polymarket trade alerts via WebSocket"
 **Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com) - required for WebSocket connections.
 </Info>
 
-Get real-time trade notifications from Polymarket markets. Subscribe to specific wallets, markets, or receive all trades with a Pro plan.
+Get real-time trade notifications from Polymarket markets. Subscribe to specific wallets, markets, or receive all trades with a Pro plan using the wildcard subscription.
 
 ## Use Cases
 
@@ -83,11 +83,25 @@ Connections with no active subscriptions are closed after **120 seconds**. Subsc
 | Total items | 10 | 50,000 |
 | Wildcard (all trades) | No | Yes |
 
-### Wildcard Rules (Pro only)
+### Wildcard Subscription (Pro only)
 
+Pro users can subscribe to **all trades** across the entire platform using the wildcard subscription. This is ideal for building comprehensive datasets, real-time analytics dashboards, or monitoring market-wide activity.
+
+**Wildcard rules:**
 - Wildcard must be the **only** subscription on the connection
 - Wildcard allows only **one active connection** per API key
 - Cannot add other subscriptions while wildcard is active
+
+**Example wildcard subscription:**
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": { "wildcard": true }
+}
+```
 
 ## Error Handling
 

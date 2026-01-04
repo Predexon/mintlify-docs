@@ -16,7 +16,7 @@ Every market in Predexon has several identifiers:
 | Identifier | Description | Example |
 |------------|-------------|---------|
 | `condition_id` | Unique hash for the market condition | `0x1a2b3c...` |
-| `market_slug` | Human-readable URL-safe identifier | `will-trump-win-2024` |
+| `market_slug` | Human-readable URL-safe identifier | `will-donald-trump-win-the-2024-us-presidential-election` |
 | `market_id` | Internal numeric identifier | `12345` |
 
 ### Outcomes (Sides)
@@ -72,6 +72,10 @@ graph LR
 ### Basic Filtering
 
 ```python
+import requests
+
+BASE_URL = "https://api.predexon.com"
+
 # Get open markets only
 response = requests.get(
     f"{BASE_URL}/v1/polymarket/markets",
