@@ -101,6 +101,10 @@
   "navbar": {
     "links": [
       {
+        "label": "Discord",
+        "href": "https://discord.com/invite/SZY52ufQB5"
+      },
+      {
         "label": "Support",
         "href": "mailto:team@predexon.com"
       }
