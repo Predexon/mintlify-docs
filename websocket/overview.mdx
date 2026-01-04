@@ -138,6 +138,20 @@ Subscribe to **all** trades:
 }
 ```
 
+**Subscribe to a market by condition ID:**
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": {
+    "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
+  }
+}
+```
+
 ---
 
 ## Unsubscribe
