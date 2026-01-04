@@ -3,9 +3,9 @@
   "theme": "maple",
   "name": "Predexon API",
   "colors": {
-    "primary": "#3EE6E6",
-    "light": "#8A5CF6",
-    "dark": "#0B0F1A"
+    "primary": "#0891B2",
+    "light": "#7C3AED",
+    "dark": "#3EE6E6"
   },
   "favicon": "/public/predexon-logo.png",
   "navigation": {
