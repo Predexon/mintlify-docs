@@ -12,8 +12,8 @@
 
   <defs>
     <linearGradient id="logo-gradient" x1="2" y1="4" x2="22" y2="24" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#6366F1"/>
-      <stop offset="1" stop-color="#4F46E5"/>
+      <stop stop-color="#3EE6E6"/>
+      <stop offset="1" stop-color="#8A5CF6"/>
     </linearGradient>
   </defs>
 </svg>

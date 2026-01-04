@@ -3,11 +3,14 @@
   "theme": "maple",
   "name": "Predexon API",
   "colors": {
-    "primary": "#6366F1",
-    "light": "#818CF8",
-    "dark": "#4F46E5"
+    "primary": "#3EE6E6",
+    "light": "#8A5CF6",
+    "dark": "#0B0F1A",
+    "background": {
+      "dark": "#0B0F1A"
+    }
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/public/predexon-logo.png",
   "navigation": {
     "tabs": [
       {
@@ -108,7 +111,7 @@
     "primary": {
       "type": "button",
       "label": "Get API Key",
-      "href": "https://predexon.com/dashboard"
+      "href": "https://dashboard.predexon.com"
     }
   },
   "api": {
@@ -123,5 +126,9 @@
   },
   "seo": {
     "indexHiddenPages": false
+  },
+  "metadata": {
+    "og:image": "/public/predexon-logo.png",
+    "twitter:image": "/public/predexon-logo.png"
   }
 }
