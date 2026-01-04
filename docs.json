@@ -80,7 +80,7 @@
           {
             "group": "WebSocket",
             "pages": [
-              "websocket/coming-soon"
+              "websocket/overview"
             ]
           }
         ]
