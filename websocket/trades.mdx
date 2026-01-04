@@ -1,0 +1,109 @@
+---
+title: "Trade Alerts"
+description: "Real-time trade message format and fields"
+---
+
+## Message Format
+
+When a trade matches your subscription, you receive a message with `type: "trade"`:
+
+```json
+{
+  "type": "trade",
+  "subscription_id": "sub_a1b2c3d4",
+  "data": {
+    "platform": "polymarket",
+    "asset_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+    "market_slug": "will-trump-win-2024",
+    "condition_id": "0x123...",
+    "shares": 100.5,
+    "shares_normalized": 100.5,
+    "price": 0.65,
+    "tx_hash": "0xabc...",
+    "title": "Will Trump win the 2024 election?",
+    "timestamp": 1704067200,
+    "order_hash": "0xdef...",
+    "user": "0x1234...",
+    "taker": "0x5678...",
+    "outcome": "Yes",
+    "source": "alchemy"
+  }
+}
+```
+
+## Field Reference
+
+### Identifiers
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `subscription_id` | string | Which subscription matched this trade |
+| `asset_id` | string | Token ID for the outcome |
+| `condition_id` | string | Market condition ID |
+| `market_slug` | string | URL-friendly market identifier |
+| `order_hash` | string | Unique order identifier |
+| `tx_hash` | string | Ethereum transaction hash |
+
+### Trade Details
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `shares` | number | Number of shares traded |
+| `shares_normalized` | number | Shares normalized for display |
+| `price` | number | Price per share (0.00 - 1.00) |
+| `outcome` | string | Outcome label (e.g., "Yes", "No") |
+| `timestamp` | number | Unix timestamp in seconds |
+
+### Participants
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | string | Maker address (order placer) |
+| `taker` | string | Taker address (order filler) |
+
+### Metadata
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `platform` | string | Always `"polymarket"` |
+| `title` | string | Market question/title |
+| `source` | string | Data source identifier |
+
+## Example: Processing Trades
+
+```javascript
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+
+  if (msg.type === 'trade') {
+    const trade = msg.data;
+    const value = trade.shares * trade.price;
+
+    console.log(`${trade.outcome} ${trade.shares} @ ${trade.price}`);
+    console.log(`Market: ${trade.title}`);
+    console.log(`Value: $${value.toFixed(2)}`);
+    console.log(`Maker: ${trade.user}`);
+    console.log(`Taker: ${trade.taker}`);
+  }
+};
+```
+
+## Filtering by Subscription
+
+If you have multiple subscriptions, use `subscription_id` to determine which filter matched:
+
+```javascript
+const subscriptions = {
+  'sub_abc123': 'whale-tracker',
+  'sub_def456': 'btc-markets'
+};
+
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+
+  if (msg.type === 'trade') {
+    const source = subscriptions[msg.subscription_id];
+    console.log(`[${source}]`, msg.data.title, msg.data.price);
+  }
+};
+```

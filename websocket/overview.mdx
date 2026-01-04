@@ -1,7 +1,32 @@
 ---
-title: "WebSocket API"
+title: "Overview"
 description: "Real-time Polymarket trade alerts via WebSocket"
 ---
+
+Get real-time trade notifications from Polymarket markets. Subscribe to specific wallets, markets, or receive all trades with a Pro plan.
+
+## Quick Start
+
+```javascript
+const ws = new WebSocket('wss://wss.predexon.com/v1/your_api_key');
+
+ws.onopen = () => {
+  ws.send(JSON.stringify({
+    action: 'subscribe',
+    platform: 'polymarket',
+    version: 1,
+    type: 'orders',
+    filters: { users: ['0x1234...'] }
+  }));
+};
+
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+  if (msg.type === 'trade') {
+    console.log('Trade:', msg.data);
+  }
+};
+```
 
 ## Connection
 
@@ -11,13 +36,7 @@ description: "Real-time Polymarket trade alerts via WebSocket"
 wss://wss.predexon.com/v1/<API_KEY>
 ```
 
-### Authentication
-
 Include your API key in the URL path. The server validates the key and returns your plan tier.
-
-```javascript
-const ws = new WebSocket('wss://wss.predexon.com/v1/your_api_key_here');
-```
 
 ### Connection Response
 
@@ -30,7 +49,9 @@ On successful connection:
 }
 ```
 
----
+### Idle Timeout
+
+Connections with no active subscriptions are closed after **120 seconds**. Subscribe to at least one filter to keep the connection alive.
 
 ## Plans & Limits
 
@@ -39,222 +60,17 @@ On successful connection:
 | Subscriptions | 2 | 100 |
 | Items per subscription | 5 | 500 |
 | Total items | 10 | 50,000 |
-| Wildcard | No | Yes |
+| Wildcard (all trades) | No | Yes |
 
 ### Wildcard Rules (Pro only)
 
-- Wildcard subscription must be the **only** subscription on the connection
+- Wildcard must be the **only** subscription on the connection
 - Wildcard allows only **one active connection** per API key
 - Cannot add other subscriptions while wildcard is active
 
-### Idle Connection Cleanup
+## Error Handling
 
-- Connections with 0 subscriptions are closed after **120 seconds**
-- Subscribe to at least one filter to keep the connection alive
-
----
-
-## Subscribe
-
-Create a subscription to receive trade alerts matching your filters.
-
-### Request
-
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "<filter_type>": ["<value1>", "<value2>", ...]
-  }
-}
-```
-
-### Filter Types
-
-| Filter | Description | Example |
-|--------|-------------|---------|
-| `users` | Wallet addresses (maker/order placer) | `["0x123...", "0xabc..."]` |
-| `condition_ids` | Market condition IDs | `["0x456...", "0x789..."]` |
-| `market_slugs` | Market URL slugs | `["will-trump-win-2024", "btc-above-100k"]` |
-
-### Wildcard Subscription (Pro only)
-
-Subscribe to **all** trades:
-
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "users": ["*"]
-  }
-}
-```
-
-### Success Response
-
-```json
-{
-  "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
-}
-```
-
-### Examples
-
-**Subscribe to specific wallets:**
-
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "users": [
-      "0x1234567890abcdef1234567890abcdef12345678",
-      "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
-    ]
-  }
-}
-```
-
-**Subscribe to a market by slug:**
-
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "market_slugs": ["btc-updown-15m-1767481200"]
-  }
-}
-```
-
-**Subscribe to a market by condition ID:**
-
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
-  }
-}
-```
-
----
-
-## Unsubscribe
-
-Remove an existing subscription.
-
-### Request
-
-```json
-{
-  "action": "unsubscribe",
-  "subscription_id": "sub_a1b2c3d4"
-}
-```
-
-### Success Response
-
-```json
-{
-  "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
-}
-```
-
----
-
-## Update Subscription
-
-Modify filters on an existing subscription.
-
-### Request
-
-```json
-{
-  "action": "update",
-  "subscription_id": "sub_a1b2c3d4",
-  "filters": {
-    "users": ["0xnewwallet..."]
-  }
-}
-```
-
-### Success Response
-
-```json
-{
-  "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
-}
-```
-
----
-
-## Trade Alert
-
-When a trade matches your subscription, you receive:
-
-```json
-{
-  "type": "trade",
-  "subscription_id": "sub_a1b2c3d4",
-  "data": {
-    "platform": "polymarket",
-    "asset_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
-    "market_slug": "will-trump-win-2024",
-    "condition_id": "0x123...",
-    "shares": 100.5,
-    "shares_normalized": 100.5,
-    "price": 0.65,
-    "tx_hash": "0xabc...",
-    "title": "Will Trump win the 2024 election?",
-    "timestamp": 1704067200,
-    "order_hash": "0xdef...",
-    "user": "0x1234...",
-    "taker": "0x5678...",
-    "outcome": "Yes",
-    "source": "alchemy"
-  }
-}
-```
-
-### Field Descriptions
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `platform` | string | Always `"polymarket"` |
-| `asset_id` | string | Token ID for the outcome |
-| `market_slug` | string | URL-friendly market identifier |
-| `condition_id` | string | Market condition ID |
-| `shares` | number | Number of shares traded |
-| `price` | number | Price per share (0.00 - 1.00) |
-| `tx_hash` | string | Ethereum transaction hash |
-| `title` | string | Market question/title |
-| `timestamp` | number | Unix timestamp (seconds) |
-| `order_hash` | string | Unique order identifier |
-| `user` | string | Maker address (order placer) |
-| `taker` | string | Taker address (order filler) |
-| `outcome` | string | Outcome label (e.g., "Yes", "No") |
-| `source` | string | Data source identifier |
-
----
-
-## Error Responses
+All errors follow this format:
 
 ```json
 {
@@ -268,19 +84,17 @@ When a trade matches your subscription, you receive:
 
 | Code | Description |
 |------|-------------|
+| `INVALID_API_KEY` | API key not found or invalid |
 | `INVALID_FILTERS` | Missing or malformed filters |
-| `SUBSCRIPTION_LIMIT` | Maximum subscriptions reached for plan |
-| `ITEMS_LIMIT` | Maximum total items reached for plan |
+| `SUBSCRIPTION_LIMIT` | Maximum subscriptions reached |
+| `ITEMS_LIMIT` | Maximum total items reached |
 | `ITEMS_PER_SUB_LIMIT` | Too many items in single subscription |
 | `WILDCARD_NOT_ALLOWED` | Wildcard requires Pro plan |
 | `WILDCARD_CONNECTION_LIMIT` | Wildcard allows only one connection |
 | `CONNECTION_LIMIT` | Too many connections for this API key |
-| `INVALID_API_KEY` | API key not found or invalid |
 | `SUBSCRIPTION_NOT_FOUND` | Subscription ID doesn't exist |
 
----
-
-## WebSocket Close Codes
+### Close Codes
 
 | Code | Reason |
 |------|--------|
@@ -291,79 +105,19 @@ When a trade matches your subscription, you receive:
 | `4001` | Authentication failed |
 | `4002` | Limit exceeded |
 
----
-
 ## Best Practices
 
 <CardGroup cols={2}>
-  <Card title="Reconnect on disconnect" icon="rotate">
-    Implement exponential backoff for reconnection
+  <Card title="Reconnect with backoff" icon="rotate">
+    Implement exponential backoff when reconnecting after disconnects
   </Card>
-  <Card title="Subscribe immediately" icon="clock">
-    Avoid idle timeout by subscribing within 120s
+  <Card title="Subscribe quickly" icon="clock">
+    Send your first subscription within 120s to avoid idle timeout
   </Card>
-  <Card title="Use market_slugs for UI" icon="link">
-    Easier to work with than condition_ids
+  <Card title="Batch items" icon="layer-group">
+    Combine multiple items in one subscription when possible
   </Card>
-  <Card title="Use users for whale tracking" icon="whale">
-    Subscribe to specific wallet addresses
+  <Card title="Handle errors gracefully" icon="shield">
+    Check error codes and adjust subscriptions accordingly
   </Card>
 </CardGroup>
-
----
-
-## Example: JavaScript Client
-
-```javascript
-const WebSocket = require('ws');
-
-const API_KEY = 'your_api_key_here';
-const ws = new WebSocket(`wss://wss.predexon.com/v1/${API_KEY}`);
-
-ws.on('open', () => {
-  console.log('Connected');
-
-  // Subscribe to a wallet
-  ws.send(JSON.stringify({
-    action: 'subscribe',
-    platform: 'polymarket',
-    version: 1,
-    type: 'orders',
-    filters: {
-      users: ['0x1234567890abcdef1234567890abcdef12345678']
-    }
-  }));
-});
-
-ws.on('message', (data) => {
-  const msg = JSON.parse(data);
-
-  switch (msg.type) {
-    case 'connected':
-      console.log('Authenticated:', msg.message);
-      break;
-    case 'ack':
-      console.log('Subscription confirmed:', msg.subscription_id);
-      break;
-    case 'trade':
-      console.log('Trade alert:', msg.data);
-      break;
-    case 'error':
-      console.error('Error:', msg.code, msg.message);
-      break;
-  }
-});
-
-ws.on('close', (code, reason) => {
-  console.log(`Disconnected: ${code} - ${reason}`);
-  // Implement reconnection logic here
-});
-```
-
----
-
-## Rate Limits
-
-- No rate limit on message frequency
-- Limits enforced on subscriptions and items only
-- Server may close connections sending malformed messages

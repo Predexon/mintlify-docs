@@ -75,12 +75,19 @@
         ]
       },
       {
-        "tab": "WebSocket",
+        "tab": "Trades",
         "groups": [
           {
-            "group": "WebSocket",
+            "group": "Getting Started",
             "pages": [
-              "websocket/overview"
+              "websocket/overview",
+              "websocket/subscriptions"
+            ]
+          },
+          {
+            "group": "Channels",
+            "pages": [
+              "websocket/trades"
             ]
           }
         ]

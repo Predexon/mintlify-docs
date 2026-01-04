@@ -1,0 +1,169 @@
+---
+title: "Subscriptions"
+description: "Create and manage WebSocket subscriptions"
+---
+
+## Subscribe
+
+Create a subscription to receive trade alerts matching your filters.
+
+### Request
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": {
+    "<filter_type>": ["<value1>", "<value2>", ...]
+  }
+}
+```
+
+### Filter Types
+
+| Filter | Description | Example |
+|--------|-------------|---------|
+| `users` | Wallet addresses (maker) | `["0x123...", "0xabc..."]` |
+| `condition_ids` | Market condition IDs | `["0x456...", "0x789..."]` |
+| `market_slugs` | Market URL slugs | `["will-trump-win-2024"]` |
+
+### Success Response
+
+```json
+{
+  "type": "ack",
+  "subscription_id": "sub_a1b2c3d4"
+}
+```
+
+Save the `subscription_id` to update or unsubscribe later.
+
+---
+
+## Examples
+
+### Subscribe to wallets
+
+Track trades from specific wallet addresses:
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": {
+    "users": [
+      "0x1234567890abcdef1234567890abcdef12345678",
+      "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+    ]
+  }
+}
+```
+
+### Subscribe to a market by slug
+
+Track all trades in a specific market:
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": {
+    "market_slugs": ["will-trump-win-2024"]
+  }
+}
+```
+
+### Subscribe to a market by condition ID
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": {
+    "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
+  }
+}
+```
+
+### Wildcard subscription (Pro only)
+
+Subscribe to **all** trades across Polymarket:
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "orders",
+  "filters": {
+    "users": ["*"]
+  }
+}
+```
+
+<Warning>
+Wildcard must be the only subscription on the connection and allows only one connection per API key.
+</Warning>
+
+---
+
+## Unsubscribe
+
+Remove an existing subscription using its ID.
+
+### Request
+
+```json
+{
+  "action": "unsubscribe",
+  "subscription_id": "sub_a1b2c3d4"
+}
+```
+
+### Response
+
+```json
+{
+  "type": "ack",
+  "subscription_id": "sub_a1b2c3d4"
+}
+```
+
+---
+
+## Update Subscription
+
+Modify filters on an existing subscription without creating a new one.
+
+### Request
+
+```json
+{
+  "action": "update",
+  "subscription_id": "sub_a1b2c3d4",
+  "filters": {
+    "users": ["0xnewwallet..."]
+  }
+}
+```
+
+### Response
+
+```json
+{
+  "type": "ack",
+  "subscription_id": "sub_a1b2c3d4"
+}
+```
+
+<Note>
+Updating replaces the existing filters entirely. Include all items you want to track.
+</Note>
