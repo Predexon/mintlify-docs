@@ -24,32 +24,30 @@ All endpoints are versioned under `/v1/`. Future versions will be introduced as 
 ## Endpoint Categories
 
 <CardGroup cols={2}>
-  <Card title="Markets" icon="chart-line" href="/api-reference/markets/list-markets">
-    Query markets, get prices, candlesticks, volume, and open interest data.
+  <Card title="Polymarket" icon="chart-line" href="/api-reference/markets/list-markets">
+    Markets, prices, candlesticks, orderbooks, trades, wallet positions, and P&L.
   </Card>
-  <Card title="Trading" icon="arrows-rotate" href="/api-reference/trading/orders">
-    Access historical orders and trading activity.
-  </Card>
-  <Card title="Wallet" icon="wallet" href="/api-reference/wallet/positions">
-    Track positions and P&L for any wallet address.
-  </Card>
-  <Card title="Matching" icon="link" href="/api-reference/matching/find-matches">
-    Find equivalent markets across platforms.
+  <Card title="Cross-Platform Matching" icon="link" href="/api-reference/matching/find-matches">
+    Find equivalent markets across Polymarket and Kalshi.
   </Card>
 </CardGroup>
+
+<Note>
+**Kalshi endpoints coming soon.** Currently, Kalshi data is available through the cross-platform matching API.
+</Note>
 
 ## Common Parameters
 
 ### Pagination
 
-Most list endpoints support pagination:
+Most list endpoints support two pagination methods:
+
+#### Offset-based Pagination
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `limit` | integer | 20-100 | Number of items to return |
 | `offset` | integer | 0 | Number of items to skip |
-
-Responses include pagination metadata:
 
 ```json
 {
@@ -61,6 +59,27 @@ Responses include pagination metadata:
   }
 }
 ```
+
+#### Key-based Pagination
+
+For large datasets or real-time data, use cursor/key-based pagination for better performance:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `limit` | integer | Number of items to return |
+| `cursor` | string | Pagination cursor from previous response |
+
+```json
+{
+  "pagination": {
+    "limit": 100,
+    "next_cursor": "eyJpZCI6MTIzNDV9",
+    "has_more": true
+  }
+}
+```
+
+Pass `next_cursor` as the `cursor` parameter in subsequent requests to fetch the next page.
 
 ### Time Parameters
 

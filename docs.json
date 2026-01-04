@@ -11,7 +11,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Data API",
         "groups": [
           {
             "group": "Getting Started",
@@ -22,20 +22,7 @@
             ]
           },
           {
-            "group": "Core Concepts",
-            "pages": [
-              "concepts/markets",
-              "concepts/positions",
-              "concepts/matching"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Data API",
-        "groups": [
-          {
-            "group": "Overview",
+            "group": "API Reference",
             "pages": [
               "api-reference/introduction"
             ]
@@ -56,7 +43,7 @@
             ]
           },
           {
-            "group": "Market Matching",
+            "group": "Cross-Platform Matching",
             "pages": [
               "api-reference/matching/find-matches"
             ]
