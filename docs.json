@@ -5,10 +5,7 @@
   "colors": {
     "primary": "#3EE6E6",
     "light": "#8A5CF6",
-    "dark": "#0B0F1A",
-    "background": {
-      "dark": "#0B0F1A"
-    }
+    "dark": "#0B0F1A"
   },
   "favicon": "/public/predexon-logo.png",
   "navigation": {
