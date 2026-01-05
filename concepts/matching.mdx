@@ -22,10 +22,14 @@ Our matching algorithm uses a knowledge graph built from:
 
 ### Match Types
 
-| Type | Description |
-|------|-------------|
-| **Exact** | Same underlying event with identical resolution criteria |
-| **Related** | Similar events or correlated outcomes |
+| Type | Description | Similarity Score |
+|------|-------------|------------------|
+| **Exact** | Same underlying event with identical resolution criteria — will always resolve identically | >= 0.95 |
+| **Related** | Similar events or correlated outcomes (same entity different outcome, or same event different candidate) | 0.90 - 0.95 |
+
+<Info>
+The `similarity` field may be `null` for matches created before January 4th, 2025.
+</Info>
 
 ## Finding Matches
 
@@ -38,7 +42,7 @@ BASE_URL = "https://api.predexon.com"
 
 response = requests.get(
     f"{BASE_URL}/v1/matching-markets",
-    params={"polymarket_market_slug": "will-donald-trump-win-the-2024-us-presidential-election"}
+    params={"polymarket_market_slug": "will-the-carolina-hurricanes-win-the-metropolitan-division-123"}
 )
 
 data = response.json()
@@ -49,9 +53,12 @@ print(f"Total matches: {data['summary']['total_matches']}")
 for match in data['matches']['KALSHI']['exact']:
     print(f"  Exact: {match['title']}")
     print(f"    Ticker: {match['market_ticker']}")
+    print(f"    Explanation: {match['explanation']}")
+    print(f"    Similarity: {match['similarity']}")
 
 for match in data['matches']['KALSHI']['related']:
     print(f"  Related: {match['title']}")
+    print(f"    Explanation: {match['explanation']}")
 ```
 
 ### From Kalshi to Polymarket
@@ -59,7 +66,7 @@ for match in data['matches']['KALSHI']['related']:
 ```python
 response = requests.get(
     f"{BASE_URL}/v1/matching-markets",
-    params={"kalshi_market_ticker": "PRES-2024-DJT"}
+    params={"kalshi_market_ticker": "KXNHLMETROPOLITAN-26-CAR"}
 )
 
 data = response.json()
@@ -67,6 +74,8 @@ data = response.json()
 for match in data['matches']['POLYMARKET']['exact']:
     print(f"  {match['title']}")
     print(f"    Slug: {match['market_slug']}")
+    print(f"    Explanation: {match['explanation']}")
+    print(f"    Similarity: {match['similarity']}")
 ```
 
 ## Response Structure
@@ -74,37 +83,46 @@ for match in data['matches']['POLYMARKET']['exact']:
 ```json
 {
   "query": {
-    "platform": "POLYMARKET",
-    "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-    "title": "Will Donald Trump win the 2024 Presidential Election?",
-    "status": "open"
+    "platform": "KALSHI",
+    "market_ticker": "KXNHLMETROPOLITAN-26-CAR",
+    "title": "Will Carolina Hurricanes win the NHL Metropolitan Division?",
+    "yes_subtitle": "Carolina Hurricanes",
+    "status": "active"
   },
   "matches": {
-    "KALSHI": {
+    "POLYMARKET": {
       "exact": [
         {
-          "market_ticker": "PRES-2024-DJT",
-          "title": "Will Trump win the 2024 presidential election?",
-          "yes_subtitle": "Donald Trump wins",
-          "status": "open",
-          "explanation": "Same underlying event with identical resolution criteria"
+          "market_slug": "will-the-carolina-hurricanes-win-the-metropolitan-division-123",
+          "title": "Will the Carolina Hurricanes win the Metropolitan Division?",
+          "status": "active",
+          "explanation": "Same entity (Carolina Hurricanes), same outcome (win the 2025–26 NHL Metropolitan Division), same timeframe (2025–26 regular season) — will always resolve identically.",
+          "similarity": 0.97
         }
       ],
       "related": [
         {
-          "market_ticker": "PRES-2024-REP",
-          "title": "Will a Republican win the 2024 presidential election?",
-          "status": "open",
-          "explanation": "Correlated outcome - Republican win includes Trump"
+          "market_slug": "will-the-carolina-hurricanes-win-the-2026-nhl-stanley-cup",
+          "title": "Will the Carolina Hurricanes win the 2026 NHL Stanley Cup?",
+          "status": "active",
+          "explanation": "Same entity (Carolina Hurricanes) but different outcome/event (win the 2026 Stanley Cup vs win the 2025–26 Metropolitan Division).",
+          "similarity": 0.94
+        },
+        {
+          "market_slug": "will-the-new-jersey-devils-win-the-metropolitan-division-424",
+          "title": "Will the New Jersey Devils win the Metropolitan Division?",
+          "status": "active",
+          "explanation": "Same event (which team wins the 2025–26 Metropolitan Division) but different candidate/team (New Jersey Devils vs Carolina Hurricanes) — competitive and thus correlated.",
+          "similarity": 0.92
         }
       ]
     }
   },
   "summary": {
-    "total_matches": 5,
+    "total_matches": 3,
     "exact_matches": 1,
-    "related_matches": 4,
-    "platforms": ["KALSHI"]
+    "related_matches": 2,
+    "platforms": ["POLYMARKET"]
   }
 }
 ```
@@ -193,7 +211,8 @@ def find_hedging_options(polymarket_slug: str):
         hedges.append({
             "ticker": match["market_ticker"],
             "title": match["title"],
-            "explanation": match.get("explanation", "")
+            "explanation": match["explanation"],
+            "similarity": match["similarity"]
         })
 
     return hedges
