@@ -40,8 +40,8 @@ Query historical trade data with flexible filtering by market, token, user, and 
   Number of orders to return (1-1000)
 </ParamField>
 
-<ParamField query="offset" type="integer" default="0">
-  Number of orders to skip
+<ParamField query="pagination_key" type="string">
+  Pagination key for cursor-based pagination (from previous response)
 </ParamField>
 
 <Warning>
@@ -67,7 +67,12 @@ Only one of `market_slug`, `condition_id`, or `token_id` can be provided.
 </ResponseField>
 
 <ResponseField name="pagination" type="object">
-  Standard pagination object with `limit`, `offset`, `total`, `has_more`
+  <Expandable>
+    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
+    <ResponseField name="count" type="integer">Number of items returned</ResponseField>
+    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+  </Expandable>
 </ResponseField>
 
 <RequestExample>
@@ -126,8 +131,8 @@ const { orders } = await response.json();
   ],
   "pagination": {
     "limit": 50,
-    "offset": 0,
-    "total": 12345,
+    "count": 50,
+    "pagination_key": "eyJ0aW1lc3RhbXAiOjE3MDQxNTM2MDAsIm9yZGVyX2hhc2giOiIweGRlZjQ1NiJ9",
     "has_more": true
   }
 }

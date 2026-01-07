@@ -33,11 +33,11 @@ Query trading activity for a specific wallet address. This includes minting oper
 </ParamField>
 
 <ParamField query="limit" type="integer" default="100">
-  Number of activities to return (1-1000)
+  Number of activities to return (1-500)
 </ParamField>
 
-<ParamField query="offset" type="integer" default="0">
-  Number of activities to skip
+<ParamField query="pagination_key" type="string">
+  Pagination key for cursor-based pagination (from previous response)
 </ParamField>
 
 <Warning>
@@ -64,8 +64,8 @@ Only one of `market_slug` or `condition_id` can be provided.
 <ResponseField name="pagination" type="object">
   <Expandable>
     <ResponseField name="limit" type="integer">Requested limit</ResponseField>
-    <ResponseField name="offset" type="integer">Current offset</ResponseField>
-    <ResponseField name="count" type="integer">Total count</ResponseField>
+    <ResponseField name="count" type="integer">Number of items returned</ResponseField>
+    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
     <ResponseField name="has_more" type="boolean">Whether more results exist</ResponseField>
   </Expandable>
 </ResponseField>
@@ -146,8 +146,8 @@ const { activities } = await response.json();
   ],
   "pagination": {
     "limit": 50,
-    "offset": 0,
-    "count": 234,
+    "count": 50,
+    "pagination_key": "eyJ0aW1lc3RhbXAiOjE3MDQwNjcyMDAsInR4X2hhc2giOiIweGRlZjQ1NiJ9",
     "has_more": true
   }
 }
