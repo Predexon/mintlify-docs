@@ -1,0 +1,221 @@
+---
+title: "List Markets"
+openapi: "GET /v1/kalshi/markets"
+description: "Query Kalshi markets with filtering, sorting, and pagination"
+---
+
+## Overview
+
+Fetch a list of prediction markets from Kalshi with comprehensive filtering options. This endpoint provides access to Kalshi's prediction market data.
+
+<ParamField query="status" type="string">
+  Filter by market status: `open`, `closed`, `determined`, or `settled`
+</ParamField>
+
+<ParamField query="min_price" type="integer">
+  Minimum last price filter (0-100 scale, returned as 0-1)
+</ParamField>
+
+<ParamField query="max_price" type="integer">
+  Maximum last price filter (0-100 scale, returned as 0-1)
+</ParamField>
+
+<ParamField query="min_open_interest" type="integer">
+  Minimum dollar open interest
+</ParamField>
+
+<ParamField query="min_volume" type="integer">
+  Minimum dollar volume
+</ParamField>
+
+<ParamField query="search" type="string">
+  Search in market title (min 2 characters)
+</ParamField>
+
+<ParamField query="ticker" type="array">
+  Filter by specific market ticker(s)
+</ParamField>
+
+<ParamField query="event_ticker" type="array">
+  Filter by event ticker(s)
+</ParamField>
+
+<ParamField query="series_ticker" type="array">
+  Filter by series ticker(s)
+</ParamField>
+
+<ParamField query="sort" type="string" default="volume">
+  Sort by: `volume`, `open_interest`, `price_desc`, `price_asc`, `close_time`
+</ParamField>
+
+<ParamField query="limit" type="integer" default="20">
+  Number of markets to return (1-100)
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of markets to skip for pagination (max 10000)
+</ParamField>
+
+<ResponseField name="markets" type="array">
+  <Expandable title="Market object">
+    <ResponseField name="ticker" type="string">
+      Unique market ticker identifier
+    </ResponseField>
+    <ResponseField name="event_ticker" type="string">
+      Event ticker this market belongs to
+    </ResponseField>
+    <ResponseField name="market_id" type="string">
+      Unique market ID
+    </ResponseField>
+    <ResponseField name="title" type="string">
+      Market title/question
+    </ResponseField>
+    <ResponseField name="subtitle" type="string">
+      Market subtitle (Yes outcome description)
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Market status: `open`, `closed`, `determined`, `settled`
+    </ResponseField>
+    <ResponseField name="result" type="string">
+      Market result (if resolved): `yes`, `no`, or `null`
+    </ResponseField>
+    <ResponseField name="open_time" type="string">
+      ISO 8601 timestamp when market opened
+    </ResponseField>
+    <ResponseField name="close_time" type="string">
+      ISO 8601 timestamp when market closes
+    </ResponseField>
+    <ResponseField name="outcomes" type="array">
+      Array of outcome objects with `label`, `subtitle`, `bid`, and `ask`
+    </ResponseField>
+    <ResponseField name="last_price" type="number">
+      Last traded price (0-1)
+    </ResponseField>
+    <ResponseField name="volume" type="integer">
+      Total contract volume
+    </ResponseField>
+    <ResponseField name="open_interest" type="integer">
+      Current open interest (contracts)
+    </ResponseField>
+    <ResponseField name="dollar_volume" type="integer">
+      Total dollar volume
+    </ResponseField>
+    <ResponseField name="dollar_open_interest" type="integer">
+      Dollar open interest
+    </ResponseField>
+    <ResponseField name="event" type="object">
+      Event information with `event_ticker`, `series_ticker`, `title`, `subtitle`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">
+      Requested limit
+    </ResponseField>
+    <ResponseField name="offset" type="integer">
+      Current offset
+    </ResponseField>
+    <ResponseField name="total" type="integer">
+      Total matching markets
+    </ResponseField>
+    <ResponseField name="has_more" type="boolean">
+      Whether more results are available
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=10"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.predexon.com/v1/kalshi/markets",
+    params={
+        "status": "open",
+        "sort": "volume",
+        "limit": 10
+    }
+)
+data = response.json()
+```
+
+```typescript TypeScript
+const response = await fetch(
+  "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=10"
+);
+const data = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "markets": [
+    {
+      "ticker": "KXBTC-25JAN10-B100000",
+      "event_ticker": "KXBTC-25JAN10",
+      "market_id": "abc123",
+      "title": "Bitcoin above $100,000?",
+      "subtitle": "Yes",
+      "status": "open",
+      "result": null,
+      "open_time": "2025-01-01T00:00:00Z",
+      "close_time": "2025-01-10T23:59:59Z",
+      "expected_expiration_time": "2025-01-11T00:00:00Z",
+      "settlement_time": null,
+      "determination_time": null,
+      "can_close_early": false,
+      "is_deactivated": false,
+      "strike_type": "greater",
+      "custom_strike": "100000",
+      "outcomes": [
+        {
+          "label": "Yes",
+          "subtitle": "Bitcoin above $100,000",
+          "bid": 0.52,
+          "ask": 0.54
+        },
+        {
+          "label": "No",
+          "subtitle": "Bitcoin at or below $100,000",
+          "bid": 0.46,
+          "ask": 0.48
+        }
+      ],
+      "last_price": 0.53,
+      "volume": 150000,
+      "open_interest": 25000,
+      "dollar_volume": 75000,
+      "dollar_open_interest": 12500,
+      "event": {
+        "event_ticker": "KXBTC-25JAN10",
+        "series_ticker": "KXBTC",
+        "title": "Bitcoin Price on Jan 10",
+        "subtitle": "Will Bitcoin be above certain prices?"
+      },
+      "created_at": "2024-12-15T10:00:00Z",
+      "updated_at": "2025-01-06T15:30:00Z"
+    }
+  ],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 5432,
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid price range",
+  "message": "min_price cannot be greater than max_price"
+}
+```
+</ResponseExample>

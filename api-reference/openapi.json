@@ -287,6 +287,69 @@
           "400": {"$ref": "#/components/responses/BadRequest"}
         }
       }
+    },
+    "/v1/kalshi/markets": {
+      "get": {
+        "operationId": "listKalshiMarkets",
+        "summary": "List Kalshi Markets",
+        "description": "Query Kalshi markets with filtering, sorting, and pagination",
+        "tags": ["Kalshi"],
+        "parameters": [
+          {"name": "status", "in": "query", "schema": {"type": "string", "enum": ["open", "closed", "determined", "settled"]}, "description": "Filter by market status"},
+          {"name": "min_price", "in": "query", "schema": {"type": "integer", "minimum": 0, "maximum": 100}, "description": "Minimum price (0-100)"},
+          {"name": "max_price", "in": "query", "schema": {"type": "integer", "minimum": 0, "maximum": 100}, "description": "Maximum price (0-100)"},
+          {"name": "min_open_interest", "in": "query", "schema": {"type": "integer"}, "description": "Minimum dollar open interest"},
+          {"name": "min_volume", "in": "query", "schema": {"type": "integer"}, "description": "Minimum dollar volume"},
+          {"name": "search", "in": "query", "schema": {"type": "string", "minLength": 2, "maxLength": 100}, "description": "Search in title"},
+          {"name": "ticker", "in": "query", "schema": {"type": "array", "items": {"type": "string"}}, "description": "Filter by ticker(s)"},
+          {"name": "event_ticker", "in": "query", "schema": {"type": "array", "items": {"type": "string"}}, "description": "Filter by event ticker(s)"},
+          {"name": "series_ticker", "in": "query", "schema": {"type": "array", "items": {"type": "string"}}, "description": "Filter by series ticker(s)"},
+          {"name": "sort", "in": "query", "schema": {"type": "string", "enum": ["volume", "open_interest", "price_desc", "price_asc", "close_time"], "default": "volume"}, "description": "Sort field"},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20}, "description": "Results per page"},
+          {"name": "offset", "in": "query", "schema": {"type": "integer", "minimum": 0, "maximum": 10000, "default": 0}, "description": "Pagination offset"}
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Kalshi markets",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/KalshiMarketsResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"}
+        }
+      }
+    },
+    "/v1/kalshi/trades": {
+      "get": {
+        "operationId": "getKalshiTrades",
+        "summary": "Get Kalshi Trades",
+        "description": "Fetch historical Kalshi trade data. At least one of ticker or event_ticker is required.",
+        "tags": ["Kalshi"],
+        "parameters": [
+          {"name": "ticker", "in": "query", "schema": {"type": "string"}, "description": "Filter by market ticker (exact match)"},
+          {"name": "event_ticker", "in": "query", "schema": {"type": "string"}, "description": "Filter by event ticker (prefix match)"},
+          {"name": "taker_side", "in": "query", "schema": {"type": "string", "enum": ["yes", "no"]}, "description": "Filter by taker side"},
+          {"name": "start_time", "in": "query", "schema": {"type": "integer"}, "description": "Start time (Unix seconds)"},
+          {"name": "end_time", "in": "query", "schema": {"type": "integer"}, "description": "End time (Unix seconds)"},
+          {"name": "min_count", "in": "query", "schema": {"type": "integer", "minimum": 1}, "description": "Minimum contract count"},
+          {"name": "order", "in": "query", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "desc"}, "description": "Sort order"},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 1000, "default": 100}, "description": "Results per page"},
+          {"name": "pagination_key", "in": "query", "schema": {"type": "string"}, "description": "Cursor for pagination"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Kalshi trade history",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/KalshiTradesResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"}
+        }
+      }
     }
   },
   "components": {
@@ -345,6 +408,81 @@
           "error": {"type": "string"},
           "message": {"type": "string"}
         }
+      },
+      "KalshiMarket": {
+        "type": "object",
+        "properties": {
+          "ticker": {"type": "string"},
+          "event_ticker": {"type": "string"},
+          "market_id": {"type": "string"},
+          "title": {"type": "string"},
+          "subtitle": {"type": "string"},
+          "status": {"type": "string", "enum": ["open", "closed", "determined", "settled"]},
+          "result": {"type": "string"},
+          "open_time": {"type": "string"},
+          "close_time": {"type": "string"},
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {"type": "string"},
+                "subtitle": {"type": "string"},
+                "bid": {"type": "number"},
+                "ask": {"type": "number"}
+              }
+            }
+          },
+          "last_price": {"type": "number"},
+          "volume": {"type": "integer"},
+          "open_interest": {"type": "integer"},
+          "dollar_volume": {"type": "integer"},
+          "dollar_open_interest": {"type": "integer"},
+          "event": {
+            "type": "object",
+            "properties": {
+              "event_ticker": {"type": "string"},
+              "series_ticker": {"type": "string"},
+              "title": {"type": "string"},
+              "subtitle": {"type": "string"}
+            }
+          }
+        }
+      },
+      "KalshiMarketsResponse": {
+        "type": "object",
+        "properties": {
+          "markets": {"type": "array", "items": {"$ref": "#/components/schemas/KalshiMarket"}},
+          "pagination": {"$ref": "#/components/schemas/Pagination"}
+        }
+      },
+      "KalshiTrade": {
+        "type": "object",
+        "properties": {
+          "trade_id": {"type": "string"},
+          "ticker": {"type": "string"},
+          "count": {"type": "integer"},
+          "yes_price": {"type": "number"},
+          "no_price": {"type": "number"},
+          "taker_side": {"type": "string", "enum": ["yes", "no"]},
+          "created_time": {"type": "integer"}
+        }
+      },
+      "CursorPagination": {
+        "type": "object",
+        "properties": {
+          "limit": {"type": "integer"},
+          "count": {"type": "integer"},
+          "pagination_key": {"type": "string"},
+          "has_more": {"type": "boolean"}
+        }
+      },
+      "KalshiTradesResponse": {
+        "type": "object",
+        "properties": {
+          "trades": {"type": "array", "items": {"$ref": "#/components/schemas/KalshiTrade"}},
+          "pagination": {"$ref": "#/components/schemas/CursorPagination"}
+        }
       }
     },
     "responses": {
@@ -368,9 +506,10 @@
   },
   "tags": [
     {"name": "System", "description": "System endpoints"},
-    {"name": "Markets", "description": "Market data endpoints"},
-    {"name": "Trading", "description": "Trading data endpoints"},
-    {"name": "Wallet", "description": "Wallet analytics endpoints"},
+    {"name": "Markets", "description": "Polymarket data endpoints"},
+    {"name": "Trading", "description": "Polymarket trading data endpoints"},
+    {"name": "Wallet", "description": "Polymarket wallet analytics endpoints"},
+    {"name": "Kalshi", "description": "Kalshi market and trade data endpoints"},
     {"name": "Matching", "description": "Cross-platform matching endpoints"}
   ]
 }

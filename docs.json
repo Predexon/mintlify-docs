@@ -43,6 +43,13 @@
             ]
           },
           {
+            "group": "Kalshi",
+            "pages": [
+              "api-reference/kalshi/list-markets",
+              "api-reference/kalshi/trades"
+            ]
+          },
+          {
             "group": "Cross-Platform Matching",
             "pages": [
               "api-reference/matching/find-matches"
