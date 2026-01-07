@@ -27,7 +27,8 @@ Provide **exactly one** of `polymarket_market_slug` or `kalshi_market_ticker`, n
     <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
     <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
     <ResponseField name="title" type="string">Market title</ResponseField>
-    <ResponseField name="status" type="string">Market status</ResponseField>
+    <ResponseField name="yes_subtitle" type="string">Short subtitle for the "Yes" outcome (Kalshi only)</ResponseField>
+    <ResponseField name="status" type="string">Market status (`active`, `closed`, etc.)</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -35,17 +36,26 @@ Provide **exactly one** of `polymarket_market_slug` or `kalshi_market_ticker`, n
   Matches grouped by platform
   <Expandable title="Platform matches">
     <ResponseField name="exact" type="array">
-      Markets representing the same underlying event
+      Markets representing the same underlying event — will always resolve identically
       <Expandable>
         <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
         <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
         <ResponseField name="title" type="string">Market title</ResponseField>
         <ResponseField name="status" type="string">Market status</ResponseField>
         <ResponseField name="explanation" type="string">Why this is a match</ResponseField>
+        <ResponseField name="similarity" type="number | null">Similarity score (0-1). May be `null` for matches created before Jan 4th, 2025.</ResponseField>
       </Expandable>
     </ResponseField>
     <ResponseField name="related" type="array">
-      Markets for correlated or similar events
+      Markets for correlated or similar events (same entity different outcome, same event different candidate, etc.)
+      <Expandable>
+        <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
+        <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
+        <ResponseField name="title" type="string">Market title</ResponseField>
+        <ResponseField name="status" type="string">Market status</ResponseField>
+        <ResponseField name="explanation" type="string">Why this is a related match</ResponseField>
+        <ResponseField name="similarity" type="number | null">Similarity score (0-1). May be `null` for matches created before Jan 4th, 2025.</ResponseField>
+      </Expandable>
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -62,40 +72,47 @@ Provide **exactly one** of `polymarket_market_slug` or `kalshi_market_ticker`, n
 <RequestExample>
 ```bash cURL
 # From Polymarket to Kalshi
-curl "https://api.predexon.com/v1/matching-markets?polymarket_market_slug=will-donald-trump-win-the-2024-us-presidential-election"
+curl "https://api.predexon.com/v1/matching-markets?polymarket_market_slug=will-the-carolina-hurricanes-win-the-metropolitan-division-123"
 
 # From Kalshi to Polymarket
-curl "https://api.predexon.com/v1/matching-markets?kalshi_market_ticker=PRES-2024-DJT"
+curl "https://api.predexon.com/v1/matching-markets?kalshi_market_ticker=KXNHLMETROPOLITAN-26-CAR"
 ```
 
 ```python Python
 import requests
 
-# Find Kalshi equivalents for a Polymarket market
+# Find Polymarket equivalents for a Kalshi market
 response = requests.get(
     "https://api.predexon.com/v1/matching-markets",
-    params={"polymarket_market_slug": "will-donald-trump-win-the-2024-us-presidential-election"}
+    params={"kalshi_market_ticker": "KXNHLMETROPOLITAN-26-CAR"}
 )
 
 data = response.json()
+print(f"Query: {data['query']['title']}")
 print(f"Found {data['summary']['total_matches']} matches")
 print(f"  Exact: {data['summary']['exact_matches']}")
 print(f"  Related: {data['summary']['related_matches']}")
 
-for match in data["matches"]["KALSHI"]["exact"]:
+for match in data["matches"]["POLYMARKET"]["exact"]:
     print(f"\nExact match: {match['title']}")
-    print(f"  Ticker: {match['market_ticker']}")
+    print(f"  Slug: {match['market_slug']}")
+    print(f"  Explanation: {match['explanation']}")
+    print(f"  Similarity: {match['similarity']}")
 ```
 
 ```typescript TypeScript
 const response = await fetch(
-  "https://api.predexon.com/v1/matching-markets?polymarket_market_slug=will-donald-trump-win-the-2024-us-presidential-election"
+  "https://api.predexon.com/v1/matching-markets?kalshi_market_ticker=KXNHLMETROPOLITAN-26-CAR"
 );
-const { matches, summary } = await response.json();
+const { query, matches, summary } = await response.json();
 
+console.log(`Query: ${query.title}`);
 console.log(`Found ${summary.total_matches} matches`);
-matches.KALSHI.exact.forEach(match => {
-  console.log(`Exact: ${match.title} (${match.market_ticker})`);
+
+matches.POLYMARKET.exact.forEach(match => {
+  console.log(`Exact: ${match.title} (${match.market_slug})`);
+  console.log(`  Explanation: ${match.explanation}`);
+  console.log(`  Similarity: ${match.similarity}`);
 });
 ```
 </RequestExample>
@@ -104,43 +121,53 @@ matches.KALSHI.exact.forEach(match => {
 ```json 200
 {
   "query": {
-    "platform": "POLYMARKET",
-    "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-    "title": "Will Donald Trump win the 2024 Presidential Election?",
-    "status": "open"
+    "platform": "KALSHI",
+    "market_ticker": "KXNHLMETROPOLITAN-26-CAR",
+    "title": "Will Carolina Hurricanes win the NHL Metropolitan Division?",
+    "yes_subtitle": "Carolina Hurricanes",
+    "status": "active"
   },
   "matches": {
-    "KALSHI": {
+    "POLYMARKET": {
       "exact": [
         {
-          "market_ticker": "PRES-2024-DJT",
-          "title": "Will Trump win the 2024 presidential election?",
-          "yes_subtitle": "Donald Trump wins",
-          "status": "open",
-          "explanation": "Same underlying event with identical resolution criteria"
+          "market_slug": "will-the-carolina-hurricanes-win-the-metropolitan-division-123",
+          "title": "Will the Carolina Hurricanes win the Metropolitan Division?",
+          "status": "active",
+          "explanation": "Same entity (Carolina Hurricanes), same outcome (win the 2025–26 NHL Metropolitan Division), same timeframe (2025–26 regular season) — will always resolve identically.",
+          "similarity": 0.97
         }
       ],
       "related": [
         {
-          "market_ticker": "PRES-2024-REP",
-          "title": "Will a Republican win the 2024 presidential election?",
-          "status": "open",
-          "explanation": "Correlated outcome - Republican win includes Trump"
+          "market_slug": "will-the-carolina-hurricanes-win-the-2026-nhl-stanley-cup",
+          "title": "Will the Carolina Hurricanes win the 2026 NHL Stanley Cup?",
+          "status": "active",
+          "explanation": "Same entity (Carolina Hurricanes) but different outcome/event (win the 2026 Stanley Cup vs win the 2025–26 Metropolitan Division).",
+          "similarity": 0.94
         },
         {
-          "market_ticker": "EC-2024-DJT-270",
-          "title": "Will Trump get 270+ electoral votes?",
-          "status": "open",
-          "explanation": "Related metric for same event"
+          "market_slug": "will-the-new-jersey-devils-win-the-metropolitan-division-424",
+          "title": "Will the New Jersey Devils win the Metropolitan Division?",
+          "status": "active",
+          "explanation": "Same event (which team wins the 2025–26 Metropolitan Division) but different candidate/team (New Jersey Devils vs Carolina Hurricanes) — competitive and thus correlated.",
+          "similarity": 0.92
+        },
+        {
+          "market_slug": "will-the-carolina-hurricanes-make-the-nhl-playoffs",
+          "title": "Will the Carolina Hurricanes make the NHL Playoffs?",
+          "status": "active",
+          "explanation": "Same entity (Carolina Hurricanes) but different outcome (make the 2025–26 NHL Playoffs vs win the 2025–26 Metropolitan Division).",
+          "similarity": 0.91
         }
       ]
     }
   },
   "summary": {
-    "total_matches": 3,
+    "total_matches": 4,
     "exact_matches": 1,
-    "related_matches": 2,
-    "platforms": ["KALSHI"]
+    "related_matches": 3,
+    "platforms": ["POLYMARKET"]
   }
 }
 ```
@@ -164,9 +191,13 @@ matches.KALSHI.exact.forEach(match => {
 
 <CardGroup cols={2}>
   <Card title="Exact Matches" icon="bullseye">
-    Same underlying event with equivalent resolution criteria. Ideal for arbitrage.
+    Same underlying event with equivalent resolution criteria. Ideal for arbitrage. Similarity score >= 0.95.
   </Card>
   <Card title="Related Matches" icon="link">
-    Similar or correlated events. Useful for hedging and research.
+    Similar or correlated events (same entity different outcome, or same event different candidate). Useful for hedging and research. Similarity score between 0.90 and 0.95.
   </Card>
 </CardGroup>
+
+<Info>
+The `similarity` field may be `null` for matches created before January 4th, 2025.
+</Info>
