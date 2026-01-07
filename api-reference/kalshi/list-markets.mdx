@@ -8,6 +8,10 @@ description: "Query Kalshi markets with filtering, sorting, and pagination"
 
 Fetch a list of prediction markets from Kalshi with comprehensive filtering options. This endpoint provides access to Kalshi's prediction market data.
 
+<Info>
+This endpoint does not include Multi Variate Event (MVE) markets such as parlays and combo bets, as these generate an infinite number of possible market combinations.
+</Info>
+
 <ParamField query="status" type="string">
   Filter by market status: `open`, `closed`, `determined`, or `settled`
 </ParamField>
