@@ -2245,6 +2245,125 @@
         }
       }
     },
+    "/v1/kalshi/orderbooks": {
+      "get": {
+        "tags": [
+          "kalshi"
+        ],
+        "summary": "Get Kalshi Orderbooks",
+        "description": "Fetch historical orderbook snapshots for a Kalshi market over a specified time range.\n\nReturns snapshots of the order book including yes bids, yes asks, and market metadata.\nAll timestamps are in milliseconds. Prices are in cents (1-99 representing $0.01 to $0.99).",
+        "operationId": "get_kalshi_orderbooks_v1_kalshi_orderbooks_get",
+        "parameters": [
+          {
+            "name": "ticker",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The Kalshi market ticker",
+              "title": "Ticker"
+            },
+            "description": "The Kalshi market ticker"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "Start time in Unix timestamp (milliseconds)",
+              "title": "Start Time"
+            },
+            "description": "Start time in Unix timestamp (milliseconds)"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "End time in Unix timestamp (milliseconds)",
+              "title": "End Time"
+            },
+            "description": "End time in Unix timestamp (milliseconds)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Maximum number of snapshots to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Maximum number of snapshots to return"
+          },
+          {
+            "name": "pagination_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pagination key to get the next chunk of data",
+              "title": "Pagination Key"
+            },
+            "description": "Pagination key to get the next chunk of data"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KalshiOrderbooksResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Root",
@@ -2489,6 +2608,117 @@
         ],
         "title": "KalshiMatchResponse",
         "description": "Response for Kalshi market matching query."
+      },
+      "KalshiOrderbookLevel": {
+        "properties": {
+          "price": {
+            "type": "integer",
+            "title": "Price",
+            "description": "Price in cents (1-99)"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size",
+            "description": "Number of contracts at this price level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "price",
+          "size"
+        ],
+        "title": "KalshiOrderbookLevel",
+        "description": "Single price level in Kalshi orderbook."
+      },
+      "KalshiOrderbookSnapshot": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker",
+            "description": "Market ticker"
+          },
+          "timestamp": {
+            "type": "integer",
+            "title": "Timestamp",
+            "description": "Snapshot timestamp in milliseconds"
+          },
+          "yes_bids": {
+            "items": {
+              "$ref": "#/components/schemas/KalshiOrderbookLevel"
+            },
+            "type": "array",
+            "title": "Yes Bids",
+            "description": "Yes bid levels, ordered by price descending"
+          },
+          "yes_asks": {
+            "items": {
+              "$ref": "#/components/schemas/KalshiOrderbookLevel"
+            },
+            "type": "array",
+            "title": "Yes Asks",
+            "description": "Yes ask levels, ordered by price ascending"
+          },
+          "best_bid": {
+            "type": "integer",
+            "title": "Best Bid",
+            "description": "Best bid price in cents"
+          },
+          "best_ask": {
+            "type": "integer",
+            "title": "Best Ask",
+            "description": "Best ask price in cents"
+          },
+          "bid_depth": {
+            "type": "integer",
+            "title": "Bid Depth",
+            "description": "Total bid depth (number of contracts)"
+          },
+          "ask_depth": {
+            "type": "integer",
+            "title": "Ask Depth",
+            "description": "Total ask depth (number of contracts)"
+          },
+          "sequence": {
+            "type": "integer",
+            "title": "Sequence",
+            "description": "Sequence number for ordering within same timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "timestamp",
+          "yes_bids",
+          "yes_asks",
+          "best_bid",
+          "best_ask",
+          "bid_depth",
+          "ask_depth",
+          "sequence"
+        ],
+        "title": "KalshiOrderbookSnapshot",
+        "description": "Single Kalshi orderbook snapshot."
+      },
+      "KalshiOrderbooksResponse": {
+        "properties": {
+          "snapshots": {
+            "items": {
+              "$ref": "#/components/schemas/KalshiOrderbookSnapshot"
+            },
+            "type": "array",
+            "title": "Snapshots"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CursorPagination"
+          }
+        },
+        "type": "object",
+        "required": [
+          "snapshots",
+          "pagination"
+        ],
+        "title": "KalshiOrderbooksResponse",
+        "description": "Kalshi orderbooks endpoint response."
       },
       "KalshiPairInfo": {
         "properties": {

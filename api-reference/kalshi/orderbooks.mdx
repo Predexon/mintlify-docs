@@ -1,0 +1,200 @@
+---
+title: "Orderbook History"
+openapi: "GET /v1/kalshi/orderbooks"
+description: "Fetch historical orderbook snapshots for a Kalshi market"
+---
+
+## Overview
+
+Fetch historical orderbook snapshots for a Kalshi market over a specified time range. Returns snapshots including yes bids, yes asks, and market metadata.
+
+<Note>
+All timestamps are in **milliseconds**. Prices are in **cents** (1-99 representing $0.01 to $0.99).
+</Note>
+
+<ParamField query="ticker" type="string" required>
+  The Kalshi market ticker
+</ParamField>
+
+<ParamField query="start_time" type="integer" required>
+  Start time in Unix timestamp (milliseconds)
+</ParamField>
+
+<ParamField query="end_time" type="integer" required>
+  End time in Unix timestamp (milliseconds)
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+  Maximum number of snapshots to return (1-200)
+</ParamField>
+
+<ParamField query="pagination_key" type="string">
+  Pagination key for cursor-based pagination (from previous response)
+</ParamField>
+
+<ResponseField name="snapshots" type="array">
+  <Expandable title="Orderbook snapshot">
+    <ResponseField name="ticker" type="string">Market ticker</ResponseField>
+    <ResponseField name="timestamp" type="integer">Snapshot timestamp in milliseconds</ResponseField>
+    <ResponseField name="yes_bids" type="array">
+      Yes bid levels, ordered by price descending
+      <Expandable title="Level">
+        <ResponseField name="price" type="integer">Price in cents (1-99)</ResponseField>
+        <ResponseField name="size" type="integer">Number of contracts at this price level</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="yes_asks" type="array">
+      Yes ask levels, ordered by price ascending
+      <Expandable title="Level">
+        <ResponseField name="price" type="integer">Price in cents (1-99)</ResponseField>
+        <ResponseField name="size" type="integer">Number of contracts at this price level</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="best_bid" type="integer">Best bid price in cents</ResponseField>
+    <ResponseField name="best_ask" type="integer">Best ask price in cents</ResponseField>
+    <ResponseField name="bid_depth" type="integer">Total bid depth (number of contracts)</ResponseField>
+    <ResponseField name="ask_depth" type="integer">Total ask depth (number of contracts)</ResponseField>
+    <ResponseField name="sequence" type="integer">Sequence number for ordering within same timestamp</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
+    <ResponseField name="count" type="integer">Number of snapshots returned</ResponseField>
+    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+# Get orderbook history for past hour
+curl "https://api.predexon.com/v1/kalshi/orderbooks?ticker=KXBTC-25JAN31-B100000&start_time=1706745600000&end_time=1706749200000&limit=50"
+```
+
+```python Python
+import requests
+import time
+
+ticker = "KXBTC-25JAN31-B100000"
+end_time = int(time.time() * 1000)  # now in ms
+start_time = end_time - (60 * 60 * 1000)  # 1 hour ago
+
+response = requests.get(
+    "https://api.predexon.com/v1/kalshi/orderbooks",
+    params={
+        "ticker": ticker,
+        "start_time": start_time,
+        "end_time": end_time,
+        "limit": 100
+    }
+)
+
+for snapshot in response.json()["snapshots"]:
+    spread = snapshot["best_ask"] - snapshot["best_bid"]
+    print(f"Time: {snapshot['timestamp']}")
+    print(f"  Best Bid: {snapshot['best_bid']}c, Best Ask: {snapshot['best_ask']}c")
+    print(f"  Spread: {spread}c")
+    print(f"  Bid Depth: {snapshot['bid_depth']}, Ask Depth: {snapshot['ask_depth']}")
+```
+
+```typescript TypeScript
+const endTime = Date.now();
+const startTime = endTime - 60 * 60 * 1000; // 1 hour ago
+
+const response = await fetch(
+  `https://api.predexon.com/v1/kalshi/orderbooks?ticker=KXBTC-25JAN31-B100000&start_time=${startTime}&end_time=${endTime}&limit=50`
+);
+const { snapshots, pagination } = await response.json();
+
+snapshots.forEach(snapshot => {
+  console.log(`${snapshot.timestamp}: ${snapshot.best_bid}c / ${snapshot.best_ask}c`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "snapshots": [
+    {
+      "ticker": "KXBTC-25JAN31-B100000",
+      "timestamp": 1706745600000,
+      "yes_bids": [
+        {"price": 52, "size": 1500},
+        {"price": 51, "size": 2300},
+        {"price": 50, "size": 1800}
+      ],
+      "yes_asks": [
+        {"price": 54, "size": 1200},
+        {"price": 55, "size": 2100},
+        {"price": 56, "size": 900}
+      ],
+      "best_bid": 52,
+      "best_ask": 54,
+      "bid_depth": 5600,
+      "ask_depth": 4200,
+      "sequence": 12345678
+    },
+    {
+      "ticker": "KXBTC-25JAN31-B100000",
+      "timestamp": 1706745660000,
+      "yes_bids": [
+        {"price": 53, "size": 1800},
+        {"price": 52, "size": 2000},
+        {"price": 51, "size": 1500}
+      ],
+      "yes_asks": [
+        {"price": 55, "size": 1100},
+        {"price": 56, "size": 1900},
+        {"price": 57, "size": 800}
+      ],
+      "best_bid": 53,
+      "best_ask": 55,
+      "bid_depth": 5300,
+      "ask_depth": 3800,
+      "sequence": 12345890
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "count": 50,
+    "pagination_key": "eyJ0aW1lc3RhbXAiOjE3MDY3NDU2NjAwMDAsInNlcXVlbmNlIjoxMjM0NTg5MH0=",
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid time range",
+  "message": "start_time must be before end_time"
+}
+```
+</ResponseExample>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Liquidity Analysis" icon="droplet">
+    Analyze historical bid/ask depth and spread patterns
+  </Card>
+  <Card title="Market Microstructure" icon="microscope">
+    Study orderbook dynamics and price formation
+  </Card>
+  <Card title="Backtesting" icon="clock-rotate-left">
+    Test trading strategies against historical orderbook data
+  </Card>
+  <Card title="Arbitrage Research" icon="scale-balanced">
+    Compare orderbook states across platforms
+  </Card>
+</CardGroup>
+
+## Price Format
+
+Kalshi uses **cents** for prices (1-99), where:
+- `52` = $0.52 (52% implied probability)
+- `99` = $0.99 (99% implied probability)
+
+To convert to decimal: `price / 100`

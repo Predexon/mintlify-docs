@@ -46,7 +46,8 @@
             "group": "Kalshi",
             "pages": [
               "api-reference/kalshi/list-markets",
-              "api-reference/kalshi/trades"
+              "api-reference/kalshi/trades",
+              "api-reference/kalshi/orderbooks"
             ]
           },
           {
