@@ -1622,7 +1622,7 @@
           "polymarket"
         ],
         "summary": "Get Trades",
-        "description": "Fetch historical trade data.",
+        "description": "Fetch historical trade data.\n\nReturns trades from Polymarket with support for:\n- Filtering by market_slug, condition_id, token_id, or user\n- Time range filtering\n- Offset-based pagination\n\nAt least one of market_slug, condition_id, token_id, or user must be provided.",
         "operationId": "get_trades_v1_polymarket_trades_get",
         "parameters": [
           {
@@ -1730,6 +1730,20 @@
             "description": "Number of orders to return"
           },
           {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Number of orders to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of orders to skip"
+          },
+          {
             "name": "user",
             "in": "query",
             "required": false,
@@ -1757,24 +1771,6 @@
               "default": "desc"
             },
             "description": "Sort order: asc or desc"
-          },
-          {
-            "name": "pagination_key",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Pagination key for cursor-based pagination",
-              "title": "Pagination Key"
-            },
-            "description": "Pagination key for cursor-based pagination"
           }
         ],
         "responses": {
@@ -3130,7 +3126,7 @@
             "title": "Orders"
           },
           "pagination": {
-            "$ref": "#/components/schemas/CursorPagination"
+            "$ref": "#/components/schemas/Pagination"
           }
         },
         "type": "object",
@@ -3145,50 +3141,34 @@
         "properties": {
           "limit": {
             "type": "integer",
-            "title": "Limit"
+            "title": "Limit",
+            "description": "Requested limit"
           },
           "offset": {
             "type": "integer",
-            "title": "Offset"
+            "title": "Offset",
+            "description": "Current offset"
           },
           "total": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "integer",
             "title": "Total",
-            "description": "Total number of items matching filters (omitted when using cursor pagination)"
+            "description": "Total number of items matching filters"
           },
           "has_more": {
             "type": "boolean",
             "title": "Has More",
             "description": "Whether there are more items available"
-          },
-          "pagination_key": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Pagination Key",
-            "description": "Base64-encoded cursor for next page"
           }
         },
         "type": "object",
         "required": [
           "limit",
           "offset",
+          "total",
           "has_more"
         ],
         "title": "Pagination",
-        "description": "Pagination model."
+        "description": "Offset-based pagination model."
       },
       "PnLDataPoint": {
         "properties": {
