@@ -1,0 +1,167 @@
+---
+title: "Matched Pairs"
+openapi: "GET /v1/matching-markets/pairs"
+description: "Get all active exact-matched market pairs across Polymarket and Kalshi"
+---
+
+## Overview
+
+Get all active exact-matched market pairs between Polymarket and Kalshi. This endpoint returns pre-computed pairs where both markets are currently active, ordered by similarity score (highest first).
+
+<ParamField query="min_similarity" type="integer">
+  Minimum similarity score filter (0-100). Only return pairs with similarity >= this value.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Maximum number of pairs to return (1-50)
+</ParamField>
+
+<ParamField query="pagination_key" type="string">
+  Pagination key for cursor-based pagination (from previous response)
+</ParamField>
+
+<ResponseField name="pairs" type="array">
+  <Expandable title="Matched pair">
+    <ResponseField name="POLYMARKET" type="object">
+      <Expandable>
+        <ResponseField name="market_slug" type="string">Polymarket market slug</ResponseField>
+        <ResponseField name="title" type="string">Market title</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="KALSHI" type="object">
+      <Expandable>
+        <ResponseField name="market_ticker" type="string">Kalshi market ticker</ResponseField>
+        <ResponseField name="title" type="string">Market title</ResponseField>
+        <ResponseField name="yes_subtitle" type="string">Yes outcome subtitle</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="similarity" type="integer">
+      Similarity score (0-100). May be `null` for older matches.
+    </ResponseField>
+    <ResponseField name="explanation" type="string">
+      Why these markets are considered an exact match. May be `null` for older matches.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
+    <ResponseField name="count" type="integer">Number of pairs returned</ResponseField>
+    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+# Get top matched pairs
+curl "https://api.predexon.com/v1/matching-markets/pairs?limit=10"
+
+# Filter by minimum similarity
+curl "https://api.predexon.com/v1/matching-markets/pairs?min_similarity=95&limit=20"
+```
+
+```python Python
+import requests
+
+# Get high-confidence matched pairs
+response = requests.get(
+    "https://api.predexon.com/v1/matching-markets/pairs",
+    params={
+        "min_similarity": 95,
+        "limit": 20
+    }
+)
+
+data = response.json()
+print(f"Found {len(data['pairs'])} pairs")
+
+for pair in data["pairs"]:
+    poly = pair["POLYMARKET"]
+    kalshi = pair["KALSHI"]
+    print(f"\nSimilarity: {pair['similarity']}")
+    print(f"  Polymarket: {poly['title']}")
+    print(f"  Kalshi: {kalshi['title']}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  "https://api.predexon.com/v1/matching-markets/pairs?min_similarity=95&limit=20"
+);
+const { pairs, pagination } = await response.json();
+
+pairs.forEach(pair => {
+  console.log(`${pair.similarity}: ${pair.POLYMARKET.title} <=> ${pair.KALSHI.title}`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "pairs": [
+    {
+      "POLYMARKET": {
+        "market_slug": "will-the-carolina-hurricanes-win-the-metropolitan-division-123",
+        "title": "Will the Carolina Hurricanes win the Metropolitan Division?"
+      },
+      "KALSHI": {
+        "market_ticker": "KXNHLMETROPOLITAN-26-CAR",
+        "title": "Will Carolina Hurricanes win the NHL Metropolitan Division?",
+        "yes_subtitle": "Carolina Hurricanes"
+      },
+      "similarity": 97,
+      "explanation": "Same entity (Carolina Hurricanes), same outcome (win the 2025-26 NHL Metropolitan Division), same timeframe (2025-26 regular season) - will always resolve identically."
+    },
+    {
+      "POLYMARKET": {
+        "market_slug": "will-bitcoin-hit-150k-in-2025",
+        "title": "Will Bitcoin hit $150,000 in 2025?"
+      },
+      "KALSHI": {
+        "market_ticker": "KXBTC-25DEC31-B150000",
+        "title": "Bitcoin above $150,000?",
+        "yes_subtitle": "Yes"
+      },
+      "similarity": 96,
+      "explanation": "Same underlying asset (Bitcoin), same price threshold ($150,000), same timeframe (end of 2025) - will always resolve identically."
+    }
+  ],
+  "pagination": {
+    "limit": 20,
+    "count": 20,
+    "pagination_key": "eyJzaW1pbGFyaXR5Ijo5NSwibWF0Y2hfaWQiOiJhYmMxMjMifQ==",
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Invalid parameter",
+  "message": "min_similarity must be between 0 and 100"
+}
+```
+</ResponseExample>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Arbitrage Discovery" icon="scale-balanced">
+    Find price discrepancies between identical markets on different platforms
+  </Card>
+  <Card title="Cross-Platform Analysis" icon="code-compare">
+    Compare liquidity and volume across platforms for the same event
+  </Card>
+  <Card title="Market Coverage" icon="globe">
+    Identify which markets exist on both platforms
+  </Card>
+  <Card title="Price Feeds" icon="chart-line">
+    Build composite price feeds from multiple sources
+  </Card>
+</CardGroup>
+
+<Note>
+Pairs are ordered by similarity score (highest first). Use `min_similarity` to filter for high-confidence matches only.
+</Note>
