@@ -1,12 +1,12 @@
 ---
 title: "Wallet Positions"
 openapi: "GET /v1/polymarket/wallet/positions/{wallet_address}"
-description: "Get current positions for a wallet address"
+description: "Get open and historical positions for a wallet address"
 ---
 
 ## Overview
 
-Fetch all current positions for a wallet address, including cost basis, current value, and P&L calculations. Supports filtering by market, share size, and status.
+Fetch all open and historical positions for a wallet address, including cost basis, current value, and P&L calculations. Supports filtering by market, share size, and status.
 
 <ParamField path="wallet_address" type="string" required>
   Wallet address to fetch positions for
