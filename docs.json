@@ -91,8 +91,8 @@
     ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/public/predexon-logo.png",
+    "dark": "/public/predexon-logo.png"
   },
   "navbar": {
     "links": [
