@@ -3892,11 +3892,24 @@
         "title": "OrderDirection",
         "description": "Sort order direction enum."
       }
+    },
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key for authentication. Get your free key at dashboard.predexon.com"
+      }
     }
   },
   "servers": [
     {
       "url": "https://api.predexon.com"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
     }
   ]
 }
