@@ -70,7 +70,8 @@ All timestamps are in **milliseconds**. Prices are in **cents** (1-99 representi
 <RequestExample>
 ```bash cURL
 # Get orderbook history for past hour
-curl "https://api.predexon.com/v1/kalshi/orderbooks?ticker=KXBTC-25JAN31-B100000&start_time=1706745600000&end_time=1706749200000&limit=50"
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://api.predexon.com/v1/kalshi/orderbooks?ticker=KXBTC-25JAN31-B100000&start_time=1706745600000&end_time=1706749200000&limit=50"
 ```
 
 ```python Python
@@ -83,6 +84,7 @@ start_time = end_time - (60 * 60 * 1000)  # 1 hour ago
 
 response = requests.get(
     "https://api.predexon.com/v1/kalshi/orderbooks",
+    headers={"x-api-key": "YOUR_API_KEY"},
     params={
         "ticker": ticker,
         "start_time": start_time,
@@ -104,7 +106,8 @@ const endTime = Date.now();
 const startTime = endTime - 60 * 60 * 1000; // 1 hour ago
 
 const response = await fetch(
-  `https://api.predexon.com/v1/kalshi/orderbooks?ticker=KXBTC-25JAN31-B100000&start_time=${startTime}&end_time=${endTime}&limit=50`
+  `https://api.predexon.com/v1/kalshi/orderbooks?ticker=KXBTC-25JAN31-B100000&start_time=${startTime}&end_time=${endTime}&limit=50`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
 );
 const { snapshots, pagination } = await response.json();
 

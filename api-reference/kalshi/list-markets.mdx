@@ -132,7 +132,8 @@ This endpoint does not include Multi Variate Event (MVE) markets such as parlays
 
 <RequestExample>
 ```bash cURL
-curl "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=10"
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=10"
 ```
 
 ```python Python
@@ -140,6 +141,7 @@ import requests
 
 response = requests.get(
     "https://api.predexon.com/v1/kalshi/markets",
+    headers={"x-api-key": "YOUR_API_KEY"},
     params={
         "status": "open",
         "sort": "volume",
@@ -151,7 +153,8 @@ data = response.json()
 
 ```typescript TypeScript
 const response = await fetch(
-  "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=10"
+  "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=10",
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
 );
 const data = await response.json();
 ```

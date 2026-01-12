@@ -28,6 +28,13 @@
             ]
           },
           {
+            "group": "Cross-Platform Matching",
+            "pages": [
+              "api-reference/matching/find-matches",
+              "api-reference/matching/matched-pairs"
+            ]
+          },
+          {
             "group": "Polymarket",
             "pages": [
               "api-reference/markets/list-markets",
@@ -48,13 +55,6 @@
               "api-reference/kalshi/list-markets",
               "api-reference/kalshi/trades",
               "api-reference/kalshi/orderbooks"
-            ]
-          },
-          {
-            "group": "Cross-Platform Matching",
-            "pages": [
-              "api-reference/matching/find-matches",
-              "api-reference/matching/matched-pairs"
             ]
           }
         ]

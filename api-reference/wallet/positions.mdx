@@ -95,7 +95,8 @@ Fetch all current positions for a wallet address, including cost basis, current 
 
 <RequestExample>
 ```bash cURL
-curl "https://api.predexon.com/v1/polymarket/wallet/positions/0x1234...?sort_by=value&limit=50"
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://api.predexon.com/v1/polymarket/wallet/positions/0x1234...?sort_by=value&limit=50"
 ```
 
 ```python Python
@@ -105,6 +106,7 @@ wallet = "0x1234567890abcdef..."
 
 response = requests.get(
     f"https://api.predexon.com/v1/polymarket/wallet/positions/{wallet}",
+    headers={"x-api-key": "YOUR_API_KEY"},
     params={
         "sort_by": "unrealized_pnl",
         "order": "desc",
@@ -125,7 +127,8 @@ for pos in data["positions"][:5]:
 
 ```typescript TypeScript
 const response = await fetch(
-  `https://api.predexon.com/v1/polymarket/wallet/positions/${walletAddress}?sort_by=value`
+  `https://api.predexon.com/v1/polymarket/wallet/positions/${walletAddress}?sort_by=value`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
 );
 const { positions, summary } = await response.json();
 ```

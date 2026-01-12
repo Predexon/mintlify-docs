@@ -54,7 +54,8 @@ Fetch historical candlestick (OHLCV) data for charting and analysis. Data is nor
 
 <RequestExample>
 ```bash cURL
-curl "https://api.predexon.com/v1/polymarket/candlesticks/0x1234...?interval=60&start_time=1704067200&end_time=1704153600"
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://api.predexon.com/v1/polymarket/candlesticks/0x1234...?interval=60&start_time=1704067200&end_time=1704153600"
 ```
 
 ```python Python
@@ -62,6 +63,7 @@ import requests
 
 response = requests.get(
     f"https://api.predexon.com/v1/polymarket/candlesticks/{condition_id}",
+    headers={"x-api-key": "YOUR_API_KEY"},
     params={
         "interval": 60,
         "start_time": 1704067200,
@@ -73,7 +75,8 @@ candlesticks = response.json()["candlesticks"]
 
 ```typescript TypeScript
 const response = await fetch(
-  `https://api.predexon.com/v1/polymarket/candlesticks/${conditionId}?interval=60&start_time=1704067200&end_time=1704153600`
+  `https://api.predexon.com/v1/polymarket/candlesticks/${conditionId}?interval=60&start_time=1704067200&end_time=1704153600`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
 );
 const { candlesticks } = await response.json();
 ```
