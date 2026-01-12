@@ -12,7 +12,7 @@ description: "How to authenticate with the Predexon API"
 The Predexon API requires an API key for all requests. **Signing up is free** at [dashboard.predexon.com](https://dashboard.predexon.com).
 
 ```bash
-curl -H "Authorization: Bearer YOUR_API_KEY" \
+curl -H "x-api-key: YOUR_API_KEY" \
   "https://api.predexon.com/v1/polymarket/markets?limit=10"
 ```
 
@@ -56,7 +56,7 @@ def get_market(condition_id: str, api_key: str) -> dict:
     response = requests.get(
         f"{BASE_URL}/v1/polymarket/markets",
         params={"condition_id": condition_id},
-        headers={"Authorization": f"Bearer {api_key}"}
+        headers={"x-api-key": api_key}
     )
     data = response.json()
     cache[cache_key] = {"data": data, "expires": now + CACHE_TTL}
@@ -92,7 +92,7 @@ API_KEY = "your_api_key"
 
 # Create a session once with auth header
 session = requests.Session()
-session.headers.update({"Authorization": f"Bearer {API_KEY}"})
+session.headers.update({"x-api-key": API_KEY})
 
 # Use it for all requests
 response = session.get(f"{BASE_URL}/v1/polymarket/markets")
@@ -106,7 +106,7 @@ The API supports CORS for browser-based applications:
 const API_KEY = "your_api_key";
 
 fetch("https://api.predexon.com/v1/polymarket/markets", {
-  headers: { "Authorization": `Bearer ${API_KEY}` }
+  headers: { "x-api-key": API_KEY }
 })
   .then(res => res.json())
   .then(data => console.log(data));

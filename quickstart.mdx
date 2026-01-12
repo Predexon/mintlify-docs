@@ -23,16 +23,19 @@ The Predexon API provides RESTful endpoints for accessing prediction market data
 
     <CodeGroup>
     ```bash cURL
-    curl "https://api.predexon.com/v1/polymarket/markets?status=open&sort=volume&limit=5"
+    curl -H "x-api-key: YOUR_API_KEY" \
+      "https://api.predexon.com/v1/polymarket/markets?status=open&sort=volume&limit=5"
     ```
 
     ```python Python
     import requests
 
     BASE_URL = "https://api.predexon.com"
+    API_KEY = "your_api_key"
 
     response = requests.get(
         f"{BASE_URL}/v1/polymarket/markets",
+        headers={"x-api-key": API_KEY},
         params={
             "status": "open",
             "sort": "volume",
@@ -47,9 +50,11 @@ The Predexon API provides RESTful endpoints for accessing prediction market data
 
     ```typescript TypeScript
     const BASE_URL = "https://api.predexon.com";
+    const API_KEY = "your_api_key";
 
     const response = await fetch(
-      `${BASE_URL}/v1/polymarket/markets?status=open&sort=volume&limit=5`
+      `${BASE_URL}/v1/polymarket/markets?status=open&sort=volume&limit=5`,
+      { headers: { "x-api-key": API_KEY } }
     );
 
     const { markets } = await response.json();
@@ -98,6 +103,7 @@ Fetch candlestick data for charting:
 ```python
 response = requests.get(
     f"{BASE_URL}/v1/polymarket/candlesticks/{condition_id}",
+    headers={"x-api-key": API_KEY},
     params={
         "interval": 60,  # 1-hour candles
         "start_time": 1704067200,
@@ -113,6 +119,7 @@ Get all open positions for a wallet address:
 ```python
 response = requests.get(
     f"{BASE_URL}/v1/polymarket/wallet/positions/{wallet_address}",
+    headers={"x-api-key": API_KEY},
     params={"sort_by": "value", "limit": 50}
 )
 ```
@@ -124,6 +131,7 @@ Discover equivalent markets on Kalshi:
 ```python
 response = requests.get(
     f"{BASE_URL}/v1/matching-markets",
+    headers={"x-api-key": API_KEY},
     params={"polymarket_market_slug": "will-donald-trump-win-the-2024-us-presidential-election"}
 )
 ```
@@ -143,6 +151,7 @@ The API uses standard HTTP status codes:
 |------|-------------|
 | `200` | Success |
 | `400` | Bad request - check your parameters |
+| `403` | Forbidden - invalid or missing API key |
 | `404` | Resource not found |
 | `429` | Rate limit exceeded |
 | `500` | Internal server error |

@@ -112,7 +112,11 @@
     }
   },
   "api": {
-    "baseUrl": "https://api.predexon.com"
+    "baseUrl": "https://api.predexon.com",
+    "auth": {
+      "method": "key",
+      "name": "x-api-key"
+    }
   },
   "openapi": "/api-reference/openapi.json",
   "footer": {
