@@ -116,106 +116,6 @@
         }
       }
     },
-    "/v1/matching-markets/batch": {
-      "get": {
-        "tags": [
-          "matching"
-        ],
-        "summary": "Get Batch Matching Markets",
-        "description": "Find matching markets for multiple market identifiers at once.\n\nProvide either Polymarket slugs OR Kalshi tickers (not both).\n\nReturns a dictionary mapping each input identifier to its matches.",
-        "operationId": "get_batch_matching_markets_v1_matching_markets_batch_get",
-        "parameters": [
-          {
-            "name": "polymarket_market_slugs",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of Polymarket market slugs",
-              "title": "Polymarket Market Slugs"
-            },
-            "description": "List of Polymarket market slugs",
-            "example": [
-              "bitcoin-up-or-down-july-25-8pm-et"
-            ]
-          },
-          {
-            "name": "kalshi_market_tickers",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of Kalshi market tickers",
-              "title": "Kalshi Market Tickers"
-            },
-            "description": "List of Kalshi market tickers",
-            "example": [
-              "KXNFLGAME-25AUG16ARIDEN"
-            ]
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Internal Server Error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/matching-markets/pairs": {
       "get": {
         "tags": [
@@ -2494,20 +2394,53 @@
         "title": "ActivitySide",
         "description": "Activity side enum."
       },
-      "CandlesticksResponse": {
+      "CandlestickData": {
         "properties": {
-          "candlesticks": {
-            "items": {
-              "items": {},
-              "type": "array"
-            },
-            "type": "array",
-            "title": "Candlesticks",
-            "description": "Array of [candlestick_data_array, token_metadata] tuples"
+          "end_period_ts": {
+            "type": "integer",
+            "title": "End Period Ts"
+          },
+          "price": {
+            "$ref": "#/components/schemas/PriceData"
+          },
+          "volume": {
+            "type": "number",
+            "title": "Volume"
+          },
+          "trades_count": {
+            "type": "integer",
+            "title": "Trades Count"
           }
         },
         "type": "object",
         "required": [
+          "end_period_ts",
+          "price",
+          "volume",
+          "trades_count"
+        ],
+        "title": "CandlestickData",
+        "description": "Individual candlestick data."
+      },
+      "CandlesticksResponse": {
+        "properties": {
+          "condition_id": {
+            "type": "string",
+            "title": "Condition Id",
+            "description": "Market condition ID"
+          },
+          "candlesticks": {
+            "items": {
+              "$ref": "#/components/schemas/CandlestickData"
+            },
+            "type": "array",
+            "title": "Candlesticks",
+            "description": "Array of candlestick data points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "condition_id",
           "candlesticks"
         ],
         "title": "CandlesticksResponse",
@@ -3705,6 +3638,75 @@
         ],
         "title": "PositionsSummary",
         "description": "Summary of all positions."
+      },
+      "PriceData": {
+        "properties": {
+          "open": {
+            "type": "number",
+            "title": "Open"
+          },
+          "high": {
+            "type": "number",
+            "title": "High"
+          },
+          "low": {
+            "type": "number",
+            "title": "Low"
+          },
+          "close": {
+            "type": "number",
+            "title": "Close"
+          },
+          "open_dollars": {
+            "type": "string",
+            "title": "Open Dollars"
+          },
+          "high_dollars": {
+            "type": "string",
+            "title": "High Dollars"
+          },
+          "low_dollars": {
+            "type": "string",
+            "title": "Low Dollars"
+          },
+          "close_dollars": {
+            "type": "string",
+            "title": "Close Dollars"
+          },
+          "mean": {
+            "type": "number",
+            "title": "Mean"
+          },
+          "mean_dollars": {
+            "type": "string",
+            "title": "Mean Dollars"
+          },
+          "previous": {
+            "type": "number",
+            "title": "Previous"
+          },
+          "previous_dollars": {
+            "type": "string",
+            "title": "Previous Dollars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "open",
+          "high",
+          "low",
+          "close",
+          "open_dollars",
+          "high_dollars",
+          "low_dollars",
+          "close_dollars",
+          "mean",
+          "mean_dollars",
+          "previous",
+          "previous_dollars"
+        ],
+        "title": "PriceData",
+        "description": "Price data within candlestick."
       },
       "TakerSide": {
         "type": "string",

@@ -27,8 +27,12 @@ Fetch historical candlestick (OHLCV) data for charting and analysis. Data is nor
   - `1440` - 1 day (max 1 year range)
 </ParamField>
 
+<ResponseField name="condition_id" type="string">
+  The market condition ID
+</ResponseField>
+
 <ResponseField name="candlesticks" type="array">
-  Array of candlestick data with token metadata
+  Array of candlestick data points
   <Expandable title="Candlestick structure">
     <ResponseField name="end_period_ts" type="integer">
       Unix timestamp for end of this candle period
@@ -39,8 +43,14 @@ Fetch historical candlestick (OHLCV) data for charting and analysis. Data is nor
         <ResponseField name="high" type="number">Highest price</ResponseField>
         <ResponseField name="low" type="number">Lowest price</ResponseField>
         <ResponseField name="close" type="number">Closing price</ResponseField>
+        <ResponseField name="open_dollars" type="string">Opening price formatted as dollars</ResponseField>
+        <ResponseField name="high_dollars" type="string">Highest price formatted as dollars</ResponseField>
+        <ResponseField name="low_dollars" type="string">Lowest price formatted as dollars</ResponseField>
+        <ResponseField name="close_dollars" type="string">Closing price formatted as dollars</ResponseField>
         <ResponseField name="mean" type="number">Mean price for period</ResponseField>
+        <ResponseField name="mean_dollars" type="string">Mean price formatted as dollars</ResponseField>
         <ResponseField name="previous" type="number">Previous candle's close</ResponseField>
+        <ResponseField name="previous_dollars" type="string">Previous close formatted as dollars</ResponseField>
       </Expandable>
     </ResponseField>
     <ResponseField name="volume" type="number">
@@ -85,52 +95,46 @@ const { candlesticks } = await response.json();
 <ResponseExample>
 ```json 200
 {
+  "condition_id": "0x1234567890abcdef1234567890abcdef12345678",
   "candlesticks": [
-    [
-      [
-        {
-          "end_period_ts": 1704070800,
-          "price": {
-            "open": 0.5500,
-            "high": 0.5650,
-            "low": 0.5480,
-            "close": 0.5620,
-            "open_dollars": "0.5500",
-            "high_dollars": "0.5650",
-            "low_dollars": "0.5480",
-            "close_dollars": "0.5620",
-            "mean": 0.5560,
-            "mean_dollars": "0.5560",
-            "previous": 0.5480,
-            "previous_dollars": "0.5480"
-          },
-          "volume": 125000.50,
-          "trades_count": 847
-        },
-        {
-          "end_period_ts": 1704074400,
-          "price": {
-            "open": 0.5620,
-            "high": 0.5700,
-            "low": 0.5590,
-            "close": 0.5680,
-            "open_dollars": "0.5620",
-            "high_dollars": "0.5700",
-            "low_dollars": "0.5590",
-            "close_dollars": "0.5680",
-            "mean": 0.5640,
-            "mean_dollars": "0.5640",
-            "previous": 0.5620,
-            "previous_dollars": "0.5620"
-          },
-          "volume": 98500.25,
-          "trades_count": 623
-        }
-      ],
-      {
-        "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455"
-      }
-    ]
+    {
+      "end_period_ts": 1704070800,
+      "price": {
+        "open": 0.5500,
+        "high": 0.5650,
+        "low": 0.5480,
+        "close": 0.5620,
+        "open_dollars": "0.5500",
+        "high_dollars": "0.5650",
+        "low_dollars": "0.5480",
+        "close_dollars": "0.5620",
+        "mean": 0.5560,
+        "mean_dollars": "0.5560",
+        "previous": 0.5480,
+        "previous_dollars": "0.5480"
+      },
+      "volume": 125000.50,
+      "trades_count": 847
+    },
+    {
+      "end_period_ts": 1704074400,
+      "price": {
+        "open": 0.5620,
+        "high": 0.5700,
+        "low": 0.5590,
+        "close": 0.5680,
+        "open_dollars": "0.5620",
+        "high_dollars": "0.5700",
+        "low_dollars": "0.5590",
+        "close_dollars": "0.5680",
+        "mean": 0.5640,
+        "mean_dollars": "0.5640",
+        "previous": 0.5620,
+        "previous_dollars": "0.5620"
+      },
+      "volume": 98500.25,
+      "trades_count": 623
+    }
   ]
 }
 ```

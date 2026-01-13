@@ -1,0 +1,65 @@
+---
+title: "Changelog"
+description: "API updates, new features, and breaking changes"
+---
+
+## January 2026
+
+### January 13, 2026
+
+#### Breaking Changes
+
+<Warning>
+**Candlesticks Response Structure Changed**
+
+The `/v1/polymarket/candlesticks/{condition_id}` endpoint response structure has been updated:
+
+**Before:** Nested array of `[candlestick_data_array, token_metadata]` tuples
+**After:** Flat structure with `condition_id` at root and `candlesticks` as a direct array of candlestick objects
+
+```json
+// New response structure
+{
+  "condition_id": "0x1234...",
+  "candlesticks": [
+    {
+      "end_period_ts": 1704070800,
+      "price": { "open": 0.55, "high": 0.57, ... },
+      "volume": 125000.50,
+      "trades_count": 847
+    }
+  ]
+}
+```
+</Warning>
+
+#### Schema Updates
+
+| Change | Details |
+|--------|---------|
+| **CandlestickData** | New properly typed schema replacing untyped tuple format |
+| **CandlesticksResponse** | Added `condition_id` field, flattened candlesticks array |
+| **PriceData** | New schema with explicit dollar-formatted string fields (`open_dollars`, `high_dollars`, `low_dollars`, `close_dollars`, `mean_dollars`, `previous_dollars`) |
+
+#### Improvements
+
+- All price values in candlesticks now include both numeric and dollar-formatted string representations
+- Response schemas are now fully typed for better client SDK generation
+- Improved API documentation with accurate response examples
+
+---
+
+## How to Stay Updated
+
+<CardGroup cols={2}>
+  <Card title="Discord" icon="discord" href="https://discord.com/invite/SZY52ufQB5">
+    Join our Discord for real-time updates and community support
+  </Card>
+  <Card title="Email Updates" icon="envelope" href="mailto:team@predexon.com">
+    Subscribe to our mailing list for changelog notifications
+  </Card>
+</CardGroup>
+
+<Note>
+All breaking changes are announced at least 2 weeks in advance via Discord and email.
+</Note>
