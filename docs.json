@@ -137,8 +137,8 @@
     }
   },
   "openapi": "/api-reference/openapi.json",
-  "copyButton": {
-    "formats": ["markdown", "text"]
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude"]
   },
   "footer": {
     "socials": {
