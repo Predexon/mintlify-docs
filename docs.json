@@ -56,6 +56,13 @@
               "api-reference/kalshi/trades",
               "api-reference/kalshi/orderbooks"
             ]
+          },
+          {
+            "group": "Dflow",
+            "pages": [
+              "api-reference/dflow/trades",
+              "api-reference/dflow/pnl"
+            ]
           }
         ]
       },
@@ -130,6 +137,9 @@
     }
   },
   "openapi": "/api-reference/openapi.json",
+  "copyButton": {
+    "formats": ["markdown", "text"]
+  },
   "footer": {
     "socials": {
       "x": "https://x.com/predexon",

@@ -1,0 +1,142 @@
+---
+title: "Trades"
+openapi: "GET /v1/dflow/trades"
+description: "Fetch trade history for a wallet on Dflow"
+---
+
+## Overview
+
+Fetch trade history for a specific wallet on the Dflow prediction market platform. Returns trades enriched with market metadata including title, category, and side.
+
+<ParamField query="wallet" type="string" required>
+  Wallet address to fetch trades for
+</ParamField>
+
+<ParamField query="market_ticker" type="string">
+  Filter by market ticker
+</ParamField>
+
+<ParamField query="outcome_mint" type="string">
+  Filter by outcome mint address
+</ParamField>
+
+<ParamField query="trade_type" type="string">
+  Filter by trade type: `BUY_FILL`, `SELL_FILL`, or `REDEEM`
+</ParamField>
+
+<ParamField query="start_time" type="integer">
+  Unix timestamp (seconds) for start of time range
+</ParamField>
+
+<ParamField query="end_time" type="integer">
+  Unix timestamp (seconds) for end of time range
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+  Number of trades to return (1-1000)
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of trades to skip for pagination (0-100000)
+</ParamField>
+
+<ParamField query="order" type="string" default="desc">
+  Sort order: `asc` or `desc`
+</ParamField>
+
+<ResponseField name="trades" type="array">
+  <Expandable title="Trade object">
+    <ResponseField name="tx_hash" type="string">Transaction hash</ResponseField>
+    <ResponseField name="wallet" type="string">Wallet address</ResponseField>
+    <ResponseField name="market_ticker" type="string">Market ticker</ResponseField>
+    <ResponseField name="outcome_mint" type="string">Outcome mint address</ResponseField>
+    <ResponseField name="trade_type" type="string">Trade type: BUY_FILL, SELL_FILL, or REDEEM</ResponseField>
+    <ResponseField name="shares" type="number">Number of shares</ResponseField>
+    <ResponseField name="price" type="number">Price per share (0-1)</ResponseField>
+    <ResponseField name="cost_usd" type="number">Total cost in USD</ResponseField>
+    <ResponseField name="timestamp" type="integer">Unix timestamp in seconds</ResponseField>
+    <ResponseField name="title" type="string">Market title</ResponseField>
+    <ResponseField name="category" type="string">Market category</ResponseField>
+    <ResponseField name="side" type="string">Position side (YES/NO)</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
+    <ResponseField name="offset" type="integer">Current offset</ResponseField>
+    <ResponseField name="total" type="integer">Total matching trades</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://api.predexon.com/v1/dflow/trades?wallet=YOUR_WALLET_ADDRESS&limit=50"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.predexon.com/v1/dflow/trades",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    params={
+        "wallet": "YOUR_WALLET_ADDRESS",
+        "limit": 50
+    }
+)
+
+for trade in response.json()["trades"]:
+    print(f"{trade['trade_type']}: {trade['shares']} shares @ ${trade['price']:.2f}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  `https://api.predexon.com/v1/dflow/trades?wallet=${walletAddress}&limit=50`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
+);
+const { trades, pagination } = await response.json();
+
+trades.forEach(trade => {
+  console.log(`${trade.trade_type}: ${trade.shares} shares @ $${trade.price}`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "trades": [
+    {
+      "tx_hash": "5xKpN2...",
+      "wallet": "7vfCXTUXx...",
+      "market_ticker": "BTCPRICE-26JAN",
+      "outcome_mint": "8xPqM3...",
+      "trade_type": "BUY_FILL",
+      "shares": 100,
+      "price": 0.65,
+      "cost_usd": 65.00,
+      "timestamp": 1705420800,
+      "title": "Bitcoin above $100k by Jan 2026?",
+      "category": "Crypto",
+      "side": "YES"
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "offset": 0,
+    "total": 127,
+    "has_more": true
+  }
+}
+```
+
+```json 400
+{
+  "error": "Bad Request",
+  "message": "wallet parameter is required"
+}
+```
+</ResponseExample>

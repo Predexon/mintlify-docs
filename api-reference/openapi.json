@@ -2264,6 +2264,303 @@
         }
       }
     },
+    "/v1/dflow/trades": {
+      "get": {
+        "tags": [
+          "dflow",
+          "dflow"
+        ],
+        "summary": "Get Dflow Trades",
+        "description": "Fetch trade history for a wallet on Dflow.\n\nReturns trades from the Dflow platform with support for:\n- Filtering by market_ticker, outcome_mint, or trade_type\n- Time range filtering\n- Offset-based pagination\n- Enriched with market metadata (title, category, side)",
+        "operationId": "get_dflow_trades_v1_dflow_trades_get",
+        "parameters": [
+          {
+            "name": "wallet",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Wallet address to fetch trades for",
+              "title": "Wallet"
+            },
+            "description": "Wallet address to fetch trades for"
+          },
+          {
+            "name": "market_ticker",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by market ticker",
+              "title": "Market Ticker"
+            },
+            "description": "Filter by market ticker"
+          },
+          {
+            "name": "outcome_mint",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by outcome mint address",
+              "title": "Outcome Mint"
+            },
+            "description": "Filter by outcome mint address"
+          },
+          {
+            "name": "trade_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DflowTradeType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by trade type: BUY_FILL, SELL_FILL, or REDEEM",
+              "title": "Trade Type"
+            },
+            "description": "Filter by trade type: BUY_FILL, SELL_FILL, or REDEEM"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Unix timestamp (seconds) for start",
+              "title": "Start Time"
+            },
+            "description": "Unix timestamp (seconds) for start"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Unix timestamp (seconds) for end",
+              "title": "End Time"
+            },
+            "description": "Unix timestamp (seconds) for end"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Number of trades to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Number of trades to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Number of trades to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of trades to skip"
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/app__models__schemas__OrderDirection",
+              "description": "Sort order: asc or desc",
+              "default": "desc"
+            },
+            "description": "Sort order: asc or desc"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DflowTradesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dflow/wallet/pnl/{wallet_address}": {
+      "get": {
+        "tags": [
+          "dflow",
+          "dflow"
+        ],
+        "summary": "Get Dflow Wallet Pnl",
+        "description": "Fetch realized profit and loss (PnL) history for a specific wallet address on Dflow.\n\nReturns cumulative realized PnL over time with data points for every interval\nin the specified granularity.",
+        "operationId": "get_dflow_wallet_pnl_v1_dflow_wallet_pnl__wallet_address__get",
+        "parameters": [
+          {
+            "name": "wallet_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Wallet address to fetch PnL for",
+              "title": "Wallet Address"
+            },
+            "description": "Wallet address to fetch PnL for"
+          },
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PnLGranularity",
+              "description": "Time granularity for PnL data"
+            },
+            "description": "Time granularity for PnL data"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Unix timestamp (seconds) for start of range",
+              "title": "Start Time"
+            },
+            "description": "Unix timestamp (seconds) for start of range"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Unix timestamp (seconds) for end of range",
+              "title": "End Time"
+            },
+            "description": "Unix timestamp (seconds) for end of range"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DflowWalletPnLResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Root",
@@ -2484,6 +2781,204 @@
         ],
         "title": "CursorPagination",
         "description": "Cursor-based pagination for endpoints that don't support offset."
+      },
+      "DflowPnLDataPoint": {
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "title": "Timestamp",
+            "description": "Unix timestamp in seconds"
+          },
+          "pnl_to_date": {
+            "type": "number",
+            "title": "Pnl To Date",
+            "description": "Cumulative realized PnL to date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "pnl_to_date"
+        ],
+        "title": "DflowPnLDataPoint",
+        "description": "Individual dflow PnL data point."
+      },
+      "DflowTrade": {
+        "properties": {
+          "signature": {
+            "type": "string",
+            "title": "Signature",
+            "description": "Solana transaction signature"
+          },
+          "slot": {
+            "type": "integer",
+            "title": "Slot",
+            "description": "Solana slot number"
+          },
+          "timestamp": {
+            "type": "integer",
+            "title": "Timestamp",
+            "description": "Unix timestamp in seconds"
+          },
+          "trade_type": {
+            "$ref": "#/components/schemas/DflowTradeType",
+            "description": "Type of trade: BUY_FILL, SELL_FILL, or REDEEM"
+          },
+          "owner_wallet": {
+            "type": "string",
+            "title": "Owner Wallet",
+            "description": "Wallet address of the trade owner"
+          },
+          "market_ticker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Ticker",
+            "description": "Market ticker identifier"
+          },
+          "outcome_mint": {
+            "type": "string",
+            "title": "Outcome Mint",
+            "description": "Outcome token mint address"
+          },
+          "input_amount": {
+            "type": "number",
+            "title": "Input Amount",
+            "description": "Input amount"
+          },
+          "output_amount": {
+            "type": "number",
+            "title": "Output Amount",
+            "description": "Output amount"
+          },
+          "trade_price": {
+            "type": "number",
+            "title": "Trade Price",
+            "description": "Trade execution price"
+          },
+          "realized_pnl": {
+            "type": "number",
+            "title": "Realized Pnl",
+            "description": "Realized PnL from this trade"
+          },
+          "fee_amount": {
+            "type": "number",
+            "title": "Fee Amount",
+            "description": "Fee amount paid"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Human-readable market title"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Side",
+            "description": "Trade side: YES or NO"
+          }
+        },
+        "type": "object",
+        "required": [
+          "signature",
+          "slot",
+          "timestamp",
+          "trade_type",
+          "owner_wallet",
+          "outcome_mint",
+          "input_amount",
+          "output_amount",
+          "trade_price",
+          "realized_pnl",
+          "fee_amount"
+        ],
+        "title": "DflowTrade",
+        "description": "Individual dflow trade."
+      },
+      "DflowTradeType": {
+        "type": "string",
+        "enum": [
+          "BUY_FILL",
+          "SELL_FILL",
+          "REDEEM"
+        ],
+        "title": "DflowTradeType",
+        "description": "Dflow trade type enum."
+      },
+      "DflowTradesResponse": {
+        "properties": {
+          "trades": {
+            "items": {
+              "$ref": "#/components/schemas/DflowTrade"
+            },
+            "type": "array",
+            "title": "Trades"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trades",
+          "pagination"
+        ],
+        "title": "DflowTradesResponse",
+        "description": "Dflow trades endpoint response."
+      },
+      "DflowWalletPnLResponse": {
+        "properties": {
+          "granularity": {
+            "$ref": "#/components/schemas/PnLGranularity"
+          },
+          "start_time": {
+            "type": "integer",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "integer",
+            "title": "End Time"
+          },
+          "wallet_address": {
+            "type": "string",
+            "title": "Wallet Address"
+          },
+          "pnl_over_time": {
+            "items": {
+              "$ref": "#/components/schemas/DflowPnLDataPoint"
+            },
+            "type": "array",
+            "title": "Pnl Over Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "granularity",
+          "start_time",
+          "end_time",
+          "wallet_address",
+          "pnl_over_time"
+        ],
+        "title": "DflowWalletPnLResponse",
+        "description": "Dflow wallet PnL endpoint response."
       },
       "ErrorResponse": {
         "properties": {
