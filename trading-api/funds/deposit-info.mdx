@@ -1,15 +1,47 @@
 ---
-title: "Bridge Deposit"
+title: "Deposits"
 openapi: "GET /api/bridge/deposit"
-description: "Get cross-chain deposit addresses for funding a Polymarket wallet"
+description: "Fund your trading wallets on Polymarket and Kalshi"
 ---
 
 ## Overview
 
-Returns deposit addresses for funding a Polymarket wallet from other chains. Supports deposits from Ethereum, Solana, Bitcoin, and other networks. Deposits are automatically bridged to USDC on Polygon.
+There are two ways to deposit funds depending on the venue:
+
+<CardGroup cols={2}>
+  <Card title="Polymarket" icon="bridge">
+    Use the Bridge API to deposit from any chain. Funds are automatically converted to USDC.e on Polygon.
+  </Card>
+  <Card title="Kalshi" icon="arrow-right">
+    Send USDC and SOL directly to your `kalshiWalletAddress` on Solana.
+  </Card>
+</CardGroup>
+
+## Kalshi Deposits
+
+To fund your Kalshi wallet, send tokens directly to the `kalshiWalletAddress` returned from [Create User](/trading-api/users/create-user).
+
+| Token | Chain | Address | Purpose |
+|-------|-------|---------|---------|
+| USDC | Solana (mainnet-beta) | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` | Trading funds |
+| SOL | Solana (mainnet-beta) | Native token | Transaction fees |
+
+<Warning>
+You must send both USDC and SOL to trade on Kalshi. USDC is used for trading, while SOL is required to pay Solana transaction fees.
+</Warning>
+
+<Note>
+To withdraw unused SOL, use the [Withdraw SOL](/trading-api/funds/withdraw-sol) endpoint.
+</Note>
+
+---
+
+## Polymarket Deposits (Bridge API)
+
+Returns deposit addresses for funding a Polymarket wallet from other chains. Supports deposits from Ethereum, Solana, Bitcoin, and other networks. Deposits are automatically bridged to USDC.e on Polygon.
 
 <ParamField query="wallet" type="string" required>
-  The Polymarket proxy wallet address (0x...) from [Create User](/trading-api/users/create-user).
+  The Polymarket wallet address (0x...) from [Create User](/trading-api/users/create-user).
 </ParamField>
 
 <RequestExample>
@@ -49,11 +81,11 @@ const depositInfo = await response.json();
 ```
 </RequestExample>
 
-<ResponseField name="wallet" type="string" required>
+<ResponseField name="wallet" type="string">
   The queried wallet address.
 </ResponseField>
 
-<ResponseField name="depositAddresses" type="object" required>
+<ResponseField name="depositAddresses" type="object">
   Deposit addresses for different chain types.
   <Expandable title="Deposit addresses">
     <ResponseField name="evm" type="string">
@@ -68,7 +100,7 @@ const depositInfo = await response.json();
   </Expandable>
 </ResponseField>
 
-<ResponseField name="supportedAssets" type="array" required>
+<ResponseField name="supportedAssets" type="array">
   List of supported tokens and chains.
   <Expandable title="Asset object">
     <ResponseField name="chain" type="string">
@@ -167,7 +199,7 @@ const depositInfo = await response.json();
     Send supported tokens to the appropriate deposit address for your source chain.
   </Step>
   <Step title="Automatic bridging">
-    Funds are automatically bridged to USDC on Polygon and credited to your wallet.
+    Funds are automatically bridged to USDC.e on Polygon and credited to your wallet.
   </Step>
   <Step title="Start trading">
     Check your balance and begin placing orders.

@@ -8,8 +8,8 @@ description: "Get the user's current positions across venues"
 
 Returns all positions held by the user across trading venues. Includes active positions (markets still trading), resolved positions (market settled), and redeemable positions (ready to cash out).
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 <ParamField query="venue" type="string">
@@ -59,7 +59,7 @@ const redeemable = positions.filter(p => p.status === "redeemable");
 ```
 </RequestExample>
 
-<ResponseField name="positions" type="array" required>
+<ResponseField name="positions" type="array">
   Array of position objects.
   <Expandable title="Position object">
     <ResponseField name="venue" type="string">

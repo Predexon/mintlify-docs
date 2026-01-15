@@ -1,24 +1,24 @@
 ---
-title: "Custodial Trading"
-description: "Understanding the custody model and wallet management"
+title: "How It Works"
+description: "Understanding wallet management and order execution"
 ---
 
-## What is Custodial Trading?
+## Overview
 
-The Predexon Custodial Trading API manages wallets on behalf of users. Instead of requiring users to handle private keys, manage gas, or sign transactions, the API handles all of this automatically.
+Predexon Trading API manages wallets on behalf of users. Instead of requiring users to handle private keys, manage gas, or sign transactions, the API handles all of this automatically.
 
 <CardGroup cols={2}>
   <Card title="Simplified Integration" icon="plug">
     No wallet SDKs or key management needed in your application
   </Card>
   <Card title="Gasless Trading" icon="gas-pump">
-    Polymarket trades use gasless relay - no ETH/MATIC required
+    Polymarket trades use gasless relay - no POL required
   </Card>
   <Card title="Multi-Venue" icon="layer-group">
     Single API for trading on Polymarket (Polygon) and Kalshi (Solana)
   </Card>
-  <Card title="Secure Custody" icon="shield-halved">
-    Keys managed by Turnkey with institutional-grade security
+  <Card title="Secure Key Management" icon="shield-halved">
+    Private keys managed by Turnkey - you never handle them
   </Card>
 </CardGroup>
 
@@ -27,65 +27,38 @@ The Predexon Custodial Trading API manages wallets on behalf of users. Instead o
 ```mermaid
 graph LR
     A[Your App] --> B[Predexon API]
-    B --> C[Turnkey]
-    C --> D[Polymarket]
-    C --> E[Kalshi/DFlow]
-    D --> F[Polygon]
-    E --> G[Solana]
+    B --> C[Polymarket]
+    B --> D[Kalshi]
 ```
 
 1. **Your Application** calls the Predexon Trading API
-2. **Predexon API** manages user sessions and routing
-3. **Turnkey** securely stores keys and signs transactions
-4. **Venue APIs** execute trades on Polymarket or Kalshi
-5. **Blockchains** settle transactions on Polygon or Solana
+2. **Predexon API** manages user wallets and executes trades
+3. **Venues** settle transactions on their respective blockchains
 
-## Wallet Architecture
+## Wallet Management
 
-### Polymarket (Polygon)
+When you create a user, the API generates managed wallets for each venue:
 
-Each user gets two components on Polygon:
+| Venue | Deposit Address | Blockchain |
+|-------|-----------------|------------|
+| Polymarket | `polymarketWalletAddress` | Polygon (USDC.e) |
+| Kalshi | `kalshiWalletAddress` | Solana (USDC) |
 
-| Component | Description |
-|-----------|-------------|
-| **Signing Wallet** | Turnkey-managed EOA that signs transactions |
-| **Gnosis Safe Proxy** | Smart contract wallet that holds funds |
+Send USDC.e (Polygon) or USDC (Solana) to the appropriate address to fund trading. The API handles all transaction signing automatically.
 
-The Gnosis Safe address (`polymarketWalletAddress`) is the deposit address. Users send USDC here, and the API uses the signing wallet to authorize trades.
+### Key Security
 
-**Why Gnosis Safe?**
-- Polymarket requires Safe wallets for trading
-- Enables gasless relay (meta-transactions)
-- Provides additional security through smart contract controls
+Private keys are managed by [Turnkey](https://turnkey.com), a secure key management infrastructure:
 
-### Kalshi (Solana)
-
-Each user gets a single Solana wallet:
-
-| Component | Description |
-|-----------|-------------|
-| **Solana Wallet** | Turnkey-managed keypair for DFlow swaps |
-
-The Solana address (`solanaWalletAddress`) is the deposit address for Kalshi trading. Users send USDC (SPL) here.
-
-**Key Difference:** Kalshi trading via DFlow requires SOL for transaction fees. Use the [Airdrop SOL](/trading-api/funds/airdrop-sol) endpoint to fund gas.
+- **Predexon never sees private keys** - keys are generated and stored in Turnkey's secure environment
+- **Hardware-backed security** - keys never leave secure enclaves
+- **No key management in your app** - all signing happens server-side
 
 ## Order Execution
 
 ### Polymarket Orders
 
-Polymarket uses a Central Limit Order Book (CLOB):
-
-```mermaid
-graph TD
-    A[Place Order] --> B{Order Type}
-    B -->|Limit| C[Added to Orderbook]
-    B -->|Market| D[Matched Immediately]
-    C --> E[Waits for Match]
-    E --> F[Partial/Full Fill]
-    D --> F
-    F --> G[Position Updated]
-```
+Polymarket uses an orderbook:
 
 **Order Types:**
 - **Limit Orders:** Placed on the orderbook at a specific price, wait for a counterparty
@@ -94,20 +67,11 @@ graph TD
 **Execution Model:**
 - Orders can be partially filled
 - Open orders can be cancelled
-- Gasless relay means no ETH/MATIC needed
+- Gasless relay means no POL needed
 
-### Kalshi Orders (via DFlow)
+### Kalshi Orders
 
-Kalshi uses atomic swaps through DFlow:
-
-```mermaid
-graph LR
-    A[Place Order] --> B[DFlow Quote]
-    B --> C{Quote Available?}
-    C -->|Yes| D[Atomic Swap]
-    C -->|No| E[Order Fails]
-    D --> F[Position Updated]
-```
+Kalshi orders execute atomically:
 
 **Execution Model:**
 - All-or-nothing execution (no partial fills)
@@ -117,64 +81,38 @@ graph LR
 
 ## Position Lifecycle
 
-```mermaid
-stateDiagram-v2
-    [*] --> Active: Buy Order Filled
-    Active --> Active: Price Changes
-    Active --> Resolved: Market Settles
-    Resolved --> Redeemable: Ready for Payout
-    Redeemable --> [*]: Redeemed
-    Active --> [*]: Sold
-```
+Positions move through three stages:
 
-| Status | Description | Available Actions |
-|--------|-------------|-------------------|
-| `active` | Market is still trading | Sell position, monitor P&L |
-| `resolved` | Market has settled, outcome determined | View result (won/lost) |
-| `redeemable` | Ready for payout | Redeem for USDC |
+<Steps>
+  <Step title="Active">
+    Market is still trading. You can sell your position or monitor P&L.
+  </Step>
+  <Step title="Resolved">
+    Market has settled and outcome is determined. Check if you won or lost.
+  </Step>
+  <Step title="Redeemable">
+    Winning positions can be redeemed for USDC via the [Redeem endpoint](/trading-api/positions/redeem-position).
+  </Step>
+</Steps>
 
 ## Security Model
 
-### Key Management
-
-All private keys are managed by [Turnkey](https://turnkey.com):
-
-- Hardware-backed key storage
-- Keys never leave secure enclaves
-- Transaction signing happens server-side
-- No private keys in your application
-
-### Access Control
-
-The ownership model ensures isolation:
-
-```
-API Key A ──┬── User 1
-            ├── User 2
-            └── User 3
-
-API Key B ──┬── User 4
-            └── User 5
-```
-
-- Each API key can only access users it created
-- Cross-API key access returns 403 Forbidden
-- Users cannot access each other's data
+Each API key can only access users it created. Attempting to access another API key's users returns `403 Forbidden`.
 
 ## Fee Structure
 
 | Venue | Trading Fees | Gas Fees |
 |-------|--------------|----------|
-| Polymarket | Per Polymarket CLOB schedule | Gasless (relay covers) |
-| Kalshi | Included in DFlow swap | User pays SOL |
+| Polymarket | Per Polymarket schedule | Gasless (relay covers) |
+| Kalshi | Included in swap | User pays SOL |
 
 <Note>
-For Kalshi, use [Airdrop SOL](/trading-api/funds/airdrop-sol) to fund transaction fees before trading.
+Kalshi trading requires SOL for Solana transaction fees.
 </Note>
 
 ## Comparison to Self-Custody
 
-| Feature | Custodial (Predexon) | Self-Custody |
+| Feature | Predexon | Self-Custody |
 |---------|---------------------|--------------|
 | Key management | Handled by API | You manage |
 | Gas fees | Gasless (Polymarket) | You pay |

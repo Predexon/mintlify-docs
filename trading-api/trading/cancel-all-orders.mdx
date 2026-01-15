@@ -8,8 +8,8 @@ description: "Cancel all open orders for a user"
 
 Cancels all open orders for the user. Optionally filter by venue to only cancel orders on a specific platform.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 <ParamField query="venue" type="string">
@@ -59,7 +59,7 @@ console.log(`Cancelled ${cancelled} orders`);
 ```
 </RequestExample>
 
-<ResponseField name="cancelled" type="integer" required>
+<ResponseField name="cancelled" type="integer">
   Number of orders that were cancelled.
 </ResponseField>
 
@@ -84,7 +84,7 @@ console.log(`Cancelled ${cancelled} orders`);
 </ResponseExample>
 
 <Note>
-This only affects Polymarket orders. Kalshi orders via DFlow are atomic swaps that execute immediately and cannot be cancelled.
+This only affects Polymarket orders. Kalshi orders are atomic swaps that execute immediately and cannot be cancelled.
 </Note>
 
 ## Use Cases

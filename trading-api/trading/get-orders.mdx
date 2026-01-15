@@ -6,10 +6,10 @@ description: "Get open orders for a user"
 
 ## Overview
 
-Returns the user's open orders. This primarily returns Polymarket orders since Kalshi orders via DFlow are atomic swaps that execute immediately.
+Returns the user's open orders. This primarily returns Polymarket orders since Kalshi orders are atomic swaps that execute immediately.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 <ParamField query="venue" type="string">
@@ -53,7 +53,7 @@ const { orders } = await response.json();
 ```
 </RequestExample>
 
-<ResponseField name="orders" type="array" required>
+<ResponseField name="orders" type="array">
   Array of open order objects.
   <Expandable title="Order object">
     <ResponseField name="orderId" type="string">
@@ -133,5 +133,5 @@ const { orders } = await response.json();
 </ResponseExample>
 
 <Note>
-Kalshi orders via DFlow are atomic swaps and execute immediately. They don't persist as open orders, so this endpoint primarily returns Polymarket limit orders.
+Kalshi orders are atomic swaps and execute immediately. They don't persist as open orders, so this endpoint primarily returns Polymarket limit orders.
 </Note>

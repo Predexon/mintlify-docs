@@ -73,6 +73,12 @@
             "group": "Getting Started",
             "pages": [
               "trading-api/introduction",
+              "trading-api/quickstart"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
               "concepts/custody"
             ]
           },
@@ -106,7 +112,7 @@
             "pages": [
               "trading-api/funds/deposit-info",
               "trading-api/funds/withdraw",
-              "trading-api/funds/airdrop-sol"
+              "trading-api/funds/withdraw-sol"
             ]
           }
         ]

@@ -8,8 +8,8 @@ description: "Retrieve user information including wallet addresses"
 
 Retrieves user information including both wallet addresses. Use this to look up deposit addresses for an existing user.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4) returned from [Create User](/trading-api/users/create-user).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 <RequestExample>
@@ -41,20 +41,20 @@ const user = await response.json();
 ```
 </RequestExample>
 
-<ResponseField name="userId" type="string" required>
-  UUID v4 identifier for the user.
+<ResponseField name="userId" type="string">
+  Unique identifier for the user.
 </ResponseField>
 
-<ResponseField name="createdAt" type="string" required>
+<ResponseField name="createdAt" type="string">
   ISO 8601 timestamp of when the user was created.
 </ResponseField>
 
-<ResponseField name="polymarketWalletAddress" type="string" required>
-  Gnosis Safe address on Polygon for Polymarket deposits.
+<ResponseField name="polymarketWalletAddress" type="string">
+  Polygon wallet address for Polymarket deposits.
 </ResponseField>
 
-<ResponseField name="solanaWalletAddress" type="string" required>
-  Solana wallet address for Kalshi deposits.
+<ResponseField name="kalshiWalletAddress" type="string">
+  Kalshi wallet address for deposits.
 </ResponseField>
 
 <ResponseExample>
@@ -63,7 +63,7 @@ const user = await response.json();
   "userId": "550e8400-e29b-41d4-a716-446655440000",
   "createdAt": "2024-01-15T10:30:00.000Z",
   "polymarketWalletAddress": "0x1234567890abcdef1234567890abcdef12345678",
-  "solanaWalletAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So"
+  "kalshiWalletAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So"
 }
 ```
 

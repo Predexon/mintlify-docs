@@ -8,8 +8,8 @@ description: "Redeem a resolved position for USDC"
 
 Redeems a resolved position, converting winning tokens back to USDC. Only positions with status `redeemable` and result `won` will return USDC - losing positions have no value to redeem.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 ## Request Body
@@ -110,11 +110,11 @@ const result = await response.json();
 ```
 </RequestExample>
 
-<ResponseField name="transactionHash" type="string" required>
+<ResponseField name="transactionHash" type="string">
   Blockchain transaction hash for the redemption.
 </ResponseField>
 
-<ResponseField name="venue" type="string" required>
+<ResponseField name="venue" type="string">
   Trading venue where the redemption occurred.
 </ResponseField>
 
@@ -126,27 +126,27 @@ const result = await response.json();
   Kalshi market ticker (Kalshi redemptions only).
 </ResponseField>
 
-<ResponseField name="title" type="string" required>
+<ResponseField name="title" type="string">
   Market question/title.
 </ResponseField>
 
-<ResponseField name="outcome" type="string" required>
+<ResponseField name="outcome" type="string">
   The outcome side that was redeemed.
 </ResponseField>
 
-<ResponseField name="sizeRedeemed" type="string" required>
+<ResponseField name="sizeRedeemed" type="string">
   Number of tokens that were burned.
 </ResponseField>
 
-<ResponseField name="result" type="string" required>
+<ResponseField name="result" type="string">
   Position result: `won` or `lost`
 </ResponseField>
 
-<ResponseField name="amountRedeemed" type="string" required>
+<ResponseField name="amountRedeemed" type="string">
   USDC received from redemption. For winning positions, this equals `sizeRedeemed`. For losing positions, this is `0`.
 </ResponseField>
 
-<ResponseField name="status" type="string" required>
+<ResponseField name="status" type="string">
   Always `completed` for successful redemptions.
 </ResponseField>
 

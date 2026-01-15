@@ -1,15 +1,15 @@
 ---
 title: "Trading API Reference"
-description: "Complete reference for the Predexon Custodial Trading API"
+description: "Complete reference for the Predexon Trading API"
 ---
 
 <Info>
-**Get your API key** at [dashboard.predexon.com](https://dashboard.predexon.com) to start trading programmatically.
+**Request your private beta API key** on [Discord](https://discord.com/invite/dxwzMcs8hX) to start trading programmatically.
 </Info>
 
 ## Overview
 
-The Predexon Custodial Trading API provides a unified interface for trading on prediction markets across multiple venues. Users don't manage their own wallets - the API handles wallet creation, key management, and transaction signing on their behalf.
+Predexon Trading API provides a unified interface for trading on prediction markets across multiple venues. Users don't manage their own wallets - the API handles wallet creation, key management, and transaction signing on their behalf.
 
 ## Base URL
 
@@ -21,17 +21,17 @@ https://trade.predexon.com
 
 <CardGroup cols={2}>
   <Card title="Polymarket" icon="chart-line">
-    Polygon blockchain with Gnosis Safe wallets. Supports limit and market orders on the CLOB.
+    Polygon blockchain. Supports limit and market orders on the orderbook.
   </Card>
   <Card title="Kalshi" icon="bolt">
-    Solana blockchain via DFlow atomic swaps. Instant execution with no persistent orderbook.
+    Solana blockchain with atomic swaps. Instant execution with no persistent orderbook.
   </Card>
 </CardGroup>
 
 | Venue | Blockchain | Order Execution |
 |-------|------------|-----------------|
-| `polymarket` | Polygon | CLOB (limit/market orders) |
-| `kalshi` | Solana | Atomic swaps via DFlow |
+| `polymarket` | Polygon | Orderbook (limit/market orders) |
+| `kalshi` | Solana | Atomic swaps |
 
 ## Authentication
 
@@ -72,12 +72,12 @@ curl -H "x-api-key: YOUR_API_KEY" \
 | Constraint | Value |
 |------------|-------|
 | Price tick size | 0.01 (can vary by market) |
-| Min limit order | > 5 shares |
+| Min limit order | > 5 shares (amount / price) |
 | Min market order | > 1 USDC |
 | Amount precision | 2 decimal places |
 
 <Warning>
-Orders with prices that don't match the tick size (e.g., 0.333, 0.505) will be rejected by the Polymarket CLOB.
+Orders with prices that don't match the tick size (e.g., 0.333, 0.505) will be rejected by Polymarket.
 </Warning>
 
 ### Kalshi
@@ -145,45 +145,40 @@ Afghanistan, Algeria, Angola, Australia, Belarus, Belgium, Bolivia, Bulgaria, Bu
 
 **Affected Endpoints:**
 - `POST /api/users/create` (creates both Polymarket and Kalshi wallets)
-- `POST /api/users/:userId/kalshi/airdrop-sol`
 - Any endpoint with `venue=kalshi`
-
-## Health Check
-
-Verify API availability:
-
-<CodeGroup>
-```bash Request
-curl https://trade.predexon.com/health
-```
-
-```json Response
-{
-  "status": "ok",
-  "timestamp": "2024-01-15T10:30:00.000Z"
-}
-```
-</CodeGroup>
 
 ## Polymarket vs Kalshi
 
 | Feature | Polymarket | Kalshi |
 |---------|------------|--------|
 | Blockchain | Polygon | Solana |
-| Order Types | Limit & Market on CLOB | Atomic swaps via DFlow |
+| Order Types | Limit & Market | Atomic swaps |
 | Market Identifier | `tokenId` | `ticker` + `outcome` |
 | Gas Fees | Gasless relay | User pays SOL |
 | Cancel Orders | Yes | No (atomic execution) |
-| Outcome Values | From token metadata | "Yes" or "No" only |
 
-## OpenAPI Specification
+<Note>
+Get Polymarket `tokenId` from the [List Markets](/api-reference/markets/list-markets) endpoint - each outcome has a unique ID in the `outcomes` array. For Kalshi, use the market `ticker` from [Kalshi List Markets](/api-reference/kalshi/list-markets) with `outcome` set to `"Yes"` or `"No"`.
+</Note>
 
-The complete OpenAPI 3.0 specification is available for generating client SDKs:
+## Token Addresses
 
-<Card
-  title="OpenAPI Specification"
-  icon="file-code"
-  href="/trading-api/openapi-trading.json"
->
-  Download the Trading API OpenAPI JSON specification
-</Card>
+Reference addresses for tokens used across venues.
+
+### Polygon (Polymarket)
+
+| Token | Chain ID | Address |
+|-------|----------|---------|
+| USDC.e | 137 | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` |
+
+### Solana (Kalshi)
+
+| Token | Chain ID | Address |
+|-------|----------|---------|
+| USDC | mainnet-beta | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
+| SOL | mainnet-beta | Native token (no contract address) |
+
+<Note>
+SOL is required for Kalshi transaction fees.
+</Note>
+

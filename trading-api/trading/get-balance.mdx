@@ -8,8 +8,8 @@ description: "Get USDC balance across trading venues"
 
 Returns the user's USDC balance across one or all venues. The balance is broken down into available funds (ready to trade) and locked funds (committed to open orders).
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 <ParamField query="venue" type="string">
@@ -55,7 +55,7 @@ const { balances } = await response.json();
 ```
 </RequestExample>
 
-<ResponseField name="balances" type="array" required>
+<ResponseField name="balances" type="array">
   Array of balance objects, one per venue.
   <Expandable title="Balance object">
     <ResponseField name="venue" type="string">
@@ -120,7 +120,7 @@ const { balances } = await response.json();
 </ResponseExample>
 
 <Note>
-Kalshi orders via DFlow are atomic swaps, so they never show locked balances - funds are either spent or available.
+Kalshi orders are atomic swaps, so they never show locked balances - funds are either spent or available.
 </Note>
 
 ## Use Cases

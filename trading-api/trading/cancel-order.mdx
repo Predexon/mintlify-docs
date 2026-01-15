@@ -8,16 +8,12 @@ description: "Cancel a specific open order"
 
 Cancels a specific open order by ID. Only works for Polymarket limit orders - Kalshi orders are atomic swaps and cannot be cancelled.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
-<ParamField path="orderId" type="string" required>
+<ParamField path="orderId" type="string">
   The order ID to cancel (returned from [Place Order](/trading-api/trading/place-order)).
-</ParamField>
-
-<ParamField query="venue" type="string">
-  Specify the venue if known. Helps optimize the cancellation request.
 </ParamField>
 
 <RequestExample>
@@ -67,7 +63,7 @@ if (response.status === 204) {
 
 ```json 400 Bad Request (Kalshi)
 {
-  "error": "Kalshi orders via DFlow cannot be cancelled - they are atomic swaps"
+  "error": "Kalshi orders cannot be cancelled - they are atomic swaps"
 }
 ```
 
@@ -79,7 +75,7 @@ if (response.status === 204) {
 </ResponseExample>
 
 <Warning>
-**Kalshi orders cannot be cancelled.** They execute atomically via DFlow - either the swap completes or it fails. There's no orderbook presence to cancel.
+**Kalshi orders cannot be cancelled.** They execute atomically - either the swap completes or it fails. There's no orderbook presence to cancel.
 </Warning>
 
 ## Use Cases

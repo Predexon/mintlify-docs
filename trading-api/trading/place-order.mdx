@@ -8,8 +8,8 @@ description: "Place a buy or sell order on a prediction market"
 
 Places a buy or sell order on a prediction market. The request format differs slightly between Polymarket and Kalshi due to their different trading mechanisms.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 ## Request Body
@@ -32,13 +32,17 @@ Places a buy or sell order on a prediction market. The request format differs sl
   For `buy`: USDC amount to spend. For `sell`: number of shares to sell. Precision: 2 decimal places.
 </ParamField>
 
-<ParamField body="price" type="string" required>
-  Price per share (0-1). Must match tick size (default 0.01). Example: `0.65`
+<ParamField body="price" type="string">
+  Price per share (0-1). Required for limit orders only. Must match tick size (default 0.01). Example: `0.65`
 </ParamField>
 
 <ParamField body="type" type="string" required>
   Order type: `limit` or `market`
 </ParamField>
+
+<Warning>
+Do not specify `price` for market orders. Market orders execute at the best available price.
+</Warning>
 
 ### Kalshi Orders
 
@@ -67,7 +71,7 @@ Places a buy or sell order on a prediction market. The request format differs sl
 | Venue | Constraint | Value |
 |-------|------------|-------|
 | Polymarket | Price tick size | 0.01 (can vary by market) |
-| Polymarket | Min limit order | > 5 shares |
+| Polymarket | Min limit order | > 5 shares (amount / price) |
 | Polymarket | Min market order | > 1 USDC |
 | Kalshi | Min order | > 1 USDC |
 | Both | Amount precision | 2 decimal places |
@@ -193,11 +197,11 @@ const kalshiOrder = await fetch(
 ```
 </RequestExample>
 
-<ResponseField name="orderId" type="string" required>
+<ResponseField name="orderId" type="string">
   Unique order identifier. For Polymarket, this is a hex string.
 </ResponseField>
 
-<ResponseField name="venue" type="string" required>
+<ResponseField name="venue" type="string">
   The venue where the order was placed.
 </ResponseField>
 
@@ -209,27 +213,27 @@ const kalshiOrder = await fetch(
   Kalshi market ticker (Kalshi orders only).
 </ResponseField>
 
-<ResponseField name="side" type="string" required>
+<ResponseField name="side" type="string">
   Order side: `buy` or `sell`
 </ResponseField>
 
-<ResponseField name="outcome" type="string" required>
+<ResponseField name="outcome" type="string">
   The outcome being traded (e.g., "Yes", "No").
 </ResponseField>
 
-<ResponseField name="amount" type="string" required>
+<ResponseField name="amount" type="string">
   Order amount.
 </ResponseField>
 
-<ResponseField name="price" type="string" required>
-  Order price.
+<ResponseField name="price" type="string">
+  Order price. For Kalshi orders, this is the execution price since they are market orders.
 </ResponseField>
 
-<ResponseField name="status" type="string" required>
+<ResponseField name="status" type="string">
   Order status: `live`, `filled`, or `matched`
 </ResponseField>
 
-<ResponseField name="createdAt" type="string" required>
+<ResponseField name="createdAt" type="string">
   ISO 8601 timestamp.
 </ResponseField>
 

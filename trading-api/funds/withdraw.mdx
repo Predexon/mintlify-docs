@@ -8,8 +8,8 @@ description: "Withdraw USDC from a user's wallet to an external address"
 
 Withdraws USDC from the user's managed wallet to an external address. Supports withdrawals from both Polymarket (Polygon) and Kalshi (Solana) venues.
 
-<ParamField path="userId" type="string" required>
-  The user's unique identifier (UUID v4).
+<ParamField path="userId" type="string">
+  Unique identifier for the user.
 </ParamField>
 
 ## Request Body
@@ -93,23 +93,23 @@ const result = await response.json();
 ```
 </RequestExample>
 
-<ResponseField name="transactionHash" type="string" required>
+<ResponseField name="transactionHash" type="string">
   Blockchain transaction hash for the withdrawal.
 </ResponseField>
 
-<ResponseField name="amount" type="string" required>
+<ResponseField name="amount" type="string">
   Amount withdrawn in USDC.
 </ResponseField>
 
-<ResponseField name="destinationAddress" type="string" required>
+<ResponseField name="destinationAddress" type="string">
   Recipient wallet address.
 </ResponseField>
 
-<ResponseField name="chain" type="string" required>
+<ResponseField name="chain" type="string">
   Destination chain.
 </ResponseField>
 
-<ResponseField name="status" type="string" required>
+<ResponseField name="status" type="string">
   Withdrawal status: `completed`
 </ResponseField>
 
