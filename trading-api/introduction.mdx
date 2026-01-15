@@ -1,0 +1,189 @@
+---
+title: "Trading API Reference"
+description: "Complete reference for the Predexon Custodial Trading API"
+---
+
+<Info>
+**Get your API key** at [dashboard.predexon.com](https://dashboard.predexon.com) to start trading programmatically.
+</Info>
+
+## Overview
+
+The Predexon Custodial Trading API provides a unified interface for trading on prediction markets across multiple venues. Users don't manage their own wallets - the API handles wallet creation, key management, and transaction signing on their behalf.
+
+## Base URL
+
+```
+https://trade.predexon.com
+```
+
+## Supported Venues
+
+<CardGroup cols={2}>
+  <Card title="Polymarket" icon="chart-line">
+    Polygon blockchain with Gnosis Safe wallets. Supports limit and market orders on the CLOB.
+  </Card>
+  <Card title="Kalshi" icon="bolt">
+    Solana blockchain via DFlow atomic swaps. Instant execution with no persistent orderbook.
+  </Card>
+</CardGroup>
+
+| Venue | Blockchain | Order Execution |
+|-------|------------|-----------------|
+| `polymarket` | Polygon | CLOB (limit/market orders) |
+| `kalshi` | Solana | Atomic swaps via DFlow |
+
+## Authentication
+
+All requests require an API key passed via the `x-api-key` header:
+
+```bash
+curl -H "x-api-key: YOUR_API_KEY" \
+  https://trade.predexon.com/api/users/create
+```
+
+### Ownership Model
+
+- Each API key can create multiple users
+- Users are "owned" by the API key that created them
+- API keys can only access their own users (403 Forbidden otherwise)
+
+## Endpoint Categories
+
+<CardGroup cols={2}>
+  <Card title="User Management" icon="user" href="/trading-api/users/create-user">
+    Create users, manage wallets, and handle authentication.
+  </Card>
+  <Card title="Trading" icon="arrow-right-arrow-left" href="/trading-api/trading/place-order">
+    Place orders, check balances, and manage open orders.
+  </Card>
+  <Card title="Positions" icon="chart-pie" href="/trading-api/positions/get-positions">
+    View positions and redeem resolved markets.
+  </Card>
+  <Card title="Funds" icon="wallet" href="/trading-api/funds/withdraw">
+    Deposits, withdrawals, and cross-chain bridging.
+  </Card>
+</CardGroup>
+
+## Order Constraints
+
+### Polymarket
+
+| Constraint | Value |
+|------------|-------|
+| Price tick size | 0.01 (can vary by market) |
+| Min limit order | > 5 shares |
+| Min market order | > 1 USDC |
+| Amount precision | 2 decimal places |
+
+<Warning>
+Orders with prices that don't match the tick size (e.g., 0.333, 0.505) will be rejected by the Polymarket CLOB.
+</Warning>
+
+### Kalshi
+
+| Constraint | Value |
+|------------|-------|
+| Min order | > 1 USDC |
+| Outcome values | "Yes" or "No" (case-sensitive) |
+| Execution | Atomic swaps (instant) |
+
+### Amount Semantics
+
+| Side | Amount Represents |
+|------|-------------------|
+| `buy` | USDC to spend |
+| `sell` | Shares to sell |
+
+## Response Format
+
+### Success Responses
+
+All successful responses return appropriate HTTP status codes with JSON body:
+
+```json
+{
+  "orderId": "0x1234...",
+  "venue": "polymarket",
+  "status": "live"
+}
+```
+
+### Error Responses
+
+Errors return appropriate HTTP status codes with a JSON body:
+
+```json
+{
+  "error": "Insufficient balance",
+  "message": "not enough balance / allowance"
+}
+```
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Bad Request - Invalid parameters or insufficient funds |
+| 401 | Unauthorized - Missing API key |
+| 403 | Forbidden - User not owned by this API key or geo-restricted |
+| 404 | Not Found - User or resource doesn't exist |
+| 500 | Internal Server Error |
+
+## Geo-Restrictions
+
+Kalshi trading is blocked in certain countries. Affected endpoints return:
+
+```json
+{
+  "error": "Kalshi trading is not available in your region",
+  "code": "GEO_RESTRICTED"
+}
+```
+
+<Accordion title="Blocked Countries (63 total)">
+Afghanistan, Algeria, Angola, Australia, Belarus, Belgium, Bolivia, Bulgaria, Burkina Faso, Cameroon, Canada, Central African Republic, China, Côte d'Ivoire, Cuba, Democratic Republic of the Congo, Ethiopia, France, Haiti, Iran, Iraq, Italy, Kenya, Laos, Lebanon, Libya, Mali, Monaco, Mozambique, Myanmar, Namibia, Nicaragua, Niger, North Korea, Poland, Russia, Singapore, Somalia, South Sudan, Sudan, Switzerland, Syria, Taiwan, Thailand, Ukraine, United Arab Emirates, United Kingdom, United States, Venezuela, Yemen, Zimbabwe
+</Accordion>
+
+**Affected Endpoints:**
+- `POST /api/users/create` (creates both Polymarket and Kalshi wallets)
+- `POST /api/users/:userId/kalshi/airdrop-sol`
+- Any endpoint with `venue=kalshi`
+
+## Health Check
+
+Verify API availability:
+
+<CodeGroup>
+```bash Request
+curl https://trade.predexon.com/health
+```
+
+```json Response
+{
+  "status": "ok",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+</CodeGroup>
+
+## Polymarket vs Kalshi
+
+| Feature | Polymarket | Kalshi |
+|---------|------------|--------|
+| Blockchain | Polygon | Solana |
+| Order Types | Limit & Market on CLOB | Atomic swaps via DFlow |
+| Market Identifier | `tokenId` | `ticker` + `outcome` |
+| Gas Fees | Gasless relay | User pays SOL |
+| Cancel Orders | Yes | No (atomic execution) |
+| Outcome Values | From token metadata | "Yes" or "No" only |
+
+## OpenAPI Specification
+
+The complete OpenAPI 3.0 specification is available for generating client SDKs:
+
+<Card
+  title="OpenAPI Specification"
+  icon="file-code"
+  href="/trading-api/openapi-trading.json"
+>
+  Download the Trading API OpenAPI JSON specification
+</Card>

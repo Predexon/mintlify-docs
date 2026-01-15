@@ -1,0 +1,1213 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Predexon Trading API",
+    "description": "Custodial trading API for prediction markets across Polymarket and Kalshi",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://trade.predexon.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Health Check",
+        "description": "Verify API availability",
+        "operationId": "healthCheck",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/create": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create User",
+        "description": "Create a new user with wallets for both Polymarket and Kalshi",
+        "operationId": "createUser",
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Geo-restricted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get User",
+        "description": "Retrieve user information including wallet addresses",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete User",
+        "description": "Delete a user and all associated data",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/balance": {
+      "get": {
+        "tags": ["Trading"],
+        "summary": "Get Balance",
+        "description": "Get USDC balance across trading venues",
+        "operationId": "getBalance",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "description": "Filter by venue",
+            "schema": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Balance information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid venue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders": {
+      "get": {
+        "tags": ["Trading"],
+        "summary": "Get Orders",
+        "description": "Get open orders for a user",
+        "operationId": "getOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "description": "Filter by venue",
+            "schema": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of open orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Trading"],
+        "summary": "Place Order",
+        "description": "Place a buy or sell order on a prediction market",
+        "operationId": "placeOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PolymarketOrderRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/KalshiOrderRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or insufficient funds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Trading"],
+        "summary": "Cancel All Orders",
+        "description": "Cancel all open orders for a user",
+        "operationId": "cancelAllOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "description": "Filter by venue",
+            "schema": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelAllResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders/{orderId}": {
+      "delete": {
+        "tags": ["Trading"],
+        "summary": "Cancel Order",
+        "description": "Cancel a specific open order",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "The order ID to cancel",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "description": "Specify venue if known",
+            "schema": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Order cancelled successfully"
+          },
+          "400": {
+            "description": "Cannot cancel order (e.g., Kalshi atomic swap)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to cancel order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/positions": {
+      "get": {
+        "tags": ["Positions"],
+        "summary": "Get Positions",
+        "description": "Get the user's current positions across venues",
+        "operationId": "getPositions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "description": "Filter by venue",
+            "schema": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of positions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/redeem": {
+      "post": {
+        "tags": ["Positions"],
+        "summary": "Redeem Position",
+        "description": "Redeem a resolved position for USDC",
+        "operationId": "redeemPosition",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PolymarketRedeemRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/KalshiRedeemRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Position redeemed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedeemResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot redeem (not resolved, no tokens, etc.)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/withdraw": {
+      "post": {
+        "tags": ["Funds"],
+        "summary": "Withdraw USDC",
+        "description": "Withdraw USDC from a user's wallet to an external address",
+        "operationId": "withdraw",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Withdrawal completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Withdrawal failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bridge/deposit": {
+      "get": {
+        "tags": ["Funds"],
+        "summary": "Bridge Deposit",
+        "description": "Get cross-chain deposit addresses for funding a Polymarket wallet",
+        "operationId": "getDepositInfo",
+        "parameters": [
+          {
+            "name": "wallet",
+            "in": "query",
+            "required": true,
+            "description": "Polymarket proxy wallet address (0x...)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deposit information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositInfoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid wallet address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Bridge API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/kalshi/airdrop-sol": {
+      "post": {
+        "tags": ["Funds"],
+        "summary": "Airdrop SOL",
+        "description": "Airdrop SOL to a user's Kalshi wallet for transaction fees",
+        "operationId": "airdropSol",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SOL airdropped successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirdropResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Geo-restricted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User does not have a Kalshi wallet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Airdrop failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "parameters": {
+      "UserId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "description": "The user's unique identifier (UUID v4)",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "schemas": {
+      "Venue": {
+        "type": "string",
+        "enum": ["polymarket", "kalshi"],
+        "description": "Trading venue"
+      },
+      "OrderSide": {
+        "type": "string",
+        "enum": ["buy", "sell"],
+        "description": "Order side"
+      },
+      "OrderType": {
+        "type": "string",
+        "enum": ["limit", "market"],
+        "description": "Order type"
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": ["live", "filled", "matched"],
+        "description": "Order status"
+      },
+      "PositionStatus": {
+        "type": "string",
+        "enum": ["active", "resolved", "redeemable"],
+        "description": "Position status"
+      },
+      "PositionResult": {
+        "type": "string",
+        "enum": ["won", "lost"],
+        "nullable": true,
+        "description": "Position result"
+      },
+      "KalshiOutcome": {
+        "type": "string",
+        "enum": ["Yes", "No"],
+        "description": "Kalshi outcome (case-sensitive)"
+      },
+      "Chain": {
+        "type": "string",
+        "enum": ["polygon", "solana"],
+        "description": "Blockchain"
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "timestamp"]
+      },
+      "UserInfo": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID v4 identifier"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "polymarketWalletAddress": {
+            "type": "string",
+            "description": "Gnosis Safe address for Polymarket deposits"
+          },
+          "solanaWalletAddress": {
+            "type": "string",
+            "description": "Solana wallet address for Kalshi deposits"
+          }
+        },
+        "required": ["userId", "createdAt", "polymarketWalletAddress", "solanaWalletAddress"]
+      },
+      "BalanceInfo": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "$ref": "#/components/schemas/Venue"
+          },
+          "available": {
+            "type": "string",
+            "description": "USDC available for trading"
+          },
+          "locked": {
+            "type": "string",
+            "description": "USDC locked in open orders"
+          },
+          "total": {
+            "type": "string",
+            "description": "Total USDC (available + locked)"
+          }
+        },
+        "required": ["venue", "available", "locked", "total"]
+      },
+      "BalanceResponse": {
+        "type": "object",
+        "properties": {
+          "balances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BalanceInfo"
+            }
+          }
+        },
+        "required": ["balances"]
+      },
+      "PolymarketOrderRequest": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["polymarket"]
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Outcome token ID"
+          },
+          "side": {
+            "$ref": "#/components/schemas/OrderSide"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price per share (0-1), must match tick size (0.01)"
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrderType"
+          }
+        },
+        "required": ["venue", "tokenId", "side", "amount", "price", "type"]
+      },
+      "KalshiOrderRequest": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["kalshi"]
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/KalshiOutcome"
+          },
+          "side": {
+            "$ref": "#/components/schemas/OrderSide"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
+          }
+        },
+        "required": ["venue", "ticker", "outcome", "side", "amount"]
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order identifier"
+          },
+          "venue": {
+            "$ref": "#/components/schemas/Venue"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Polymarket token ID"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Kalshi market ticker"
+          },
+          "side": {
+            "$ref": "#/components/schemas/OrderSide"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Outcome being traded"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["orderId", "venue", "side", "outcome", "amount", "price", "status", "createdAt"]
+      },
+      "OrdersResponse": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderResponse"
+            }
+          }
+        },
+        "required": ["orders"]
+      },
+      "CancelAllResponse": {
+        "type": "object",
+        "properties": {
+          "cancelled": {
+            "type": "integer",
+            "description": "Number of orders cancelled"
+          }
+        },
+        "required": ["cancelled"]
+      },
+      "PositionInfo": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "$ref": "#/components/schemas/Venue"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Polymarket token ID"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Kalshi market ticker"
+          },
+          "title": {
+            "type": "string",
+            "description": "Market question/title"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Position side"
+          },
+          "size": {
+            "type": "string",
+            "description": "Number of shares held"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PositionStatus"
+          },
+          "result": {
+            "$ref": "#/components/schemas/PositionResult"
+          },
+          "averagePrice": {
+            "type": "string",
+            "description": "Average entry price"
+          },
+          "currentPrice": {
+            "type": "string",
+            "description": "Current market price"
+          },
+          "currentValue": {
+            "type": "string",
+            "description": "Current position value in USDC"
+          },
+          "pnl": {
+            "type": "string",
+            "description": "Unrealized profit/loss"
+          }
+        },
+        "required": ["venue", "outcome", "size", "status"]
+      },
+      "PositionsResponse": {
+        "type": "object",
+        "properties": {
+          "positions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PositionInfo"
+            }
+          }
+        },
+        "required": ["positions"]
+      },
+      "PolymarketRedeemRequest": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["polymarket"]
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Token ID to redeem"
+          }
+        },
+        "required": ["venue", "tokenId"]
+      },
+      "KalshiRedeemRequest": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["kalshi"]
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/KalshiOutcome"
+          }
+        },
+        "required": ["venue", "ticker", "outcome"]
+      },
+      "RedeemResponse": {
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string",
+            "description": "Blockchain transaction hash"
+          },
+          "venue": {
+            "$ref": "#/components/schemas/Venue"
+          },
+          "tokenId": {
+            "type": "string"
+          },
+          "ticker": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "sizeRedeemed": {
+            "type": "string",
+            "description": "Number of tokens burned"
+          },
+          "result": {
+            "type": "string",
+            "enum": ["won", "lost"]
+          },
+          "amountRedeemed": {
+            "type": "string",
+            "description": "USDC received"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed"]
+          }
+        },
+        "required": ["transactionHash", "venue", "outcome", "sizeRedeemed", "result", "amountRedeemed", "status"]
+      },
+      "WithdrawRequest": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "$ref": "#/components/schemas/Venue"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC amount to withdraw"
+          },
+          "destinationAddress": {
+            "type": "string",
+            "description": "Recipient wallet address"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          }
+        },
+        "required": ["venue", "amount", "destinationAddress", "chain"]
+      },
+      "WithdrawResponse": {
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "destinationAddress": {
+            "type": "string"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed"]
+          }
+        },
+        "required": ["transactionHash", "amount", "destinationAddress", "chain", "status"]
+      },
+      "DepositAddresses": {
+        "type": "object",
+        "properties": {
+          "evm": {
+            "type": "string",
+            "description": "Address for EVM chain deposits"
+          },
+          "solana": {
+            "type": "string",
+            "description": "Address for Solana deposits"
+          },
+          "bitcoin": {
+            "type": "string",
+            "description": "Address for Bitcoin deposits"
+          }
+        }
+      },
+      "SupportedAsset": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string"
+          },
+          "chainId": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "tokenAddress": {
+            "type": "string"
+          },
+          "decimals": {
+            "type": "integer"
+          },
+          "minDepositUsd": {
+            "type": "number"
+          }
+        },
+        "required": ["chain", "chainId", "token", "tokenAddress", "decimals", "minDepositUsd"]
+      },
+      "DepositInfoResponse": {
+        "type": "object",
+        "properties": {
+          "wallet": {
+            "type": "string"
+          },
+          "depositAddresses": {
+            "$ref": "#/components/schemas/DepositAddresses"
+          },
+          "supportedAssets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupportedAsset"
+            }
+          }
+        },
+        "required": ["wallet", "depositAddresses", "supportedAssets"]
+      },
+      "AirdropResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Solana transaction signature"
+          },
+          "walletAddress": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["success", "signature", "walletAddress", "message"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional details"
+          }
+        },
+        "required": ["error"]
+      },
+      "GeoErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": ["GEO_RESTRICTED"]
+          }
+        },
+        "required": ["error", "code"]
+      }
+    }
+  }
+}

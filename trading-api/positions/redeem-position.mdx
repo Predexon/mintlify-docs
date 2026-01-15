@@ -1,0 +1,237 @@
+---
+title: "Redeem Position"
+openapi: "POST /api/users/{userId}/redeem"
+description: "Redeem a resolved position for USDC"
+---
+
+## Overview
+
+Redeems a resolved position, converting winning tokens back to USDC. Only positions with status `redeemable` and result `won` will return USDC - losing positions have no value to redeem.
+
+<ParamField path="userId" type="string" required>
+  The user's unique identifier (UUID v4).
+</ParamField>
+
+## Request Body
+
+### Polymarket Redemption
+
+<ParamField body="venue" type="string" required>
+  Must be `polymarket`
+</ParamField>
+
+<ParamField body="tokenId" type="string" required>
+  The token ID of the position to redeem.
+</ParamField>
+
+### Kalshi Redemption
+
+<ParamField body="venue" type="string" required>
+  Must be `kalshi`
+</ParamField>
+
+<ParamField body="ticker" type="string" required>
+  Market ticker (e.g., `PRES-2024-DJT`)
+</ParamField>
+
+<ParamField body="outcome" type="string" required>
+  Must be `Yes` or `No` (case-sensitive)
+</ParamField>
+
+<RequestExample>
+```bash cURL (Polymarket)
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "polymarket",
+    "tokenId": "71321045679252212594626385..."
+  }' \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/redeem"
+```
+
+```bash cURL (Kalshi)
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "kalshi",
+    "ticker": "PRES-2024-DJT",
+    "outcome": "Yes"
+  }' \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/redeem"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+HEADERS = {
+    "x-api-key": "YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+# Redeem Polymarket position
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/redeem",
+    headers=HEADERS,
+    json={
+        "venue": "polymarket",
+        "tokenId": "71321045679252212594626385..."
+    }
+)
+
+result = response.json()
+print(f"Redeemed {result['sizeRedeemed']} tokens for ${result['amountRedeemed']} USDC")
+print(f"Transaction: {result['transactionHash']}")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+// Redeem Kalshi position
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/redeem`,
+  {
+    method: "POST",
+    headers: {
+      "x-api-key": "YOUR_API_KEY",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      venue: "kalshi",
+      ticker: "PRES-2024-DJT",
+      outcome: "Yes"
+    })
+  }
+);
+
+const result = await response.json();
+```
+</RequestExample>
+
+<ResponseField name="transactionHash" type="string" required>
+  Blockchain transaction hash for the redemption.
+</ResponseField>
+
+<ResponseField name="venue" type="string" required>
+  Trading venue where the redemption occurred.
+</ResponseField>
+
+<ResponseField name="tokenId" type="string">
+  Polymarket token ID (Polymarket redemptions only).
+</ResponseField>
+
+<ResponseField name="ticker" type="string">
+  Kalshi market ticker (Kalshi redemptions only).
+</ResponseField>
+
+<ResponseField name="title" type="string" required>
+  Market question/title.
+</ResponseField>
+
+<ResponseField name="outcome" type="string" required>
+  The outcome side that was redeemed.
+</ResponseField>
+
+<ResponseField name="sizeRedeemed" type="string" required>
+  Number of tokens that were burned.
+</ResponseField>
+
+<ResponseField name="result" type="string" required>
+  Position result: `won` or `lost`
+</ResponseField>
+
+<ResponseField name="amountRedeemed" type="string" required>
+  USDC received from redemption. For winning positions, this equals `sizeRedeemed`. For losing positions, this is `0`.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  Always `completed` for successful redemptions.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK (Winning Position)
+{
+  "transactionHash": "0x1234567890abcdef...",
+  "venue": "polymarket",
+  "tokenId": "71321045679252...",
+  "title": "Will Bitcoin reach $100k?",
+  "outcome": "Yes",
+  "sizeRedeemed": "100.50",
+  "result": "won",
+  "amountRedeemed": "100.50",
+  "status": "completed"
+}
+```
+
+```json 200 OK (Losing Position)
+{
+  "transactionHash": "0xabcdef1234567890...",
+  "venue": "polymarket",
+  "tokenId": "48331043336612...",
+  "title": "Will ETH flip BTC?",
+  "outcome": "Yes",
+  "sizeRedeemed": "200.00",
+  "result": "lost",
+  "amountRedeemed": "0",
+  "status": "completed"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Missing required fields: ticker, outcome"
+}
+```
+
+```json 400 Market Not Resolved
+{
+  "error": "Market is not resolved yet (status: active)"
+}
+```
+
+```json 400 No Position
+{
+  "error": "No tokens to redeem"
+}
+```
+
+```json 400 Redemption Closed
+{
+  "error": "Redemption not available (status: closed)"
+}
+```
+</ResponseExample>
+
+## Redemption Flow
+
+<Steps>
+  <Step title="Check positions">
+    Use [Get Positions](/trading-api/positions/get-positions) to find positions with `status: redeemable`.
+  </Step>
+  <Step title="Verify result">
+    Only positions with `result: won` return USDC. Losing positions return 0.
+  </Step>
+  <Step title="Redeem">
+    Call this endpoint with the position identifier.
+  </Step>
+  <Step title="Check balance">
+    USDC is credited immediately. Verify with [Get Balance](/trading-api/trading/get-balance).
+  </Step>
+</Steps>
+
+<Note>
+You can redeem losing positions to clear them from your portfolio, but you'll receive 0 USDC since they're worthless.
+</Note>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Automated Redemption" icon="robot">
+    Periodically scan for and redeem all winning positions
+  </Card>
+  <Card title="Portfolio Cleanup" icon="broom">
+    Clear resolved positions (both wins and losses)
+  </Card>
+</CardGroup>

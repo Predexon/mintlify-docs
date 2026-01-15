@@ -1,0 +1,99 @@
+---
+title: "Cancel All Orders"
+openapi: "DELETE /api/users/{userId}/orders"
+description: "Cancel all open orders for a user"
+---
+
+## Overview
+
+Cancels all open orders for the user. Optionally filter by venue to only cancel orders on a specific platform.
+
+<ParamField path="userId" type="string" required>
+  The user's unique identifier (UUID v4).
+</ParamField>
+
+<ParamField query="venue" type="string">
+  Filter by venue: `polymarket` or `kalshi`. Omit to cancel orders on all venues.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+# Cancel all orders
+curl -X DELETE \
+  -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders"
+
+# Cancel only Polymarket orders
+curl -X DELETE \
+  -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders?venue=polymarket"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+
+response = requests.delete(
+    f"https://trade.predexon.com/api/users/{user_id}/orders",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+
+result = response.json()
+print(f"Cancelled {result['cancelled']} orders")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/orders`,
+  {
+    method: "DELETE",
+    headers: { "x-api-key": "YOUR_API_KEY" }
+  }
+);
+
+const { cancelled } = await response.json();
+console.log(`Cancelled ${cancelled} orders`);
+```
+</RequestExample>
+
+<ResponseField name="cancelled" type="integer" required>
+  Number of orders that were cancelled.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "cancelled": 3
+}
+```
+
+```json 200 OK (No Orders)
+{
+  "cancelled": 0
+}
+```
+
+```json 404 Not Found
+{
+  "error": "User not found"
+}
+```
+</ResponseExample>
+
+<Note>
+This only affects Polymarket orders. Kalshi orders via DFlow are atomic swaps that execute immediately and cannot be cancelled.
+</Note>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Emergency Stop" icon="hand">
+    Quickly cancel all pending orders during volatile markets
+  </Card>
+  <Card title="Account Cleanup" icon="broom">
+    Clear all orders before withdrawing funds or deleting a user
+  </Card>
+</CardGroup>

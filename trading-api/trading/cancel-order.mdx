@@ -1,0 +1,94 @@
+---
+title: "Cancel Order"
+openapi: "DELETE /api/users/{userId}/orders/{orderId}"
+description: "Cancel a specific open order"
+---
+
+## Overview
+
+Cancels a specific open order by ID. Only works for Polymarket limit orders - Kalshi orders are atomic swaps and cannot be cancelled.
+
+<ParamField path="userId" type="string" required>
+  The user's unique identifier (UUID v4).
+</ParamField>
+
+<ParamField path="orderId" type="string" required>
+  The order ID to cancel (returned from [Place Order](/trading-api/trading/place-order)).
+</ParamField>
+
+<ParamField query="venue" type="string">
+  Specify the venue if known. Helps optimize the cancellation request.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X DELETE \
+  -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders/0x1234567890abcdef"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+order_id = "0x1234567890abcdef"
+
+response = requests.delete(
+    f"https://trade.predexon.com/api/users/{user_id}/orders/{order_id}",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+
+if response.status_code == 204:
+    print("Order cancelled successfully")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+const orderId = "0x1234567890abcdef";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/orders/${orderId}`,
+  {
+    method: "DELETE",
+    headers: { "x-api-key": "YOUR_API_KEY" }
+  }
+);
+
+if (response.status === 204) {
+  console.log("Order cancelled successfully");
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```text 204 No Content
+(empty response body)
+```
+
+```json 400 Bad Request (Kalshi)
+{
+  "error": "Kalshi orders via DFlow cannot be cancelled - they are atomic swaps"
+}
+```
+
+```json 500 Internal Error
+{
+  "error": "Failed to cancel order"
+}
+```
+</ResponseExample>
+
+<Warning>
+**Kalshi orders cannot be cancelled.** They execute atomically via DFlow - either the swap completes or it fails. There's no orderbook presence to cancel.
+</Warning>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Price Adjustment" icon="sliders">
+    Cancel an order and resubmit at a different price
+  </Card>
+  <Card title="Strategy Change" icon="rotate">
+    Cancel orders when market conditions change
+  </Card>
+</CardGroup>

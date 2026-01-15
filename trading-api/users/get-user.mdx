@@ -1,0 +1,91 @@
+---
+title: "Get User"
+openapi: "GET /api/users/{userId}"
+description: "Retrieve user information including wallet addresses"
+---
+
+## Overview
+
+Retrieves user information including both wallet addresses. Use this to look up deposit addresses for an existing user.
+
+<ParamField path="userId" type="string" required>
+  The user's unique identifier (UUID v4) returned from [Create User](/trading-api/users/create-user).
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+
+response = requests.get(
+    f"https://trade.predexon.com/api/users/{user_id}",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+user = response.json()
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
+);
+const user = await response.json();
+```
+</RequestExample>
+
+<ResponseField name="userId" type="string" required>
+  UUID v4 identifier for the user.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string" required>
+  ISO 8601 timestamp of when the user was created.
+</ResponseField>
+
+<ResponseField name="polymarketWalletAddress" type="string" required>
+  Gnosis Safe address on Polygon for Polymarket deposits.
+</ResponseField>
+
+<ResponseField name="solanaWalletAddress" type="string" required>
+  Solana wallet address for Kalshi deposits.
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "polymarketWalletAddress": "0x1234567890abcdef1234567890abcdef12345678",
+  "solanaWalletAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So"
+}
+```
+
+```json 401 Unauthorized
+{
+  "error": "API key required"
+}
+```
+
+```json 403 Forbidden
+{
+  "error": "Access denied"
+}
+```
+
+```json 404 Not Found
+{
+  "error": "User not found"
+}
+```
+</ResponseExample>
+
+<Note>
+You can only access users created with your API key. Attempting to access another API key's users returns 403 Forbidden.
+</Note>

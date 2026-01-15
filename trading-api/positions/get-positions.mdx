@@ -1,0 +1,199 @@
+---
+title: "Get Positions"
+openapi: "GET /api/users/{userId}/positions"
+description: "Get the user's current positions across venues"
+---
+
+## Overview
+
+Returns all positions held by the user across trading venues. Includes active positions (markets still trading), resolved positions (market settled), and redeemable positions (ready to cash out).
+
+<ParamField path="userId" type="string" required>
+  The user's unique identifier (UUID v4).
+</ParamField>
+
+<ParamField query="venue" type="string">
+  Filter by venue: `polymarket` or `kalshi`. Omit to get positions from all venues.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+# Get all positions
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/positions"
+
+# Get Kalshi positions only
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/positions?venue=kalshi"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+
+response = requests.get(
+    f"https://trade.predexon.com/api/users/{user_id}/positions",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+positions = response.json()["positions"]
+
+for pos in positions:
+    print(f"{pos['title']}")
+    print(f"  {pos['outcome']}: {pos['size']} shares @ avg {pos['averagePrice']}")
+    print(f"  Current value: ${pos['currentValue']} (PnL: ${pos['pnl']})")
+    print(f"  Status: {pos['status']}")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/positions`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
+);
+const { positions } = await response.json();
+
+// Find redeemable positions
+const redeemable = positions.filter(p => p.status === "redeemable");
+```
+</RequestExample>
+
+<ResponseField name="positions" type="array" required>
+  Array of position objects.
+  <Expandable title="Position object">
+    <ResponseField name="venue" type="string">
+      Trading venue: `polymarket` or `kalshi`
+    </ResponseField>
+    <ResponseField name="tokenId" type="string">
+      Polymarket token ID (Polymarket positions only).
+    </ResponseField>
+    <ResponseField name="ticker" type="string">
+      Kalshi market ticker (Kalshi positions only).
+    </ResponseField>
+    <ResponseField name="title" type="string">
+      Market question/title.
+    </ResponseField>
+    <ResponseField name="outcome" type="string">
+      Position side (e.g., "Yes", "No", team name).
+    </ResponseField>
+    <ResponseField name="size" type="string">
+      Number of shares/contracts held.
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Position status: `active`, `resolved`, or `redeemable`
+    </ResponseField>
+    <ResponseField name="result" type="string">
+      Outcome result: `won`, `lost`, or `null` (if still active).
+    </ResponseField>
+    <ResponseField name="averagePrice" type="string">
+      Average entry price per share.
+    </ResponseField>
+    <ResponseField name="currentPrice" type="string">
+      Current market price (or 1.0/0.0 if resolved).
+    </ResponseField>
+    <ResponseField name="currentValue" type="string">
+      Current position value in USDC.
+    </ResponseField>
+    <ResponseField name="pnl" type="string">
+      Unrealized profit/loss in USDC.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "positions": [
+    {
+      "venue": "polymarket",
+      "tokenId": "71321045679252...",
+      "title": "Will Bitcoin reach $100k by 2024?",
+      "outcome": "Yes",
+      "size": "100.50",
+      "status": "active",
+      "result": null,
+      "averagePrice": "0.45",
+      "currentPrice": "0.62",
+      "currentValue": "62.31",
+      "pnl": "17.08"
+    },
+    {
+      "venue": "kalshi",
+      "ticker": "PRES-2024-DJT",
+      "title": "Trump wins 2024 election",
+      "outcome": "Yes",
+      "size": "50.00",
+      "status": "redeemable",
+      "result": "won",
+      "averagePrice": "0.55",
+      "currentPrice": "1.0000",
+      "currentValue": "50.00",
+      "pnl": "22.50"
+    },
+    {
+      "venue": "polymarket",
+      "tokenId": "48331043336612...",
+      "title": "Will ETH flip BTC by 2025?",
+      "outcome": "Yes",
+      "size": "200.00",
+      "status": "resolved",
+      "result": "lost",
+      "averagePrice": "0.15",
+      "currentPrice": "0.00",
+      "currentValue": "0.00",
+      "pnl": "-30.00"
+    }
+  ]
+}
+```
+
+```json 200 OK (No Positions)
+{
+  "positions": []
+}
+```
+
+```json 404 Not Found
+{
+  "error": "User not found"
+}
+```
+</ResponseExample>
+
+## Position Status Values
+
+| Status | Description | Action |
+|--------|-------------|--------|
+| `active` | Market is still trading | Can sell via [Place Order](/trading-api/trading/place-order) |
+| `resolved` | Market has settled | Check `result` for outcome |
+| `redeemable` | Position can be cashed out | Use [Redeem Position](/trading-api/positions/redeem-position) |
+
+## P&L Calculation
+
+The `pnl` field shows unrealized profit/loss:
+
+```
+pnl = currentValue - (size × averagePrice)
+```
+
+For resolved positions:
+- **Won:** `currentPrice` = 1.0, full value redeemable
+- **Lost:** `currentPrice` = 0.0, position is worthless
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Portfolio Dashboard" icon="chart-pie">
+    Display all holdings with live P&L
+  </Card>
+  <Card title="Redemption Queue" icon="money-bill">
+    Find and process redeemable positions
+  </Card>
+  <Card title="Risk Management" icon="shield">
+    Monitor exposure across markets
+  </Card>
+  <Card title="Performance Tracking" icon="chart-line">
+    Track realized and unrealized gains
+  </Card>
+</CardGroup>

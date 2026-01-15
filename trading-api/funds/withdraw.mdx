@@ -1,0 +1,167 @@
+---
+title: "Withdraw USDC"
+openapi: "POST /api/users/{userId}/withdraw"
+description: "Withdraw USDC from a user's wallet to an external address"
+---
+
+## Overview
+
+Withdraws USDC from the user's managed wallet to an external address. Supports withdrawals from both Polymarket (Polygon) and Kalshi (Solana) venues.
+
+<ParamField path="userId" type="string" required>
+  The user's unique identifier (UUID v4).
+</ParamField>
+
+## Request Body
+
+<ParamField body="venue" type="string" required>
+  Source venue: `polymarket` or `kalshi`
+</ParamField>
+
+<ParamField body="amount" type="string" required>
+  USDC amount to withdraw (e.g., `"100.00"`).
+</ParamField>
+
+<ParamField body="destinationAddress" type="string" required>
+  Recipient wallet address. Must match the chain format.
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+  Destination chain: `polygon` or `solana`
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "polymarket",
+    "amount": "100.00",
+    "destinationAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    "chain": "polygon"
+  }' \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/withdraw"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+HEADERS = {
+    "x-api-key": "YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+# Withdraw from Polymarket to Polygon address
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/withdraw",
+    headers=HEADERS,
+    json={
+        "venue": "polymarket",
+        "amount": "100.00",
+        "destinationAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+        "chain": "polygon"
+    }
+)
+
+result = response.json()
+print(f"Withdrawal complete: {result['transactionHash']}")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/withdraw`,
+  {
+    method: "POST",
+    headers: {
+      "x-api-key": "YOUR_API_KEY",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      venue: "polymarket",
+      amount: "100.00",
+      destinationAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      chain: "polygon"
+    })
+  }
+);
+
+const result = await response.json();
+```
+</RequestExample>
+
+<ResponseField name="transactionHash" type="string" required>
+  Blockchain transaction hash for the withdrawal.
+</ResponseField>
+
+<ResponseField name="amount" type="string" required>
+  Amount withdrawn in USDC.
+</ResponseField>
+
+<ResponseField name="destinationAddress" type="string" required>
+  Recipient wallet address.
+</ResponseField>
+
+<ResponseField name="chain" type="string" required>
+  Destination chain.
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  Withdrawal status: `completed`
+</ResponseField>
+
+<ResponseExample>
+```json 200 OK
+{
+  "transactionHash": "0x1234567890abcdef...",
+  "amount": "100.00",
+  "destinationAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+  "chain": "polygon",
+  "status": "completed"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Missing required fields: venue, amount, destinationAddress, chain"
+}
+```
+
+```json 500 Withdrawal Failed
+{
+  "error": "Withdrawal failed"
+}
+```
+</ResponseExample>
+
+## Venue and Chain Combinations
+
+| Venue | Supported Chains | Address Format |
+|-------|------------------|----------------|
+| `polymarket` | `polygon` | Ethereum-style (0x...) |
+| `kalshi` | `solana` | Solana base58 address |
+
+<Warning>
+Ensure the destination address matches the chain. Sending to the wrong address format may result in lost funds.
+</Warning>
+
+## Before Withdrawing
+
+<Steps>
+  <Step title="Cancel open orders">
+    Funds locked in orders can't be withdrawn. Use [Cancel All Orders](/trading-api/trading/cancel-all-orders) first.
+  </Step>
+  <Step title="Check available balance">
+    Use [Get Balance](/trading-api/trading/get-balance) to verify available funds.
+  </Step>
+  <Step title="Withdraw">
+    Call this endpoint with the withdrawal details.
+  </Step>
+</Steps>
+
+<Note>
+Withdrawal transactions are processed on-chain and may take a few seconds to confirm.
+</Note>
