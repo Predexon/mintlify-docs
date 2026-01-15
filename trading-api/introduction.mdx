@@ -42,6 +42,10 @@ curl -H "x-api-key: YOUR_API_KEY" \
   https://trade.predexon.com/api/users/create
 ```
 
+### Security
+
+All wallet private keys are managed by [Turnkey](https://turnkey.com) - Predexon never stores or has access to user private keys. Keys are generated and stored in Turnkey's secure hardware enclaves.
+
 ### Ownership Model
 
 - Each API key can create multiple users
@@ -130,7 +134,7 @@ Errors return appropriate HTTP status codes with a JSON body:
 
 ## Geo-Restrictions
 
-Kalshi trading is blocked in certain countries. Affected endpoints return:
+In compliance with Kalshi's regulatory requirements, Kalshi trading is unavailable in certain regions. Affected endpoints return:
 
 ```json
 {
