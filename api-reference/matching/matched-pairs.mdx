@@ -8,6 +8,24 @@ description: "Get all active exact-matched market pairs across Polymarket and Ka
 
 Get all active exact-matched market pairs between Polymarket and Kalshi. This endpoint returns pre-computed pairs where both markets are currently active, ordered by similarity score (highest first).
 
+## What is an "Exact" Match?
+
+An **exact match** refers to market pairs that track the same real-world outcome and will resolve identically - when one resolves YES, the other will also resolve YES (and vice versa for NO). These are markets asking fundamentally the same question, even if the wording differs slightly between platforms.
+
+### Similarity Score Spectrum
+
+All pairs returned by this endpoint have a similarity score of **95 or higher** (on a 0-100 scale), which qualifies them as exact matches:
+
+| Score Range | Classification | Description |
+|-------------|----------------|-------------|
+| **98-100** | High confidence | Virtually identical markets with near-perfect semantic alignment. Recommended for rigorous applications. |
+| **96-97** | Confident | Strong matches with minor wording variations. Reliable for most use cases. |
+| **95-96** | Threshold | Meets exact match criteria but may include edge cases with differences in resolution criteria. |
+
+<Info>
+**For maximum accuracy:** Filter with `min_similarity=98` when precision is critical (e.g., automated trading systems). The 95-97 range is generally reliable but may contain occasional false positives where resolution criteria have minor discrepancies.
+</Info>
+
 <ParamField query="min_similarity" type="integer">
   Minimum similarity score filter (0-100). Only return pairs with similarity >= this value.
 </ParamField>
