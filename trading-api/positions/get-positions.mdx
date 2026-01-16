@@ -4,18 +4,6 @@ title: "Get Positions"
 description: "Get the user's current positions across venues"
 ---
 
-## Overview
-
-Returns all positions held by the user across trading venues. Includes active positions (markets still trading), resolved positions (market settled), and redeemable positions (ready to cash out).
-
-<ParamField path="userId" type="string">
-  Unique identifier for the user.
-</ParamField>
-
-<ParamField query="venue" type="string">
-  Filter by venue: `polymarket` or `kalshi`. Omit to get positions from all venues.
-</ParamField>
-
 <RequestExample>
 ```bash cURL
 # Get all positions
@@ -58,48 +46,6 @@ const { positions } = await response.json();
 const redeemable = positions.filter(p => p.status === "redeemable");
 ```
 </RequestExample>
-
-<ResponseField name="positions" type="array">
-  Array of position objects.
-  <Expandable title="Position object">
-    <ResponseField name="venue" type="string">
-      Trading venue: `polymarket` or `kalshi`
-    </ResponseField>
-    <ResponseField name="tokenId" type="string">
-      Polymarket token ID (Polymarket positions only).
-    </ResponseField>
-    <ResponseField name="ticker" type="string">
-      Kalshi market ticker (Kalshi positions only).
-    </ResponseField>
-    <ResponseField name="title" type="string">
-      Market question/title.
-    </ResponseField>
-    <ResponseField name="outcome" type="string">
-      Position side (e.g., "Yes", "No", team name).
-    </ResponseField>
-    <ResponseField name="size" type="string">
-      Number of shares/contracts held.
-    </ResponseField>
-    <ResponseField name="status" type="string">
-      Position status: `active`, `resolved`, or `redeemable`
-    </ResponseField>
-    <ResponseField name="result" type="string">
-      Outcome result: `won`, `lost`, or `null` (if still active).
-    </ResponseField>
-    <ResponseField name="averagePrice" type="string">
-      Average entry price per share.
-    </ResponseField>
-    <ResponseField name="currentPrice" type="string">
-      Current market price (or 1.0/0.0 if resolved).
-    </ResponseField>
-    <ResponseField name="currentValue" type="string">
-      Current position value in USDC.
-    </ResponseField>
-    <ResponseField name="pnl" type="string">
-      Unrealized profit/loss in USDC.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
 
 <ResponseExample>
 ```json 200 OK
@@ -168,18 +114,6 @@ const redeemable = positions.filter(p => p.status === "redeemable");
 | `active` | Market is still trading | Can sell via [Place Order](/trading-api/trading/place-order) |
 | `resolved` | Market has settled | Check `result` for outcome |
 | `redeemable` | Position can be cashed out | Use [Redeem Position](/trading-api/positions/redeem-position) |
-
-## P&L Calculation
-
-The `pnl` field shows unrealized profit/loss:
-
-```
-pnl = currentValue - (size × averagePrice)
-```
-
-For resolved positions:
-- **Won:** `currentPrice` = 1.0, full value redeemable
-- **Lost:** `currentPrice` = 0.0, position is worthless
 
 ## Use Cases
 

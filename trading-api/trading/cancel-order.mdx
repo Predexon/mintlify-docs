@@ -4,18 +4,6 @@ title: "Cancel Order"
 description: "Cancel a specific open order"
 ---
 
-## Overview
-
-Cancels a specific open order by ID. Only works for Polymarket limit orders - Kalshi orders are atomic swaps and cannot be cancelled.
-
-<ParamField path="userId" type="string">
-  Unique identifier for the user.
-</ParamField>
-
-<ParamField path="orderId" type="string">
-  The order ID to cancel (returned from [Place Order](/trading-api/trading/place-order)).
-</ParamField>
-
 <RequestExample>
 ```bash cURL
 curl -X DELETE \

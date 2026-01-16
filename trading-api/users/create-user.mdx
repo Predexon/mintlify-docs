@@ -4,27 +4,9 @@ title: "Create User"
 description: "Create a new user with wallets for both Polymarket and Kalshi"
 ---
 
-Creates a new user with managed wallets for both supported venues. The returned wallet addresses are used for depositing funds before trading.
-
 <Warning>
 This endpoint is blocked in Kalshi-restricted countries. See [Geo-Restrictions](/trading-api/introduction#geo-restrictions) for the full list.
 </Warning>
-
-<ResponseField name="userId" type="string">
-  Unique identifier for the user. Store this for subsequent API calls.
-</ResponseField>
-
-<ResponseField name="createdAt" type="string">
-  ISO 8601 timestamp of when the user was created.
-</ResponseField>
-
-<ResponseField name="polymarketWalletAddress" type="string">
-  Polygon wallet address for Polymarket deposits. Send USDC.e here to fund trading.
-</ResponseField>
-
-<ResponseField name="kalshiWalletAddress" type="string">
-  Kalshi wallet address for deposits. Send USDC on Solana and SOL here for Kalshi trading.
-</ResponseField>
 
 <RequestExample>
 ```bash cURL

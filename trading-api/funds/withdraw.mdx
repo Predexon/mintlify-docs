@@ -4,15 +4,6 @@ title: "Withdraw USDC"
 description: "Withdraw USDC from a user's wallet to an external address"
 ---
 
-## Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `venue` | string | Yes | Source venue: `polymarket` or `kalshi` |
-| `amount` | string | Yes | USDC amount to withdraw (e.g., `"100.00"`) |
-| `destinationAddress` | string | Yes | Recipient wallet address |
-| `chain` | string | Yes | Destination chain: `polygon` or `solana` |
-
 <RequestExample>
 ```bash cURL (Polymarket)
 curl -X POST \

@@ -378,6 +378,16 @@
             "description": "Unique identifier for the user"
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Position redeemed",
@@ -440,6 +450,16 @@
             "description": "Unique identifier for the user"
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Withdrawal completed",
@@ -502,16 +522,20 @@
         "type": "object",
         "properties": {
           "userId": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique identifier for the user"
           },
           "createdAt": {
-            "type": "string"
+            "type": "string",
+            "description": "ISO 8601 timestamp of when the user was created"
           },
           "polymarketWalletAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "Polygon wallet address for Polymarket deposits (send USDC.e here)"
           },
           "kalshiWalletAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "Solana wallet address for Kalshi deposits (send USDC and SOL here)"
           }
         }
       },
@@ -530,16 +554,20 @@
         "type": "object",
         "properties": {
           "venue": {
-            "type": "string"
+            "type": "string",
+            "description": "Trading venue: polymarket or kalshi"
           },
           "available": {
-            "type": "string"
+            "type": "string",
+            "description": "USDC available for trading (not locked in orders)"
           },
           "locked": {
-            "type": "string"
+            "type": "string",
+            "description": "USDC locked in open orders"
           },
           "total": {
-            "type": "string"
+            "type": "string",
+            "description": "Total USDC balance (available + locked)"
           }
         }
       },
@@ -558,34 +586,44 @@
         "type": "object",
         "properties": {
           "orderId": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique order identifier"
           },
           "venue": {
-            "type": "string"
+            "type": "string",
+            "description": "Trading venue: polymarket or kalshi"
           },
           "tokenId": {
-            "type": "string"
+            "type": "string",
+            "description": "Polymarket token ID (Polymarket orders only)"
           },
           "ticker": {
-            "type": "string"
+            "type": "string",
+            "description": "Kalshi market ticker (Kalshi orders only)"
           },
           "side": {
-            "type": "string"
+            "type": "string",
+            "description": "Order side: buy or sell"
           },
           "outcome": {
-            "type": "string"
+            "type": "string",
+            "description": "The outcome being traded (e.g., Yes, No)"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "description": "Order amount in USDC"
           },
           "price": {
-            "type": "string"
+            "type": "string",
+            "description": "Order price (0-1)"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Order status: live, matched, or filled"
           },
           "createdAt": {
-            "type": "string"
+            "type": "string",
+            "description": "ISO 8601 timestamp"
           }
         }
       },
@@ -729,7 +767,8 @@
         "type": "object",
         "properties": {
           "cancelled": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Number of orders that were cancelled"
           }
         }
       },
@@ -748,57 +787,76 @@
         "type": "object",
         "properties": {
           "venue": {
-            "type": "string"
+            "type": "string",
+            "description": "Trading venue: polymarket or kalshi"
           },
           "tokenId": {
-            "type": "string"
+            "type": "string",
+            "description": "Polymarket token ID (Polymarket positions only)"
           },
           "ticker": {
-            "type": "string"
+            "type": "string",
+            "description": "Kalshi market ticker (Kalshi positions only)"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Market question/title"
           },
           "outcome": {
-            "type": "string"
+            "type": "string",
+            "description": "Position side (e.g., Yes, No)"
           },
           "size": {
-            "type": "string"
+            "type": "string",
+            "description": "Number of shares held"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Position status: active, resolved, or redeemable"
           },
           "result": {
-            "type": "string"
+            "type": "string",
+            "description": "Outcome result: won, lost, or null (if still active)"
           },
           "averagePrice": {
-            "type": "string"
+            "type": "string",
+            "description": "Average entry price per share"
           },
           "currentPrice": {
-            "type": "string"
+            "type": "string",
+            "description": "Current market price (or 1.0/0.0 if resolved)"
           },
           "currentValue": {
-            "type": "string"
+            "type": "string",
+            "description": "Current position value in USDC"
           },
           "pnl": {
-            "type": "string"
+            "type": "string",
+            "description": "Unrealized profit/loss in USDC"
           }
         }
       },
       "RedeemRequest": {
         "type": "object",
+        "required": ["venue"],
         "properties": {
           "venue": {
-            "type": "string"
+            "type": "string",
+            "enum": ["polymarket", "kalshi"],
+            "description": "Trading venue: polymarket or kalshi"
           },
           "tokenId": {
-            "type": "string"
+            "type": "string",
+            "description": "Token ID to redeem (required for Polymarket)"
           },
           "ticker": {
-            "type": "string"
+            "type": "string",
+            "description": "Market ticker (required for Kalshi)"
           },
           "outcome": {
-            "type": "string"
+            "type": "string",
+            "enum": ["Yes", "No"],
+            "description": "Outcome to redeem: Yes or No (required for Kalshi)"
           }
         }
       },
@@ -806,34 +864,44 @@
         "type": "object",
         "properties": {
           "transactionHash": {
-            "type": "string"
+            "type": "string",
+            "description": "Blockchain transaction hash for the redemption"
           },
           "venue": {
-            "type": "string"
+            "type": "string",
+            "description": "Trading venue where the redemption occurred"
           },
           "tokenId": {
-            "type": "string"
+            "type": "string",
+            "description": "Polymarket token ID (Polymarket redemptions only)"
           },
           "ticker": {
-            "type": "string"
+            "type": "string",
+            "description": "Kalshi market ticker (Kalshi redemptions only)"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Market question/title"
           },
           "outcome": {
-            "type": "string"
+            "type": "string",
+            "description": "The outcome side that was redeemed"
           },
           "sizeRedeemed": {
-            "type": "string"
+            "type": "string",
+            "description": "Number of tokens that were burned"
           },
           "result": {
-            "type": "string"
+            "type": "string",
+            "description": "Position result: won or lost"
           },
           "amountRedeemed": {
-            "type": "string"
+            "type": "string",
+            "description": "USDC received from redemption (0 for losing positions)"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Always 'completed' for successful redemptions"
           }
         }
       },
@@ -841,24 +909,30 @@
         "type": "object",
         "properties": {
           "wallet": {
-            "type": "string"
+            "type": "string",
+            "description": "The queried Polymarket wallet address"
           },
           "depositAddresses": {
             "type": "object",
+            "description": "Deposit addresses for different chain types",
             "properties": {
               "evm": {
-                "type": "string"
+                "type": "string",
+                "description": "Address for EVM chain deposits (Ethereum, Arbitrum, Base, etc.)"
               },
               "solana": {
-                "type": "string"
+                "type": "string",
+                "description": "Address for Solana deposits"
               },
               "bitcoin": {
-                "type": "string"
+                "type": "string",
+                "description": "Address for Bitcoin deposits"
               }
             }
           },
           "supportedAssets": {
             "type": "array",
+            "description": "List of supported tokens and chains",
             "items": {
               "type": "object"
             }
@@ -867,18 +941,25 @@
       },
       "WithdrawRequest": {
         "type": "object",
+        "required": ["venue", "amount", "destinationAddress", "chain"],
         "properties": {
           "venue": {
-            "type": "string"
+            "type": "string",
+            "enum": ["polymarket", "kalshi"],
+            "description": "Source venue: polymarket or kalshi"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "description": "USDC amount to withdraw (e.g., \"100.00\")"
           },
           "destinationAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "Recipient wallet address (must match chain format)"
           },
           "chain": {
-            "type": "string"
+            "type": "string",
+            "enum": ["polygon", "solana"],
+            "description": "Destination chain: polygon or solana"
           }
         }
       },
@@ -886,19 +967,24 @@
         "type": "object",
         "properties": {
           "transactionHash": {
-            "type": "string"
+            "type": "string",
+            "description": "Blockchain transaction hash for the withdrawal"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "description": "Amount withdrawn in USDC"
           },
           "destinationAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "Recipient wallet address"
           },
           "chain": {
-            "type": "string"
+            "type": "string",
+            "description": "Destination chain: polygon or solana"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Withdrawal status: completed"
           }
         }
       },
@@ -920,16 +1006,20 @@
         "type": "object",
         "properties": {
           "success": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the withdrawal was successful"
           },
           "transactionHash": {
-            "type": "string"
+            "type": "string",
+            "description": "Solana transaction signature"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "description": "SOL amount withdrawn"
           },
           "destinationAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "Recipient wallet address"
           }
         }
       }

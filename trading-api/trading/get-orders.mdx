@@ -4,18 +4,6 @@ title: "Get Orders"
 description: "Get open orders for a user"
 ---
 
-## Overview
-
-Returns the user's open orders. This primarily returns Polymarket orders since Kalshi orders are atomic swaps that execute immediately.
-
-<ParamField path="userId" type="string">
-  Unique identifier for the user.
-</ParamField>
-
-<ParamField query="venue" type="string">
-  Filter by venue: `polymarket` or `kalshi`. Omit to get orders from all venues.
-</ParamField>
-
 <RequestExample>
 ```bash cURL
 # Get all open orders
@@ -52,42 +40,6 @@ const response = await fetch(
 const { orders } = await response.json();
 ```
 </RequestExample>
-
-<ResponseField name="orders" type="array">
-  Array of open order objects.
-  <Expandable title="Order object">
-    <ResponseField name="orderId" type="string">
-      Unique order identifier.
-    </ResponseField>
-    <ResponseField name="venue" type="string">
-      Trading venue: `polymarket` or `kalshi`
-    </ResponseField>
-    <ResponseField name="tokenId" type="string">
-      Polymarket token ID (Polymarket orders only).
-    </ResponseField>
-    <ResponseField name="ticker" type="string">
-      Kalshi market ticker (Kalshi orders only).
-    </ResponseField>
-    <ResponseField name="side" type="string">
-      Order side: `buy` or `sell`
-    </ResponseField>
-    <ResponseField name="outcome" type="string">
-      The outcome being traded.
-    </ResponseField>
-    <ResponseField name="amount" type="string">
-      Order amount.
-    </ResponseField>
-    <ResponseField name="price" type="string">
-      Order price.
-    </ResponseField>
-    <ResponseField name="status" type="string">
-      Order status: `live` or `matched`
-    </ResponseField>
-    <ResponseField name="createdAt" type="string">
-      ISO 8601 timestamp.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
 
 <ResponseExample>
 ```json 200 OK

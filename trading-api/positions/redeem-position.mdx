@@ -4,15 +4,6 @@ title: "Redeem Position"
 description: "Redeem a resolved position for USDC"
 ---
 
-## Request Body
-
-| Parameter | Type | Polymarket | Kalshi |
-|-----------|------|------------|--------|
-| `venue` | string | Required (`polymarket`) | Required (`kalshi`) |
-| `tokenId` | string | Required | - |
-| `ticker` | string | - | Required |
-| `outcome` | string | - | Required (`Yes` or `No`) |
-
 <RequestExample>
 ```bash cURL (Polymarket)
 curl -X POST \

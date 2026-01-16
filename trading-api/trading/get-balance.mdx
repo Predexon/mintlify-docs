@@ -4,18 +4,6 @@ title: "Get Balance"
 description: "Get USDC balance across trading venues"
 ---
 
-## Overview
-
-Returns the user's USDC balance across one or all venues. The balance is broken down into available funds (ready to trade) and locked funds (committed to open orders).
-
-<ParamField path="userId" type="string">
-  Unique identifier for the user.
-</ParamField>
-
-<ParamField query="venue" type="string">
-  Filter by venue: `polymarket` or `kalshi`. Omit to get balances for all venues.
-</ParamField>
-
 <RequestExample>
 ```bash cURL
 # Get all balances
@@ -54,24 +42,6 @@ const response = await fetch(
 const { balances } = await response.json();
 ```
 </RequestExample>
-
-<ResponseField name="balances" type="array">
-  Array of balance objects, one per venue.
-  <Expandable title="Balance object">
-    <ResponseField name="venue" type="string">
-      The venue name: `polymarket` or `kalshi`
-    </ResponseField>
-    <ResponseField name="available" type="string">
-      USDC available for trading (not locked in orders)
-    </ResponseField>
-    <ResponseField name="locked" type="string">
-      USDC locked in open orders
-    </ResponseField>
-    <ResponseField name="total" type="string">
-      Total USDC balance (available + locked)
-    </ResponseField>
-  </Expandable>
-</ResponseField>
 
 <ResponseExample>
 ```json 200 OK
