@@ -5,6 +5,7 @@ description: "Get USDC balance across trading venues"
 ---
 
 <RequestExample>
+
 ```bash cURL
 # Get all balances
 curl -H "x-api-key: YOUR_API_KEY" \
@@ -14,6 +15,7 @@ curl -H "x-api-key: YOUR_API_KEY" \
 curl -H "x-api-key: YOUR_API_KEY" \
   "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/balance?venue=polymarket"
 ```
+
 
 ```python Python
 import requests
@@ -32,6 +34,7 @@ for balance in balances:
     print(f"{balance['venue']}: ${balance['available']} available, ${balance['locked']} locked")
 ```
 
+
 ```typescript TypeScript
 const userId = "550e8400-e29b-41d4-a716-446655440000";
 
@@ -41,9 +44,11 @@ const response = await fetch(
 );
 const { balances } = await response.json();
 ```
+
 </RequestExample>
 
 <ResponseExample>
+
 ```json 200 OK
 {
   "balances": [
@@ -63,6 +68,7 @@ const { balances } = await response.json();
 }
 ```
 
+
 ```json 200 OK (Single Venue)
 {
   "balances": [
@@ -76,21 +82,24 @@ const { balances } = await response.json();
 }
 ```
 
+
 ```json 400 Bad Request
 {
   "error": "Invalid venue: 'xxx'. Must be 'polymarket' or 'kalshi'"
 }
 ```
 
+
 ```json 404 Not Found
 {
   "error": "User not found"
 }
 ```
+
 </ResponseExample>
 
 <Note>
-Kalshi orders are atomic swaps, so they never show locked balances - funds are either spent or available.
+  Kalshi orders are atomic swaps, so they never show locked balances - funds are either spent or available.
 </Note>
 
 ## Use Cases

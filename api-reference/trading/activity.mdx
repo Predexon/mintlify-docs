@@ -4,79 +4,7 @@ openapi: "GET /v1/polymarket/activity"
 description: "Fetch trading activity (merges, splits, redeems) for a user"
 ---
 
-## Overview
-
-Query trading activity for a specific wallet address. This includes minting operations (splits), redemptions (merges, redeems), and position changes.
-
-<ParamField query="user" type="string" required>
-  User wallet address (required)
-</ParamField>
-
-<ParamField query="market_slug" type="string">
-  Filter by market slug
-</ParamField>
-
-<ParamField query="condition_id" type="string">
-  Filter by condition ID
-</ParamField>
-
-<ParamField query="start_time" type="integer">
-  Unix timestamp (seconds) for start of range
-</ParamField>
-
-<ParamField query="end_time" type="integer">
-  Unix timestamp (seconds) for end of range
-</ParamField>
-
-<ParamField query="order" type="string" default="desc">
-  Sort order: `asc` or `desc` by timestamp
-</ParamField>
-
-<ParamField query="limit" type="integer" default="100">
-  Number of activities to return (1-500)
-</ParamField>
-
-<ParamField query="pagination_key" type="string">
-  Pagination key for cursor-based pagination (from previous response)
-</ParamField>
-
-<Warning>
-Only one of `market_slug` or `condition_id` can be provided.
-</Warning>
-
-<ResponseField name="activities" type="array">
-  <Expandable title="Activity object">
-    <ResponseField name="side" type="string">
-      Activity type: `MERGE`, `SPLIT`, or `REDEEM`
-    </ResponseField>
-    <ResponseField name="market_slug" type="string">Market slug</ResponseField>
-    <ResponseField name="condition_id" type="string">Market condition ID</ResponseField>
-    <ResponseField name="shares" type="integer">Raw number of shares</ResponseField>
-    <ResponseField name="shares_normalized" type="number">Shares / 1,000,000</ResponseField>
-    <ResponseField name="price" type="number">Price at time of activity</ResponseField>
-    <ResponseField name="tx_hash" type="string">Transaction hash</ResponseField>
-    <ResponseField name="title" type="string">Market title</ResponseField>
-    <ResponseField name="timestamp" type="integer">Unix timestamp</ResponseField>
-    <ResponseField name="user" type="string">Wallet address</ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  <Expandable>
-    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
-    <ResponseField name="count" type="integer">Number of items returned</ResponseField>
-    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
-    <ResponseField name="has_more" type="boolean">Whether more results exist</ResponseField>
-  </Expandable>
-</ResponseField>
-
-## Activity Types
-
-| Type | Description |
-|------|-------------|
-| `SPLIT` | User deposited collateral to create YES+NO token pairs |
-| `MERGE` | User combined YES+NO pairs back to collateral |
-| `REDEEM` | User redeemed winning tokens after market resolution |
+Query trading activity for a wallet. Includes `SPLIT` (deposit collateral to create YES+NO pairs), `MERGE` (combine pairs back to collateral), and `REDEEM` (redeem winning tokens after resolution).
 
 <RequestExample>
 ```bash cURL
@@ -163,15 +91,3 @@ const { activities } = await response.json();
 }
 ```
 </ResponseExample>
-
-## Understanding Activity Flow
-
-```mermaid
-graph TD
-    A[Collateral] -->|SPLIT| B[YES + NO Tokens]
-    B -->|MERGE| A
-    B -->|Trade| C[Different User]
-    B -->|Market Resolves| D{Winner?}
-    D -->|Yes| E[REDEEM for $1]
-    D -->|No| F[Worth $0]
-```

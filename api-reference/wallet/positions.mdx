@@ -4,94 +4,7 @@ openapi: "GET /v1/polymarket/wallet/positions/{wallet_address}"
 description: "Get open and historical positions for a wallet address"
 ---
 
-## Overview
-
-Fetch all open and historical positions for a wallet address, including cost basis, current value, and P&L calculations. Supports filtering by market, share size, and status.
-
-<ParamField path="wallet_address" type="string" required>
-  Wallet address to fetch positions for
-</ParamField>
-
-<ParamField query="include_closed" type="boolean" default="true">
-  Include zero-balance (closed) positions
-</ParamField>
-
-<ParamField query="min_shares" type="number" default="0">
-  Minimum number of shares to include
-</ParamField>
-
-<ParamField query="condition_id" type="string">
-  Filter to a specific market by condition ID
-</ParamField>
-
-<ParamField query="sort_by" type="string" default="value">
-  Sort by: `value`, `unrealized_pnl`, `realized_pnl`, or `cost`
-</ParamField>
-
-<ParamField query="order" type="string" default="desc">
-  Sort order: `asc` or `desc`
-</ParamField>
-
-<ParamField query="limit" type="integer" default="100">
-  Maximum positions to return (1-500)
-</ParamField>
-
-<ParamField query="offset" type="integer" default="0">
-  Positions to skip for pagination
-</ParamField>
-
-<ResponseField name="wallet_address" type="string">
-  The queried wallet address
-</ResponseField>
-
-<ResponseField name="positions" type="array">
-  <Expandable title="Position object">
-    <ResponseField name="market" type="object">
-      <Expandable>
-        <ResponseField name="condition_id" type="string">Market condition ID</ResponseField>
-        <ResponseField name="market_slug" type="string">Market slug</ResponseField>
-        <ResponseField name="title" type="string">Market title</ResponseField>
-        <ResponseField name="side" type="string">`YES` or `NO`</ResponseField>
-        <ResponseField name="token_id" type="string">Token ID</ResponseField>
-        <ResponseField name="status" type="string">`open`, `resolved_win`, or `resolved_loss`</ResponseField>
-      </Expandable>
-    </ResponseField>
-    <ResponseField name="position" type="object">
-      <Expandable>
-        <ResponseField name="shares" type="number">Number of shares held</ResponseField>
-        <ResponseField name="avg_entry_price" type="number">Average entry price (0-1)</ResponseField>
-        <ResponseField name="total_cost_usd" type="number">Total cost basis in USD</ResponseField>
-      </Expandable>
-    </ResponseField>
-    <ResponseField name="current" type="object">
-      <Expandable>
-        <ResponseField name="price" type="number">Current market price</ResponseField>
-        <ResponseField name="value_usd" type="number">Current position value</ResponseField>
-      </Expandable>
-    </ResponseField>
-    <ResponseField name="pnl" type="object">
-      <Expandable>
-        <ResponseField name="unrealized_usd" type="number">Unrealized P&L in USD</ResponseField>
-        <ResponseField name="unrealized_pct" type="number">Unrealized P&L as percentage</ResponseField>
-        <ResponseField name="realized_usd" type="number">Realized P&L from closed trades</ResponseField>
-      </Expandable>
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="summary" type="object">
-  <Expandable>
-    <ResponseField name="total_positions" type="integer">Total number of positions</ResponseField>
-    <ResponseField name="total_value_usd" type="number">Total portfolio value</ResponseField>
-    <ResponseField name="total_cost_usd" type="number">Total cost basis</ResponseField>
-    <ResponseField name="total_unrealized_pnl_usd" type="number">Total unrealized P&L</ResponseField>
-    <ResponseField name="total_realized_pnl_usd" type="number">Total realized P&L</ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  Standard pagination object
-</ResponseField>
+Fetch positions for a Polymarket wallet with cost basis, current value, and P&L.
 
 <RequestExample>
 ```bash cURL
@@ -102,27 +15,12 @@ curl -H "x-api-key: YOUR_API_KEY" \
 ```python Python
 import requests
 
-wallet = "0x1234567890abcdef..."
-
 response = requests.get(
     f"https://api.predexon.com/v1/polymarket/wallet/positions/{wallet}",
     headers={"x-api-key": "YOUR_API_KEY"},
-    params={
-        "sort_by": "unrealized_pnl",
-        "order": "desc",
-        "min_shares": 10
-    }
+    params={"sort_by": "unrealized_pnl", "order": "desc"}
 )
-
 data = response.json()
-print(f"Portfolio Value: ${data['summary']['total_value_usd']:,.2f}")
-print(f"Total P&L: ${data['summary']['total_unrealized_pnl_usd']:,.2f}")
-
-for pos in data["positions"][:5]:
-    print(f"\n{pos['market']['title'][:50]}...")
-    print(f"  Side: {pos['market']['side']}")
-    print(f"  Shares: {pos['position']['shares']:,.2f}")
-    print(f"  P&L: ${pos['pnl']['unrealized_usd']:,.2f} ({pos['pnl']['unrealized_pct']:.1f}%)")
 ```
 
 ```typescript TypeScript
@@ -137,7 +35,7 @@ const { positions, summary } = await response.json();
 <ResponseExample>
 ```json 200
 {
-  "wallet_address": "0x1234567890abcdef...",
+  "wallet_address": "0x1234...",
   "positions": [
     {
       "market": {
@@ -180,11 +78,3 @@ const { positions, summary } = await response.json();
 }
 ```
 </ResponseExample>
-
-## Position Status
-
-| Status | Description | Current Price |
-|--------|-------------|---------------|
-| `open` | Market still trading | Live market price |
-| `resolved_win` | User's side won | 1.00 |
-| `resolved_loss` | User's side lost | 0.00 |

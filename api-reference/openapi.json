@@ -1176,7 +1176,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PolymarketMarketsListResponse"
+                }
               }
             }
           },
@@ -1943,7 +1945,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/KalshiMarketsListResponse"
+                }
               }
             }
           },
@@ -2568,7 +2572,7 @@
           "dflow"
         ],
         "summary": "Get Dflow Wallet Positions",
-        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with cost basis, realized PnL, and fees paid.\n\n- **Open positions**: qty > 0 (still holding tokens)\n- **Closed positions**: qty = 0 but has realized PnL history\n\nEnriched with market metadata (title, category) from PostgreSQL.",
+        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with total cost basis, realized PnL, and fees paid.\n\n- **Open positions**: Currently holding tokens (total_qty_bought > total_qty_sold)\n- **Closed positions**: No longer holding but has trading history\n\nEnriched with market metadata (title, subtitles) from PostgreSQL.",
         "operationId": "get_dflow_wallet_positions_v1_dflow_wallet_positions__wallet_address__get",
         "parameters": [
           {
@@ -2643,7 +2647,7 @@
             "schema": {
               "$ref": "#/components/schemas/DflowPositionSortBy",
               "description": "Field to sort by",
-              "default": "quantity"
+              "default": "total_cost_basis"
             },
             "description": "Field to sort by"
           },
@@ -3043,20 +3047,10 @@
             "$ref": "#/components/schemas/DflowPositionStatus",
             "description": "Position status: open or closed"
           },
-          "quantity": {
-            "type": "number",
-            "title": "Quantity",
-            "description": "Current quantity of tokens held"
-          },
-          "cost_basis": {
-            "type": "number",
-            "title": "Cost Basis",
-            "description": "Current cost basis in USD"
-          },
           "total_cost_basis": {
             "type": "number",
             "title": "Total Cost Basis",
-            "description": "Total historical cost basis in USD"
+            "description": "Total cost basis in USD"
           },
           "avg_entry_price": {
             "type": "number",
@@ -3076,12 +3070,12 @@
           "total_qty_bought": {
             "type": "number",
             "title": "Total Qty Bought",
-            "description": "Total quantity ever bought"
+            "description": "Total quantity bought"
           },
           "total_qty_sold": {
             "type": "number",
             "title": "Total Qty Sold",
-            "description": "Total quantity ever sold"
+            "description": "Total quantity sold"
           },
           "first_trade_at": {
             "anyOf": [
@@ -3112,8 +3106,6 @@
         "required": [
           "outcome_mint",
           "status",
-          "quantity",
-          "cost_basis",
           "total_cost_basis",
           "avg_entry_price",
           "realized_pnl",
@@ -3127,8 +3119,8 @@
       "DflowPositionSortBy": {
         "type": "string",
         "enum": [
-          "quantity",
-          "cost_basis",
+          "total_qty_bought",
+          "total_cost_basis",
           "realized_pnl",
           "fees_paid"
         ],
@@ -3428,6 +3420,77 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "KalshiMarketsListResponse": {
+        "type": "object",
+        "properties": {
+          "markets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ticker": {"type": "string", "description": "Market ticker"},
+                "event_ticker": {"type": "string", "description": "Event ticker"},
+                "market_id": {"type": "string", "description": "Market ID"},
+                "title": {"type": "string", "description": "Market title"},
+                "yes_subtitle": {"type": "string", "description": "Yes outcome subtitle"},
+                "no_subtitle": {"type": "string", "description": "No outcome subtitle"},
+                "status": {"type": "string", "enum": ["open", "closed", "determined", "settled"], "description": "Market status"},
+                "result": {"type": "string", "description": "Market result (yes/no) if resolved"},
+                "open_time": {"type": "string", "format": "date-time", "description": "Market open time"},
+                "close_time": {"type": "string", "format": "date-time", "description": "Market close time"},
+                "expected_expiration_time": {"type": "string", "format": "date-time", "description": "Expected expiration time"},
+                "settlement_time": {"type": "string", "format": "date-time", "description": "Settlement time"},
+                "determination_time": {"type": "string", "format": "date-time", "description": "Determination time"},
+                "can_close_early": {"type": "boolean", "description": "Whether market can close early"},
+                "strike_type": {"type": "string", "description": "Strike type"},
+                "custom_strike": {"type": "string", "description": "Custom strike value"},
+                "outcomes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {"type": "string", "description": "Outcome label (Yes/No)"},
+                      "bid": {"type": "number", "description": "Best bid price (0-1)"},
+                      "ask": {"type": "number", "description": "Best ask price (0-1)"}
+                    }
+                  },
+                  "description": "Outcome prices"
+                },
+                "last_price": {"type": "number", "description": "Last trade price (0-1)"},
+                "volume": {"type": "integer", "description": "Total volume in contracts"},
+                "open_interest": {"type": "integer", "description": "Open interest in contracts"},
+                "dollar_volume": {"type": "integer", "description": "Total volume in dollars"},
+                "dollar_open_interest": {"type": "integer", "description": "Open interest in dollars"},
+                "event": {
+                  "type": "object",
+                  "properties": {
+                    "event_ticker": {"type": "string", "description": "Event ticker"},
+                    "series_ticker": {"type": "string", "description": "Series ticker"},
+                    "title": {"type": "string", "description": "Event title"},
+                    "subtitle": {"type": "string", "description": "Event subtitle"}
+                  },
+                  "description": "Parent event info"
+                },
+                "created_at": {"type": "string", "format": "date-time", "description": "Creation timestamp"},
+                "updated_at": {"type": "string", "format": "date-time", "description": "Last update timestamp"}
+              }
+            },
+            "description": "List of markets"
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "limit": {"type": "integer", "description": "Results per page"},
+              "offset": {"type": "integer", "description": "Number of results skipped"},
+              "total": {"type": "integer", "description": "Total matching results"},
+              "has_more": {"type": "boolean", "description": "Whether more results exist"}
+            },
+            "description": "Pagination info"
+          }
+        },
+        "title": "KalshiMarketsListResponse",
+        "description": "Kalshi markets list response"
       },
       "KalshiMatchResponse": {
         "properties": {
@@ -4275,6 +4338,63 @@
         ],
         "title": "PnLGranularity",
         "description": "PnL granularity enum."
+      },
+      "PolymarketMarketsListResponse": {
+        "type": "object",
+        "properties": {
+          "markets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "condition_id": {"type": "string", "description": "Unique condition identifier"},
+                "question_id": {"type": "string", "description": "Question ID"},
+                "market_id": {"type": "string", "description": "Market ID"},
+                "market_slug": {"type": "string", "description": "URL-friendly market slug"},
+                "title": {"type": "string", "description": "Market title/question"},
+                "description": {"type": "string", "description": "Market description"},
+                "status": {"type": "string", "enum": ["open", "closed"], "description": "Market status"},
+                "winning_side": {"type": "string", "description": "Winning side if resolved"},
+                "start_time": {"type": "string", "format": "date-time", "description": "Market start time"},
+                "end_time": {"type": "string", "format": "date-time", "description": "Market end time"},
+                "close_time": {"type": "string", "format": "date-time", "description": "Market close time"},
+                "created_time": {"type": "string", "format": "date-time", "description": "Creation timestamp"},
+                "image_url": {"type": "string", "description": "Market image URL"},
+                "event_id": {"type": "string", "description": "Parent event ID"},
+                "event_slug": {"type": "string", "description": "Parent event slug"},
+                "event_title": {"type": "string", "description": "Parent event title"},
+                "outcomes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {"type": "string", "description": "Outcome label (Yes/No)"},
+                      "token_id": {"type": "string", "description": "Token ID for this outcome"},
+                      "price": {"type": "number", "description": "Current price (0-1)"}
+                    }
+                  },
+                  "description": "Market outcomes with prices"
+                },
+                "total_volume_usd": {"type": "number", "description": "Total trading volume in USD"},
+                "liquidity_usd": {"type": "number", "description": "Current liquidity in USD"},
+                "tags": {"type": "array", "items": {"type": "string"}, "description": "Market tags/categories"}
+              }
+            },
+            "description": "List of markets"
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "limit": {"type": "integer", "description": "Results per page"},
+              "offset": {"type": "integer", "description": "Number of results skipped"},
+              "total": {"type": "integer", "description": "Total matching results"},
+              "has_more": {"type": "boolean", "description": "Whether more results exist"}
+            },
+            "description": "Pagination info"
+          }
+        },
+        "title": "PolymarketMarketsListResponse",
+        "description": "Polymarket markets list response"
       },
       "PolymarketMatchResponse": {
         "properties": {
