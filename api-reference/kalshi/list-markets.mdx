@@ -93,7 +93,7 @@ This endpoint does not include Multi Variate Event (MVE) markets such as parlays
       ISO 8601 timestamp when market closes
     </ResponseField>
     <ResponseField name="outcomes" type="array">
-      Array of outcome objects with `label`, `subtitle`, `bid`, and `ask`
+      Array of outcome objects with `label`, `bid`, and `ask`
     </ResponseField>
     <ResponseField name="last_price" type="number">
       Last traded price (0-1)
@@ -182,19 +182,16 @@ const data = await response.json();
       "settlement_time": null,
       "determination_time": null,
       "can_close_early": false,
-      "is_deactivated": false,
       "strike_type": "greater",
       "custom_strike": "100000",
       "outcomes": [
         {
           "label": "Yes",
-          "subtitle": "Bitcoin above $100,000",
           "bid": 0.52,
           "ask": 0.54
         },
         {
           "label": "No",
-          "subtitle": "Bitcoin at or below $100,000",
           "bid": 0.46,
           "ask": 0.48
         }

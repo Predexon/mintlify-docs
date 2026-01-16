@@ -2568,7 +2568,7 @@
           "dflow"
         ],
         "summary": "Get Dflow Wallet Positions",
-        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with cost basis, realized PnL, and fees paid.\n\n- **Open positions**: qty > 0 (still holding tokens)\n- **Closed positions**: qty = 0 but has realized PnL history\n\nEnriched with market metadata (title, category) from PostgreSQL.",
+        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with total cost basis, realized PnL, and fees paid.\n\n- **Open positions**: Currently holding tokens (total_qty_bought > total_qty_sold)\n- **Closed positions**: No longer holding but has trading history\n\nEnriched with market metadata (title, subtitles) from PostgreSQL.",
         "operationId": "get_dflow_wallet_positions_v1_dflow_wallet_positions__wallet_address__get",
         "parameters": [
           {
@@ -2643,7 +2643,7 @@
             "schema": {
               "$ref": "#/components/schemas/DflowPositionSortBy",
               "description": "Field to sort by",
-              "default": "quantity"
+              "default": "total_cost_basis"
             },
             "description": "Field to sort by"
           },
@@ -3043,20 +3043,10 @@
             "$ref": "#/components/schemas/DflowPositionStatus",
             "description": "Position status: open or closed"
           },
-          "quantity": {
-            "type": "number",
-            "title": "Quantity",
-            "description": "Current quantity of tokens held"
-          },
-          "cost_basis": {
-            "type": "number",
-            "title": "Cost Basis",
-            "description": "Current cost basis in USD"
-          },
           "total_cost_basis": {
             "type": "number",
             "title": "Total Cost Basis",
-            "description": "Total historical cost basis in USD"
+            "description": "Total cost basis in USD"
           },
           "avg_entry_price": {
             "type": "number",
@@ -3076,12 +3066,12 @@
           "total_qty_bought": {
             "type": "number",
             "title": "Total Qty Bought",
-            "description": "Total quantity ever bought"
+            "description": "Total quantity bought"
           },
           "total_qty_sold": {
             "type": "number",
             "title": "Total Qty Sold",
-            "description": "Total quantity ever sold"
+            "description": "Total quantity sold"
           },
           "first_trade_at": {
             "anyOf": [
@@ -3112,8 +3102,6 @@
         "required": [
           "outcome_mint",
           "status",
-          "quantity",
-          "cost_basis",
           "total_cost_basis",
           "avg_entry_price",
           "realized_pnl",
@@ -3127,8 +3115,8 @@
       "DflowPositionSortBy": {
         "type": "string",
         "enum": [
-          "quantity",
-          "cost_basis",
+          "total_qty_bought",
+          "total_cost_basis",
           "realized_pnl",
           "fees_paid"
         ],

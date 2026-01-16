@@ -6,12 +6,12 @@ description: "Fetch current positions for a Dflow wallet"
 
 ## Overview
 
-Fetch current positions for a wallet address on Dflow. Returns all positions with cost basis, realized PnL, and fees paid.
+Fetch current positions for a wallet address on Dflow. Returns all positions with total cost basis, realized PnL, and fees paid.
 
-- **Open positions**: `qty > 0` (still holding tokens)
-- **Closed positions**: `qty = 0` but still has realized PnL history
+- **Open positions**: Currently holding tokens (`total_qty_bought > total_qty_sold`)
+- **Closed positions**: No longer holding but has trading history
 
-Enriched with market metadata (title, category) from the database.
+Enriched with market metadata (title, subtitles) from PostgreSQL.
 
 <ParamField path="wallet_address" type="string" required>
   Wallet address to fetch positions for
@@ -29,8 +29,8 @@ Enriched with market metadata (title, category) from the database.
   Filter by market ticker (case-insensitive)
 </ParamField>
 
-<ParamField query="sort_by" default="quantity" type="string">
-  Field to sort by: `quantity`, `cost_basis`, `realized_pnl`, `fees_paid`
+<ParamField query="sort_by" default="total_cost_basis" type="string">
+  Field to sort by: `total_qty_bought`, `total_cost_basis`, `realized_pnl`, `fees_paid`
 </ParamField>
 
 <ParamField query="order" default="desc" type="string">
@@ -45,7 +45,7 @@ Enriched with market metadata (title, category) from the database.
   Number of positions to skip for pagination
 </ParamField>
 
-<ResponseField name="wallet_address" type="string">
+<ResponseField name="wallet" type="string">
   The wallet address
 </ResponseField>
 
@@ -70,13 +70,7 @@ Enriched with market metadata (title, category) from the database.
       Outcome side (yes/no)
     </ResponseField>
     <ResponseField name="status" type="string">
-      Position status
-    </ResponseField>
-    <ResponseField name="quantity" type="number">
-      Current quantity held
-    </ResponseField>
-    <ResponseField name="cost_basis" type="number">
-      Cost basis per share
+      Position status: `open` or `closed`
     </ResponseField>
     <ResponseField name="total_cost_basis" type="number">
       Total cost basis in USD
@@ -109,6 +103,12 @@ Enriched with market metadata (title, category) from the database.
   <Expandable>
     <ResponseField name="total_positions" type="integer">
       Total number of positions
+    </ResponseField>
+    <ResponseField name="open_positions" type="integer">
+      Number of open positions
+    </ResponseField>
+    <ResponseField name="closed_positions" type="integer">
+      Number of closed positions
     </ResponseField>
     <ResponseField name="total_cost_basis" type="number">
       Sum of all cost bases
@@ -180,7 +180,7 @@ positions.forEach(pos => {
 
 ```json 200
 {
-  "wallet_address": "7vfCXTUXx...",
+  "wallet": "7vfCXTUXx...",
   "positions": [
     {
       "outcome_mint": "8xPqM3...",
@@ -190,8 +190,6 @@ positions.forEach(pos => {
       "no_subtitle": "No, Bitcoin will be at or below $100k",
       "outcome": "yes",
       "status": "open",
-      "quantity": 150,
-      "cost_basis": 0.65,
       "total_cost_basis": 97.50,
       "avg_entry_price": 0.65,
       "realized_pnl": 0,
@@ -209,8 +207,6 @@ positions.forEach(pos => {
       "no_subtitle": "No, ETH will be at or below $5k",
       "outcome": "no",
       "status": "open",
-      "quantity": 200,
-      "cost_basis": 0.40,
       "total_cost_basis": 80.00,
       "avg_entry_price": 0.40,
       "realized_pnl": 25.50,
@@ -223,6 +219,8 @@ positions.forEach(pos => {
   ],
   "summary": {
     "total_positions": 2,
+    "open_positions": 2,
+    "closed_positions": 0,
     "total_cost_basis": 177.50,
     "total_realized_pnl": 25.50,
     "total_fees_paid": 4.05
