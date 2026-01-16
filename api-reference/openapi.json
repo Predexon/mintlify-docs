@@ -3509,6 +3509,11 @@
           }
         },
         "type": "object",
+        "required": [
+          "query",
+          "matches",
+          "summary"
+        ],
         "title": "KalshiMatchResponse",
         "description": "Response for Kalshi market matching query."
       },
@@ -3646,6 +3651,10 @@
           }
         },
         "type": "object",
+        "required": [
+          "market_ticker",
+          "title"
+        ],
         "title": "KalshiPairInfo",
         "description": "Kalshi market info in a pair."
       },
@@ -3681,6 +3690,11 @@
           }
         },
         "type": "object",
+        "required": [
+          "market_ticker",
+          "title",
+          "status"
+        ],
         "title": "KalshiQueryInfo",
         "description": "Kalshi query information."
       },
@@ -3871,6 +3885,12 @@
           }
         },
         "type": "object",
+        "required": [
+          "total_matches",
+          "exact_matches",
+          "related_matches",
+          "platforms"
+        ],
         "title": "MatchSummary",
         "description": "Summary of matches."
       },
@@ -3906,6 +3926,10 @@
           }
         },
         "type": "object",
+        "required": [
+          "POLYMARKET",
+          "KALSHI"
+        ],
         "title": "MatchedPair",
         "description": "A matched pair of markets (exact matches only)."
       },
@@ -3936,6 +3960,11 @@
           }
         },
         "type": "object",
+        "required": [
+          "limit",
+          "count",
+          "has_more"
+        ],
         "title": "MatchedPairsPagination",
         "description": "Pagination for matched pairs endpoint."
       },
@@ -3953,6 +3982,10 @@
           }
         },
         "type": "object",
+        "required": [
+          "pairs",
+          "pagination"
+        ],
         "title": "MatchedPairsResponse",
         "description": "Response for matched pairs endpoint."
       },
@@ -4380,6 +4413,11 @@
           }
         },
         "type": "object",
+        "required": [
+          "query",
+          "matches",
+          "summary"
+        ],
         "title": "PolymarketMatchResponse",
         "description": "Response for Polymarket market matching query."
       },
@@ -4395,6 +4433,10 @@
           }
         },
         "type": "object",
+        "required": [
+          "market_slug",
+          "title"
+        ],
         "title": "PolymarketPairInfo",
         "description": "Polymarket market info in a pair."
       },
@@ -4419,6 +4461,11 @@
           }
         },
         "type": "object",
+        "required": [
+          "market_slug",
+          "title",
+          "status"
+        ],
         "title": "PolymarketQueryInfo",
         "description": "Polymarket query information."
       },
