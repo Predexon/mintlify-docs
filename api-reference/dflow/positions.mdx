@@ -29,19 +29,19 @@ Enriched with market metadata (title, category) from the database.
   Filter by market ticker (case-insensitive)
 </ParamField>
 
-<ParamField query="sort_by" type="string" default="quantity">
+<ParamField query="sort_by" default="quantity" type="string">
   Field to sort by: `quantity`, `cost_basis`, `realized_pnl`, `fees_paid`
 </ParamField>
 
-<ParamField query="order" type="string" default="desc">
+<ParamField query="order" default="desc" type="string">
   Sort order: `asc` or `desc`
 </ParamField>
 
-<ParamField query="limit" type="integer" default="100">
+<ParamField query="limit" default="100" type="integer">
   Maximum number of positions to return (1-500)
 </ParamField>
 
-<ParamField query="offset" type="integer" default="0">
+<ParamField query="offset" default="0" type="integer">
   Number of positions to skip for pagination
 </ParamField>
 
@@ -51,49 +51,101 @@ Enriched with market metadata (title, category) from the database.
 
 <ResponseField name="positions" type="array">
   <Expandable title="Position object">
-    <ResponseField name="outcome_mint" type="string">Outcome mint address</ResponseField>
-    <ResponseField name="market_ticker" type="string">Market ticker</ResponseField>
-    <ResponseField name="market_title" type="string">Market title</ResponseField>
-    <ResponseField name="yes_subtitle" type="string">Yes outcome subtitle</ResponseField>
-    <ResponseField name="no_subtitle" type="string">No outcome subtitle</ResponseField>
-    <ResponseField name="outcome" type="string">Outcome side (yes/no)</ResponseField>
-    <ResponseField name="status" type="string">Position status</ResponseField>
-    <ResponseField name="quantity" type="number">Current quantity held</ResponseField>
-    <ResponseField name="cost_basis" type="number">Cost basis per share</ResponseField>
-    <ResponseField name="total_cost_basis" type="number">Total cost basis in USD</ResponseField>
-    <ResponseField name="avg_entry_price" type="number">Average entry price (0-1)</ResponseField>
-    <ResponseField name="realized_pnl" type="number">Realized profit/loss in USD</ResponseField>
-    <ResponseField name="fees_paid" type="number">Total fees paid in USD</ResponseField>
-    <ResponseField name="total_qty_bought" type="number">Total quantity bought</ResponseField>
-    <ResponseField name="total_qty_sold" type="number">Total quantity sold</ResponseField>
-    <ResponseField name="first_trade_at" type="integer">Timestamp of first trade</ResponseField>
-    <ResponseField name="last_trade_at" type="integer">Timestamp of last trade</ResponseField>
+    <ResponseField name="outcome_mint" type="string">
+      Outcome mint address
+    </ResponseField>
+    <ResponseField name="market_ticker" type="string">
+      Market ticker
+    </ResponseField>
+    <ResponseField name="market_title" type="string">
+      Market title
+    </ResponseField>
+    <ResponseField name="yes_subtitle" type="string">
+      Yes outcome subtitle
+    </ResponseField>
+    <ResponseField name="no_subtitle" type="string">
+      No outcome subtitle
+    </ResponseField>
+    <ResponseField name="outcome" type="string">
+      Outcome side (yes/no)
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Position status
+    </ResponseField>
+    <ResponseField name="quantity" type="number">
+      Current quantity held
+    </ResponseField>
+    <ResponseField name="cost_basis" type="number">
+      Cost basis per share
+    </ResponseField>
+    <ResponseField name="total_cost_basis" type="number">
+      Total cost basis in USD
+    </ResponseField>
+    <ResponseField name="avg_entry_price" type="number">
+      Average entry price (0-1)
+    </ResponseField>
+    <ResponseField name="realized_pnl" type="number">
+      Realized profit/loss in USD
+    </ResponseField>
+    <ResponseField name="fees_paid" type="number">
+      Total fees paid in USD
+    </ResponseField>
+    <ResponseField name="total_qty_bought" type="number">
+      Total quantity bought
+    </ResponseField>
+    <ResponseField name="total_qty_sold" type="number">
+      Total quantity sold
+    </ResponseField>
+    <ResponseField name="first_trade_at" type="integer">
+      Timestamp of first trade
+    </ResponseField>
+    <ResponseField name="last_trade_at" type="integer">
+      Timestamp of last trade
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
 <ResponseField name="summary" type="object">
   <Expandable>
-    <ResponseField name="total_positions" type="integer">Total number of positions</ResponseField>
-    <ResponseField name="total_cost_basis" type="number">Sum of all cost bases</ResponseField>
-    <ResponseField name="total_realized_pnl" type="number">Sum of all realized PnL</ResponseField>
-    <ResponseField name="total_fees_paid" type="number">Sum of all fees paid</ResponseField>
+    <ResponseField name="total_positions" type="integer">
+      Total number of positions
+    </ResponseField>
+    <ResponseField name="total_cost_basis" type="number">
+      Sum of all cost bases
+    </ResponseField>
+    <ResponseField name="total_realized_pnl" type="number">
+      Sum of all realized PnL
+    </ResponseField>
+    <ResponseField name="total_fees_paid" type="number">
+      Sum of all fees paid
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
 <ResponseField name="pagination" type="object">
   <Expandable>
-    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
-    <ResponseField name="offset" type="integer">Current offset</ResponseField>
-    <ResponseField name="total" type="integer">Total matching positions</ResponseField>
-    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+    <ResponseField name="limit" type="integer">
+      Requested limit
+    </ResponseField>
+    <ResponseField name="offset" type="integer">
+      Current offset
+    </ResponseField>
+    <ResponseField name="total" type="integer">
+      Total matching positions
+    </ResponseField>
+    <ResponseField name="has_more" type="boolean">
+      Whether more results are available
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
 <RequestExample>
+
 ```bash cURL
 curl -H "x-api-key: YOUR_API_KEY" \
   "https://api.predexon.com/v1/dflow/wallet/positions/YOUR_WALLET_ADDRESS?status=open"
 ```
+
 
 ```python Python
 import requests
@@ -109,6 +161,7 @@ for pos in data["positions"]:
     print(f"{pos['market_title']}: {pos['quantity']} shares, PnL: ${pos['realized_pnl']:.2f}")
 ```
 
+
 ```typescript TypeScript
 const response = await fetch(
   `https://api.predexon.com/v1/dflow/wallet/positions/${walletAddress}?status=open`,
@@ -120,9 +173,11 @@ positions.forEach(pos => {
   console.log(`${pos.market_title}: ${pos.quantity} shares, PnL: $${pos.realized_pnl}`);
 });
 ```
+
 </RequestExample>
 
 <ResponseExample>
+
 ```json 200
 {
   "wallet_address": "7vfCXTUXx...",
@@ -181,10 +236,12 @@ positions.forEach(pos => {
 }
 ```
 
+
 ```json 400
 {
   "error": "Bad Request",
   "message": "Invalid wallet address format"
 }
 ```
+
 </ResponseExample>
