@@ -8,66 +8,9 @@ description: "Find equivalent markets across Polymarket and Kalshi"
 
 Find matching markets across prediction market platforms. Given a Polymarket market slug OR a Kalshi market ticker, discover equivalent or related markets on the other platform.
 
-<ParamField query="polymarket_market_slug" type="string">
-  Polymarket market slug to find matches for
-</ParamField>
-
-<ParamField query="kalshi_market_ticker" type="string">
-  Kalshi market ticker to find matches for
-</ParamField>
-
 <Warning>
 Provide **exactly one** of `polymarket_market_slug` or `kalshi_market_ticker`, not both.
 </Warning>
-
-<ResponseField name="query" type="object">
-  Information about the queried market
-  <Expandable>
-    <ResponseField name="platform" type="string">`POLYMARKET` or `KALSHI`</ResponseField>
-    <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
-    <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
-    <ResponseField name="title" type="string">Market title</ResponseField>
-    <ResponseField name="yes_subtitle" type="string">Short subtitle for the "Yes" outcome (Kalshi only)</ResponseField>
-    <ResponseField name="status" type="string">Market status (`active`, `closed`, etc.)</ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="matches" type="object">
-  Matches grouped by platform
-  <Expandable title="Platform matches">
-    <ResponseField name="exact" type="array">
-      Markets representing the same underlying event — will always resolve identically
-      <Expandable>
-        <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
-        <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
-        <ResponseField name="title" type="string">Market title</ResponseField>
-        <ResponseField name="status" type="string">Market status</ResponseField>
-        <ResponseField name="explanation" type="string">Why this is a match</ResponseField>
-        <ResponseField name="similarity" type="number | null">Similarity score (0-1). May be `null` for matches created before Jan 4th, 2025.</ResponseField>
-      </Expandable>
-    </ResponseField>
-    <ResponseField name="related" type="array">
-      Markets for correlated or similar events (same entity different outcome, same event different candidate, etc.)
-      <Expandable>
-        <ResponseField name="market_slug" type="string">Market slug (Polymarket)</ResponseField>
-        <ResponseField name="market_ticker" type="string">Market ticker (Kalshi)</ResponseField>
-        <ResponseField name="title" type="string">Market title</ResponseField>
-        <ResponseField name="status" type="string">Market status</ResponseField>
-        <ResponseField name="explanation" type="string">Why this is a related match</ResponseField>
-        <ResponseField name="similarity" type="number | null">Similarity score (0-1). May be `null` for matches created before Jan 4th, 2025.</ResponseField>
-      </Expandable>
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="summary" type="object">
-  <Expandable>
-    <ResponseField name="total_matches" type="integer">Total number of matches found</ResponseField>
-    <ResponseField name="exact_matches" type="integer">Number of exact matches</ResponseField>
-    <ResponseField name="related_matches" type="integer">Number of related matches</ResponseField>
-    <ResponseField name="platforms" type="array">List of platforms with matches</ResponseField>
-  </Expandable>
-</ResponseField>
 
 <RequestExample>
 ```bash cURL
