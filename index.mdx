@@ -1,6 +1,6 @@
 ---
 title: "Predexon API"
-description: "Unified prediction market data API for Polymarket and Kalshi"
+description: "Unified prediction market data API for Polymarket, Kalshi, and Dflow"
 ---
 
 <Info>
@@ -93,12 +93,15 @@ const { markets } = await response.json();
 
 ## Supported Platforms
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Polymarket" icon="chart-mixed">
     Full data access including markets, orders, activity, positions, and orderbooks.
   </Card>
   <Card title="Kalshi" icon="square-poll-vertical">
-    Cross-platform market matching to find equivalent Kalshi markets.
+    Markets, trades, and orderbook data with cross-platform matching.
+  </Card>
+  <Card title="Dflow" icon="bolt">
+    Wallet trades, positions, and PnL tracking on Solana.
   </Card>
 </CardGroup>
 
