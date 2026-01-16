@@ -203,14 +203,12 @@
             }
           }
         }
-      }
-    },
-    "/api/users/{userId}/orders/polymarket": {
+      },
       "post": {
         "tags": ["Trading"],
-        "summary": "Place Order (Polymarket)",
-        "description": "Place a buy or sell order on Polymarket",
-        "operationId": "place_order_polymarket",
+        "summary": "Place Order",
+        "description": "Place a buy or sell order on a prediction market. Use venue='polymarket' for Polymarket orders or venue='kalshi' for Kalshi orders.",
+        "operationId": "place_order",
         "parameters": [
           {
             "name": "userId",
@@ -227,7 +225,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PolymarketOrderRequest"
+                "$ref": "#/components/schemas/PlaceOrderRequest"
               }
             }
           }
@@ -238,48 +236,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PolymarketOrder"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/users/{userId}/orders/kalshi": {
-      "post": {
-        "tags": ["Trading"],
-        "summary": "Place Order (Kalshi)",
-        "description": "Place a buy or sell order on Kalshi",
-        "operationId": "place_order_kalshi",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Unique identifier for the user"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/KalshiOrderRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Order placed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/KalshiOrder"
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
@@ -627,10 +584,57 @@
           }
         }
       },
+      "PlaceOrderRequest": {
+        "type": "object",
+        "required": ["venue", "side", "amount"],
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["polymarket", "kalshi"],
+            "description": "Trading venue: polymarket or kalshi"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Polymarket token ID (required for Polymarket orders)"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Kalshi market ticker (required for Kalshi orders)"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["Yes", "No"],
+            "description": "Yes or No (required for Kalshi, case-sensitive)"
+          },
+          "side": {
+            "type": "string",
+            "enum": ["buy", "sell"],
+            "description": "Buy or sell"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price per share (0-1). Required for Polymarket limit orders. Must match tick size."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["limit", "market"],
+            "description": "Order type (Polymarket only, defaults to limit)"
+          }
+        }
+      },
       "PolymarketOrderRequest": {
         "type": "object",
-        "required": ["tokenId", "side", "amount", "type"],
+        "required": ["venue", "tokenId", "side", "amount", "type"],
         "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["polymarket"],
+            "description": "Must be 'polymarket'"
+          },
           "tokenId": {
             "type": "string",
             "description": "The outcome token ID from List Markets"
@@ -657,8 +661,13 @@
       },
       "KalshiOrderRequest": {
         "type": "object",
-        "required": ["ticker", "outcome", "side", "amount"],
+        "required": ["venue", "ticker", "outcome", "side", "amount"],
         "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["kalshi"],
+            "description": "Must be 'kalshi'"
+          },
           "ticker": {
             "type": "string",
             "description": "Market ticker from Kalshi List Markets"

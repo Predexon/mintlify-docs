@@ -1,12 +1,30 @@
 ---
-openapi: "POST /api/users/{userId}/orders/kalshi"
 title: "Place Order (Kalshi)"
 description: "Place a buy or sell order on Kalshi"
+api: "POST /api/users/{userId}/orders"
 ---
 
+## Endpoint
+
+```
+POST /api/users/{userId}/orders
+```
+
+Place orders on Kalshi by setting `venue: "kalshi"` in the request body.
+
 <Warning>
-Kalshi trading requires **USDC on Solana** and **SOL** in your wallet. SOL is needed for Solana transaction fees. See [Deposits](/trading-api/funds/deposit-info) for funding instructions.
+Kalshi trading requires **USDC on Solana** and **SOL** in your wallet. SOL is needed for Solana transaction fees.
 </Warning>
+
+## Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `venue` | string | Yes | Must be `"kalshi"` |
+| `ticker` | string | Yes | Market ticker from [Kalshi List Markets](/api-reference/kalshi/list-markets) |
+| `outcome` | string | Yes | `"Yes"` or `"No"` (case-sensitive) |
+| `side` | string | Yes | `"buy"` or `"sell"` |
+| `amount` | string | Yes | USDC to spend (buy) or shares to sell (sell) |
 
 ## Constraints
 
@@ -24,9 +42,105 @@ Kalshi trading requires **USDC on Solana** and **SOL** in your wallet. SOL is ne
 | `sell` | Shares to sell |
 
 <Note>
-Kalshi orders execute atomically - they either fill completely or fail. There's no partial fill or orderbook. The `price` in the response is the execution price.
+Kalshi orders execute atomically via DFlow - they either fill completely or fail. There's no partial fill or orderbook. The `price` in the response is the execution price.
 </Note>
 
-<Note>
-Get the `ticker` from [Kalshi List Markets](/api-reference/kalshi/list-markets).
-</Note>
+<RequestExample>
+```bash cURL
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "kalshi",
+    "ticker": "KXBTC-25JAN10-B100000",
+    "outcome": "Yes",
+    "side": "buy",
+    "amount": "25.00"
+  }' \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/orders",
+    headers={
+        "x-api-key": "YOUR_API_KEY",
+        "Content-Type": "application/json"
+    },
+    json={
+        "venue": "kalshi",
+        "ticker": "KXBTC-25JAN10-B100000",
+        "outcome": "Yes",
+        "side": "buy",
+        "amount": "25.00"
+    }
+)
+
+order = response.json()
+print(f"Order ID: {order['orderId']}")
+print(f"Execution price: {order['price']}")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/orders`,
+  {
+    method: "POST",
+    headers: {
+      "x-api-key": "YOUR_API_KEY",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      venue: "kalshi",
+      ticker: "KXBTC-25JAN10-B100000",
+      outcome: "Yes",
+      side: "buy",
+      amount: "25.00"
+    })
+  }
+);
+
+const order = await response.json();
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201 Created
+{
+  "orderId": "kalshi-order-12345",
+  "venue": "kalshi",
+  "ticker": "KXBTC-25JAN10-B100000",
+  "side": "buy",
+  "outcome": "Yes",
+  "amount": "25.00",
+  "price": "0.55",
+  "status": "filled",
+  "createdAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Kalshi orders require ticker and outcome (Yes/No)"
+}
+```
+
+```json 400 Insufficient Balance
+{
+  "error": "Insufficient USDC balance to buy 45 contracts"
+}
+```
+
+```json 403 Geo-Restricted
+{
+  "error": "Kalshi trading is not available in your region",
+  "code": "GEO_RESTRICTED"
+}
+```
+</ResponseExample>

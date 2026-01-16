@@ -111,7 +111,7 @@ const redeemable = positions.filter(p => p.status === "redeemable");
 
 | Status | Description | Action |
 |--------|-------------|--------|
-| `active` | Market is still trading | Can sell via [Place Order](/trading-api/trading/place-order) |
+| `active` | Market is still trading | Can sell via Place Order ([Polymarket](/trading-api/trading/place-order-polymarket) / [Kalshi](/trading-api/trading/place-order-kalshi)) |
 | `resolved` | Market has settled | Check `result` for outcome |
 | `redeemable` | Position can be cashed out | Use [Redeem Position](/trading-api/positions/redeem-position) |
 

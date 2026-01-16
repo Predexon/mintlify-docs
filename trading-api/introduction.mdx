@@ -58,7 +58,7 @@ All wallet private keys are managed by [Turnkey](https://turnkey.com) - Predexon
   <Card title="User Management" icon="user" href="/trading-api/users/create-user">
     Create users, manage wallets, and handle authentication.
   </Card>
-  <Card title="Trading" icon="arrow-right-arrow-left" href="/trading-api/trading/place-order">
+  <Card title="Trading" icon="arrow-right-arrow-left" href="/trading-api/trading/place-order-polymarket">
     Place orders, check balances, and manage open orders.
   </Card>
   <Card title="Positions" icon="chart-pie" href="/trading-api/positions/get-positions">
@@ -143,7 +143,7 @@ In compliance with Kalshi's regulatory requirements, Kalshi trading is unavailab
 }
 ```
 
-<Accordion title="Blocked Countries (63 total)">
+<Accordion title="Blocked Countries (51 total)">
 Afghanistan, Algeria, Angola, Australia, Belarus, Belgium, Bolivia, Bulgaria, Burkina Faso, Cameroon, Canada, Central African Republic, China, Côte d'Ivoire, Cuba, Democratic Republic of the Congo, Ethiopia, France, Haiti, Iran, Iraq, Italy, Kenya, Laos, Lebanon, Libya, Mali, Monaco, Mozambique, Myanmar, Namibia, Nicaragua, Niger, North Korea, Poland, Russia, Singapore, Somalia, South Sudan, Sudan, Switzerland, Syria, Taiwan, Thailand, Ukraine, United Arab Emirates, United Kingdom, United States, Venezuela, Yemen, Zimbabwe
 </Accordion>
 
@@ -174,6 +174,10 @@ Reference addresses for tokens used across venues.
 | Token | Chain ID | Address |
 |-------|----------|---------|
 | USDC.e | 137 | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` |
+
+<Note>
+You can also use the [Bridge API](/trading-api/funds/deposit-info) to deposit from Ethereum, Solana, Bitcoin, or other chains. Funds are automatically converted to USDC.e and deposited to your Polymarket wallet.
+</Note>
 
 ### Solana (Kalshi)
 

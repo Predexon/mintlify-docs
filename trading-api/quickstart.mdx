@@ -93,15 +93,15 @@ Use the Data API to find a market you want to trade.
       "https://api.predexon.com/v1/markets?status=active&sort=volume&limit=5"
     ```
 
-    Find the `token_id` in the `outcomes` array for the side you want to trade:
+    Find the `tokenId` in the `outcomes` array for the side you want to trade:
 
     ```json
     {
       "markets": [{
         "question": "Will Bitcoin reach $100k?",
         "outcomes": [
-          { "label": "Yes", "token_id": "71321045679252..." },
-          { "label": "No", "token_id": "48331043336612..." }
+          { "label": "Yes", "tokenId": "71321045679252..." },
+          { "label": "No", "tokenId": "48331043336612..." }
         ]
       }]
     }
@@ -219,8 +219,8 @@ for pos in positions:
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Place Order" icon="paper-plane" href="/trading-api/trading/place-order">
-    Learn about order types and constraints
+  <Card title="Place Order (Polymarket)" icon="paper-plane" href="/trading-api/trading/place-order-polymarket">
+    Learn about Polymarket order types and constraints
   </Card>
   <Card title="Get Balance" icon="wallet" href="/trading-api/trading/get-balance">
     Check your available funds
@@ -261,7 +261,7 @@ markets = requests.get(
 ).json()
 
 market = markets["markets"][0]
-token_id = market["outcomes"][0]["token_id"]  # Buy "Yes" side
+tokenId = market["outcomes"][0]["tokenId"]  # Buy "Yes" side
 print(f"Trading: {market['question']}")
 
 # 4. Check balance
@@ -277,7 +277,7 @@ order = requests.post(
     headers=HEADERS,
     json={
         "venue": "polymarket",
-        "tokenId": token_id,
+        "tokenId": tokenId,
         "side": "buy",
         "amount": "5.00",
         "price": "0.50",
