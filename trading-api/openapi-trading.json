@@ -1,0 +1,1040 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Predexon Trading API",
+    "description": "Unified trading API for prediction markets",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://trade.predexon.com"
+    }
+  ],
+  "paths": {
+    "/api/users/create": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create User",
+        "description": "Create a new user with managed wallets for both Polymarket and Kalshi",
+        "operationId": "create_user",
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get User",
+        "description": "Get user details and wallet addresses",
+        "operationId": "get_user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete User",
+        "description": "Delete a user and all associated data",
+        "operationId": "delete_user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/balance": {
+      "get": {
+        "tags": ["Trading"],
+        "summary": "Get Balance",
+        "description": "Get USDC balance across trading venues",
+        "operationId": "get_balance",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["polymarket", "kalshi"]
+            },
+            "description": "Filter by venue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Balance information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders": {
+      "get": {
+        "tags": ["Trading"],
+        "summary": "Get Orders",
+        "description": "Get open orders for a user",
+        "operationId": "get_orders",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["polymarket", "kalshi"]
+            },
+            "description": "Filter by venue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of open orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Trading"],
+        "summary": "Cancel All Orders",
+        "description": "Cancel all open orders for a user",
+        "operationId": "cancel_all_orders",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["polymarket", "kalshi"]
+            },
+            "description": "Filter by venue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelAllResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders/polymarket": {
+      "post": {
+        "tags": ["Trading"],
+        "summary": "Place Order (Polymarket)",
+        "description": "Place a buy or sell order on Polymarket",
+        "operationId": "place_order_polymarket",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolymarketOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolymarketOrder"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders/kalshi": {
+      "post": {
+        "tags": ["Trading"],
+        "summary": "Place Order (Kalshi)",
+        "description": "Place a buy or sell order on Kalshi",
+        "operationId": "place_order_kalshi",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KalshiOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KalshiOrder"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders/{orderId}": {
+      "delete": {
+        "tags": ["Trading"],
+        "summary": "Cancel Order",
+        "description": "Cancel a specific open order",
+        "operationId": "cancel_order",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The order ID to cancel"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Order cancelled successfully"
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/positions": {
+      "get": {
+        "tags": ["Positions"],
+        "summary": "Get Positions",
+        "description": "Get the user's current positions across venues",
+        "operationId": "get_positions",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["polymarket", "kalshi"]
+            },
+            "description": "Filter by venue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of positions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/redeem": {
+      "post": {
+        "tags": ["Positions"],
+        "summary": "Redeem Position",
+        "description": "Redeem a resolved position for USDC",
+        "operationId": "redeem_position",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Position redeemed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedeemResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bridge/deposit": {
+      "get": {
+        "tags": ["Funds"],
+        "summary": "Get Deposit Info",
+        "description": "Get cross-chain deposit addresses for funding a Polymarket wallet",
+        "operationId": "get_deposit_info",
+        "parameters": [
+          {
+            "name": "wallet",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Polymarket wallet address"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deposit addresses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/withdraw": {
+      "post": {
+        "tags": ["Funds"],
+        "summary": "Withdraw USDC",
+        "description": "Withdraw USDC from a user's wallet to an external address",
+        "operationId": "withdraw_usdc",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Withdrawal completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/withdraw/withdraw-sol": {
+      "post": {
+        "tags": ["Funds"],
+        "summary": "Withdraw SOL",
+        "description": "Withdraw SOL from a user's Kalshi wallet to an external address",
+        "operationId": "withdraw_sol",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawSolRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SOL withdrawal completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawSolResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "Unique identifier for the user"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO 8601 timestamp of when the user was created"
+          },
+          "polymarketWalletAddress": {
+            "type": "string",
+            "description": "Polygon wallet address for Polymarket deposits (send USDC.e here)"
+          },
+          "kalshiWalletAddress": {
+            "type": "string",
+            "description": "Solana wallet address for Kalshi deposits (send USDC and SOL here)"
+          }
+        }
+      },
+      "BalanceResponse": {
+        "type": "object",
+        "properties": {
+          "balances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Balance"
+            }
+          }
+        }
+      },
+      "Balance": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "type": "string",
+            "description": "Trading venue: polymarket or kalshi"
+          },
+          "available": {
+            "type": "string",
+            "description": "USDC available for trading (not locked in orders)"
+          },
+          "locked": {
+            "type": "string",
+            "description": "USDC locked in open orders"
+          },
+          "total": {
+            "type": "string",
+            "description": "Total USDC balance (available + locked)"
+          }
+        }
+      },
+      "OrdersResponse": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            }
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order identifier"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Trading venue: polymarket or kalshi"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Polymarket token ID (Polymarket orders only)"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Kalshi market ticker (Kalshi orders only)"
+          },
+          "side": {
+            "type": "string",
+            "description": "Order side: buy or sell"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "The outcome being traded (e.g., Yes, No)"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Order amount in USDC"
+          },
+          "price": {
+            "type": "string",
+            "description": "Order price (0-1)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status: live, matched, or filled"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO 8601 timestamp"
+          }
+        }
+      },
+      "PolymarketOrderRequest": {
+        "type": "object",
+        "required": ["tokenId", "side", "amount", "type"],
+        "properties": {
+          "tokenId": {
+            "type": "string",
+            "description": "The outcome token ID from List Markets"
+          },
+          "side": {
+            "type": "string",
+            "enum": ["buy", "sell"],
+            "description": "Buy or sell"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price per share (0-1). Required for limit orders. Must match tick size (default 0.01)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["limit", "market"],
+            "description": "Order type"
+          }
+        }
+      },
+      "KalshiOrderRequest": {
+        "type": "object",
+        "required": ["ticker", "outcome", "side", "amount"],
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker from Kalshi List Markets"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["Yes", "No"],
+            "description": "Yes or No (case-sensitive)"
+          },
+          "side": {
+            "type": "string",
+            "enum": ["buy", "sell"],
+            "description": "Buy or sell"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
+          }
+        }
+      },
+      "PolymarketOrder": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order identifier"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Always 'polymarket'"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "The outcome token ID"
+          },
+          "side": {
+            "type": "string",
+            "description": "Buy or sell"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "The outcome name (e.g., 'Yes')"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Order amount"
+          },
+          "price": {
+            "type": "string",
+            "description": "Order price"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["live", "filled", "matched"],
+            "description": "Order status"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Order creation timestamp"
+          }
+        }
+      },
+      "KalshiOrder": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order identifier"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Always 'kalshi'"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker"
+          },
+          "side": {
+            "type": "string",
+            "description": "Buy or sell"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Yes or No"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Order amount"
+          },
+          "price": {
+            "type": "string",
+            "description": "Execution price"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["filled"],
+            "description": "Order status (always filled for Kalshi)"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Order creation timestamp"
+          }
+        }
+      },
+      "CancelAllResponse": {
+        "type": "object",
+        "properties": {
+          "cancelled": {
+            "type": "integer",
+            "description": "Number of orders that were cancelled"
+          }
+        }
+      },
+      "PositionsResponse": {
+        "type": "object",
+        "properties": {
+          "positions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Position"
+            }
+          }
+        }
+      },
+      "Position": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "type": "string",
+            "description": "Trading venue: polymarket or kalshi"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Polymarket token ID (Polymarket positions only)"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Kalshi market ticker (Kalshi positions only)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Market question/title"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Position side (e.g., Yes, No)"
+          },
+          "size": {
+            "type": "string",
+            "description": "Number of shares held"
+          },
+          "status": {
+            "type": "string",
+            "description": "Position status: active, resolved, or redeemable"
+          },
+          "result": {
+            "type": "string",
+            "description": "Outcome result: won, lost, or null (if still active)"
+          },
+          "averagePrice": {
+            "type": "string",
+            "description": "Average entry price per share"
+          },
+          "currentPrice": {
+            "type": "string",
+            "description": "Current market price (or 1.0/0.0 if resolved)"
+          },
+          "currentValue": {
+            "type": "string",
+            "description": "Current position value in USDC"
+          },
+          "pnl": {
+            "type": "string",
+            "description": "Unrealized profit/loss in USDC"
+          }
+        }
+      },
+      "RedeemRequest": {
+        "type": "object",
+        "required": ["venue"],
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["polymarket", "kalshi"],
+            "description": "Trading venue: polymarket or kalshi"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Token ID to redeem (required for Polymarket)"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker (required for Kalshi)"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["Yes", "No"],
+            "description": "Outcome to redeem: Yes or No (required for Kalshi)"
+          }
+        }
+      },
+      "RedeemResponse": {
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string",
+            "description": "Blockchain transaction hash for the redemption"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Trading venue where the redemption occurred"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "Polymarket token ID (Polymarket redemptions only)"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Kalshi market ticker (Kalshi redemptions only)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Market question/title"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "The outcome side that was redeemed"
+          },
+          "sizeRedeemed": {
+            "type": "string",
+            "description": "Number of tokens that were burned"
+          },
+          "result": {
+            "type": "string",
+            "description": "Position result: won or lost"
+          },
+          "amountRedeemed": {
+            "type": "string",
+            "description": "USDC received from redemption (0 for losing positions)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Always 'completed' for successful redemptions"
+          }
+        }
+      },
+      "DepositInfo": {
+        "type": "object",
+        "properties": {
+          "wallet": {
+            "type": "string",
+            "description": "The queried Polymarket wallet address"
+          },
+          "depositAddresses": {
+            "type": "object",
+            "description": "Deposit addresses for different chain types",
+            "properties": {
+              "evm": {
+                "type": "string",
+                "description": "Address for EVM chain deposits (Ethereum, Arbitrum, Base, etc.)"
+              },
+              "solana": {
+                "type": "string",
+                "description": "Address for Solana deposits"
+              },
+              "bitcoin": {
+                "type": "string",
+                "description": "Address for Bitcoin deposits"
+              }
+            }
+          },
+          "supportedAssets": {
+            "type": "array",
+            "description": "List of supported tokens and chains",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "WithdrawRequest": {
+        "type": "object",
+        "required": ["venue", "amount", "destinationAddress", "chain"],
+        "properties": {
+          "venue": {
+            "type": "string",
+            "enum": ["polymarket", "kalshi"],
+            "description": "Source venue: polymarket or kalshi"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC amount to withdraw (e.g., \"100.00\")"
+          },
+          "destinationAddress": {
+            "type": "string",
+            "description": "Recipient wallet address (must match chain format)"
+          },
+          "chain": {
+            "type": "string",
+            "enum": ["polygon", "solana"],
+            "description": "Destination chain: polygon or solana"
+          }
+        }
+      },
+      "WithdrawResponse": {
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string",
+            "description": "Blockchain transaction hash for the withdrawal"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount withdrawn in USDC"
+          },
+          "destinationAddress": {
+            "type": "string",
+            "description": "Recipient wallet address"
+          },
+          "chain": {
+            "type": "string",
+            "description": "Destination chain: polygon or solana"
+          },
+          "status": {
+            "type": "string",
+            "description": "Withdrawal status: completed"
+          }
+        }
+      },
+      "WithdrawSolRequest": {
+        "type": "object",
+        "required": ["destinationAddress", "amount"],
+        "properties": {
+          "destinationAddress": {
+            "type": "string",
+            "description": "Recipient Solana wallet address (base58 format)"
+          },
+          "amount": {
+            "type": "string",
+            "description": "SOL amount to withdraw (e.g., \"0.05\")"
+          }
+        }
+      },
+      "WithdrawSolResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the withdrawal was successful"
+          },
+          "transactionHash": {
+            "type": "string",
+            "description": "Solana transaction signature"
+          },
+          "amount": {
+            "type": "string",
+            "description": "SOL amount withdrawn"
+          },
+          "destinationAddress": {
+            "type": "string",
+            "description": "Recipient wallet address"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}

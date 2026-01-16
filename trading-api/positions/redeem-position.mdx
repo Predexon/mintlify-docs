@@ -1,0 +1,113 @@
+---
+openapi: "POST /api/users/{userId}/redeem"
+title: "Redeem Position"
+description: "Redeem a resolved position for USDC"
+---
+
+<RequestExample>
+```bash cURL (Polymarket)
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "polymarket",
+    "tokenId": "71321045679252212594626385..."
+  }' \
+  "https://trade.predexon.com/api/users/USER_ID/redeem"
+```
+
+```bash cURL (Kalshi)
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "kalshi",
+    "ticker": "PRES-2024-DJT",
+    "outcome": "Yes"
+  }' \
+  "https://trade.predexon.com/api/users/USER_ID/redeem"
+```
+
+```python Python (Polymarket)
+import requests
+
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/redeem",
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={"venue": "polymarket", "tokenId": "71321045679252212594626385..."}
+)
+```
+
+```python Python (Kalshi)
+import requests
+
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/redeem",
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={"venue": "kalshi", "ticker": "PRES-2024-DJT", "outcome": "Yes"}
+)
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK (Won)
+{
+  "transactionHash": "0x1234567890abcdef...",
+  "venue": "polymarket",
+  "tokenId": "71321045679252...",
+  "title": "Will Bitcoin reach $100k?",
+  "outcome": "Yes",
+  "sizeRedeemed": "100.50",
+  "result": "won",
+  "amountRedeemed": "100.50",
+  "status": "completed"
+}
+```
+
+```json 200 OK (Lost)
+{
+  "transactionHash": "0xabcdef1234567890...",
+  "venue": "polymarket",
+  "tokenId": "48331043336612...",
+  "title": "Will ETH flip BTC?",
+  "outcome": "Yes",
+  "sizeRedeemed": "200.00",
+  "result": "lost",
+  "amountRedeemed": "0",
+  "status": "completed"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Missing required fields: ticker, outcome"
+}
+```
+
+```json 400 Market Not Resolved
+{
+  "error": "Market is not resolved yet (status: active)"
+}
+```
+</ResponseExample>
+
+## Redemption Flow
+
+<Steps>
+  <Step title="Check positions">
+    Use [Get Positions](/trading-api/positions/get-positions) to find positions with `status: redeemable`.
+  </Step>
+  <Step title="Verify result">
+    Only positions with `result: won` return USDC. Losing positions return 0.
+  </Step>
+  <Step title="Redeem">
+    Call this endpoint with the position identifier.
+  </Step>
+  <Step title="Check balance">
+    USDC is credited immediately. Verify with [Get Balance](/trading-api/trading/get-balance).
+  </Step>
+</Steps>
+
+<Note>
+You can redeem losing positions to clear them from your portfolio, but you'll receive 0 USDC since they're worthless.
+</Note>

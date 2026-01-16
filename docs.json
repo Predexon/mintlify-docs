@@ -71,9 +71,50 @@
         "tab": "Trading API",
         "groups": [
           {
-            "group": "Trading API",
+            "group": "Getting Started",
             "pages": [
-              "trading-api/coming-soon"
+              "trading-api/introduction",
+              "trading-api/quickstart"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/custody"
+            ]
+          },
+          {
+            "group": "User Management",
+            "pages": [
+              "trading-api/users/create-user",
+              "trading-api/users/get-user",
+              "trading-api/users/delete-user"
+            ]
+          },
+          {
+            "group": "Trading",
+            "pages": [
+              "trading-api/trading/get-balance",
+              "trading-api/trading/place-order-polymarket",
+              "trading-api/trading/place-order-kalshi",
+              "trading-api/trading/get-orders",
+              "trading-api/trading/cancel-order",
+              "trading-api/trading/cancel-all-orders"
+            ]
+          },
+          {
+            "group": "Positions",
+            "pages": [
+              "trading-api/positions/get-positions",
+              "trading-api/positions/redeem-position"
+            ]
+          },
+          {
+            "group": "Funds",
+            "pages": [
+              "trading-api/funds/deposit-info",
+              "trading-api/funds/withdraw",
+              "trading-api/funds/withdraw-sol"
             ]
           }
         ]
@@ -137,7 +178,7 @@
       "name": "x-api-key"
     }
   },
-  "openapi": "/api-reference/openapi.json",
+  "openapi": ["/api-reference/openapi.json", "/trading-api/openapi-trading.json"],
   "contextual": {
     "options": ["copy", "view", "chatgpt", "claude"]
   },

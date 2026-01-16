@@ -1,0 +1,116 @@
+---
+openapi: "POST /api/users/{userId}/withdraw"
+title: "Withdraw USDC"
+description: "Withdraw USDC from a user's wallet to an external address"
+---
+
+<RequestExample>
+```bash cURL (Polymarket)
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "polymarket",
+    "amount": "100.00",
+    "destinationAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    "chain": "polygon"
+  }' \
+  "https://trade.predexon.com/api/users/USER_ID/withdraw"
+```
+
+```bash cURL (Kalshi)
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "venue": "kalshi",
+    "amount": "100.00",
+    "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
+    "chain": "solana"
+  }' \
+  "https://trade.predexon.com/api/users/USER_ID/withdraw"
+```
+
+```python Python (Polymarket)
+import requests
+
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/withdraw",
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={
+        "venue": "polymarket",
+        "amount": "100.00",
+        "destinationAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+        "chain": "polygon"
+    }
+)
+```
+
+```python Python (Kalshi)
+import requests
+
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/withdraw",
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={
+        "venue": "kalshi",
+        "amount": "100.00",
+        "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
+        "chain": "solana"
+    }
+)
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "transactionHash": "0x1234567890abcdef...",
+  "amount": "100.00",
+  "destinationAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+  "chain": "polygon",
+  "status": "completed"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Missing required fields: venue, amount, destinationAddress, chain"
+}
+```
+
+```json 500 Withdrawal Failed
+{
+  "error": "Withdrawal failed"
+}
+```
+</ResponseExample>
+
+## Venue and Chain Combinations
+
+| Venue | Supported Chains | Address Format |
+|-------|------------------|----------------|
+| `polymarket` | `polygon` | Ethereum-style (0x...) |
+| `kalshi` | `solana` | Solana base58 address |
+
+<Warning>
+Ensure the destination address matches the chain. Sending to the wrong address format may result in lost funds.
+</Warning>
+
+## Before Withdrawing
+
+<Steps>
+  <Step title="Cancel open orders">
+    Funds locked in orders can't be withdrawn. Use [Cancel All Orders](/trading-api/trading/cancel-all-orders) first.
+  </Step>
+  <Step title="Check available balance">
+    Use [Get Balance](/trading-api/trading/get-balance) to verify available funds.
+  </Step>
+  <Step title="Withdraw">
+    Call this endpoint with the withdrawal details.
+  </Step>
+</Steps>
+
+<Note>
+Withdrawal transactions are processed on-chain and may take a few seconds to confirm.
+</Note>

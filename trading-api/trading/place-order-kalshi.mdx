@@ -1,0 +1,32 @@
+---
+openapi: "POST /api/users/{userId}/orders/kalshi"
+title: "Place Order (Kalshi)"
+description: "Place a buy or sell order on Kalshi"
+---
+
+<Warning>
+Kalshi trading requires **USDC on Solana** and **SOL** in your wallet. SOL is needed for Solana transaction fees. See [Deposits](/trading-api/funds/deposit-info) for funding instructions.
+</Warning>
+
+## Constraints
+
+| Constraint | Value |
+|------------|-------|
+| Min order | > 1 USDC |
+| Outcome values | `Yes` or `No` (case-sensitive) |
+| Amount precision | 2 decimal places |
+
+## Amount Semantics
+
+| Side | Amount Represents |
+|------|-------------------|
+| `buy` | USDC to spend |
+| `sell` | Shares to sell |
+
+<Note>
+Kalshi orders execute atomically - they either fill completely or fail. There's no partial fill or orderbook. The `price` in the response is the execution price.
+</Note>
+
+<Note>
+Get the `ticker` from [Kalshi List Markets](/api-reference/kalshi/list-markets).
+</Note>

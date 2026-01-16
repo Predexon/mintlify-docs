@@ -1,0 +1,65 @@
+---
+openapi: "POST /api/users/{userId}/withdraw/withdraw-sol"
+title: "Withdraw SOL"
+description: "Withdraw SOL from a user's Kalshi wallet to an external address"
+---
+
+<RequestExample>
+```bash cURL
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
+    "amount": "0.05"
+  }' \
+  "https://trade.predexon.com/api/users/USER_ID/withdraw/withdraw-sol"
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/withdraw/withdraw-sol",
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={
+        "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
+        "amount": "0.05"
+    }
+)
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "success": true,
+  "transactionHash": "5KtP9LMv...",
+  "amount": "0.05",
+  "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Missing required fields: destinationAddress, amount"
+}
+```
+
+```json 400 Insufficient Balance
+{
+  "error": "Insufficient SOL balance"
+}
+```
+</ResponseExample>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Recover Unused SOL" icon="coins">
+    Withdraw excess SOL after you're done trading on Kalshi
+  </Card>
+  <Card title="Account Cleanup" icon="broom">
+    Withdraw all SOL before deleting a user
+  </Card>
+</CardGroup>

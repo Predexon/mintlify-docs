@@ -1,0 +1,133 @@
+---
+openapi: "GET /api/users/{userId}/positions"
+title: "Get Positions"
+description: "Get the user's current positions across venues"
+---
+
+<RequestExample>
+```bash cURL
+# Get all positions
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/positions"
+
+# Get Kalshi positions only
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/positions?venue=kalshi"
+```
+
+```python Python
+import requests
+
+user_id = "550e8400-e29b-41d4-a716-446655440000"
+
+response = requests.get(
+    f"https://trade.predexon.com/api/users/{user_id}/positions",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+positions = response.json()["positions"]
+
+for pos in positions:
+    print(f"{pos['title']}")
+    print(f"  {pos['outcome']}: {pos['size']} shares @ avg {pos['averagePrice']}")
+    print(f"  Current value: ${pos['currentValue']} (PnL: ${pos['pnl']})")
+    print(f"  Status: {pos['status']}")
+```
+
+```typescript TypeScript
+const userId = "550e8400-e29b-41d4-a716-446655440000";
+
+const response = await fetch(
+  `https://trade.predexon.com/api/users/${userId}/positions`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
+);
+const { positions } = await response.json();
+
+// Find redeemable positions
+const redeemable = positions.filter(p => p.status === "redeemable");
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "positions": [
+    {
+      "venue": "polymarket",
+      "tokenId": "71321045679252...",
+      "title": "Will Bitcoin reach $100k by 2024?",
+      "outcome": "Yes",
+      "size": "100.50",
+      "status": "active",
+      "result": null,
+      "averagePrice": "0.45",
+      "currentPrice": "0.62",
+      "currentValue": "62.31",
+      "pnl": "17.08"
+    },
+    {
+      "venue": "kalshi",
+      "ticker": "PRES-2024-DJT",
+      "title": "Trump wins 2024 election",
+      "outcome": "Yes",
+      "size": "50.00",
+      "status": "redeemable",
+      "result": "won",
+      "averagePrice": "0.55",
+      "currentPrice": "1.0000",
+      "currentValue": "50.00",
+      "pnl": "22.50"
+    },
+    {
+      "venue": "polymarket",
+      "tokenId": "48331043336612...",
+      "title": "Will ETH flip BTC by 2025?",
+      "outcome": "Yes",
+      "size": "200.00",
+      "status": "resolved",
+      "result": "lost",
+      "averagePrice": "0.15",
+      "currentPrice": "0.00",
+      "currentValue": "0.00",
+      "pnl": "-30.00"
+    }
+  ]
+}
+```
+
+```json 200 OK (No Positions)
+{
+  "positions": []
+}
+```
+
+```json 404 Not Found
+{
+  "error": "User not found"
+}
+```
+</ResponseExample>
+
+## Position Status Values
+
+| Status | Description | Action |
+|--------|-------------|--------|
+| `active` | Market is still trading | Can sell via [Place Order](/trading-api/trading/place-order) |
+| `resolved` | Market has settled | Check `result` for outcome |
+| `redeemable` | Position can be cashed out | Use [Redeem Position](/trading-api/positions/redeem-position) |
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Portfolio Dashboard" icon="chart-pie">
+    Display all holdings with live P&L
+  </Card>
+  <Card title="Redemption Queue" icon="money-bill">
+    Find and process redeemable positions
+  </Card>
+  <Card title="Risk Management" icon="shield">
+    Monitor exposure across markets
+  </Card>
+  <Card title="Performance Tracking" icon="chart-line">
+    Track realized and unrealized gains
+  </Card>
+</CardGroup>

@@ -1,0 +1,37 @@
+---
+openapi: "POST /api/users/{userId}/orders/polymarket"
+title: "Place Order (Polymarket)"
+description: "Place a buy or sell order on Polymarket"
+---
+
+## Constraints
+
+| Constraint | Value |
+|------------|-------|
+| Price tick size | 0.01 (can vary by market) |
+| Min limit order | > 5 shares (amount / price) |
+| Min market order | > 1 USDC |
+| Amount precision | 2 decimal places |
+
+<Warning>
+Orders with prices that don't match the tick size will be rejected. Valid: `0.01`, `0.25`, `0.50`, `0.99`. Invalid: `0.333`, `0.505`.
+</Warning>
+
+## Order Status
+
+| Status | Description |
+|--------|-------------|
+| `live` | Order is active on the orderbook (limit orders) |
+| `filled` | Order fully executed (market orders) |
+| `matched` | Order partially or fully matched |
+
+## Amount Semantics
+
+| Side | Amount Represents |
+|------|-------------------|
+| `buy` | USDC to spend |
+| `sell` | Shares to sell |
+
+<Note>
+Get the `tokenId` from [List Markets](/api-reference/markets/list-markets). Each outcome (Yes/No) has its own token ID.
+</Note>

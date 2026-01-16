@@ -1,0 +1,295 @@
+---
+title: "Quickstart"
+description: "Place your first prediction market trade in 5 minutes"
+---
+
+This guide walks you through placing your first trade on a prediction market using the Predexon Trading API.
+
+## Prerequisites
+
+<Info>
+**Request your private beta API key** on [Discord](https://discord.com/invite/dxwzMcs8hX) before starting.
+</Info>
+
+## Step 1: Create a User
+
+Create a user to get managed wallet addresses for depositing funds.
+
+<CodeGroup>
+```bash cURL
+curl -X POST \
+  -H "x-api-key: YOUR_API_KEY" \
+  "https://trade.predexon.com/api/users/create"
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://trade.predexon.com/api/users/create",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+user = response.json()
+
+print(f"User ID: {user['userId']}")
+print(f"Polymarket wallet: {user['polymarketWalletAddress']}")
+print(f"Kalshi wallet: {user['kalshiWalletAddress']}")
+```
+</CodeGroup>
+
+**Response:**
+```json
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "polymarketWalletAddress": "0x1234...5678",
+  "kalshiWalletAddress": "7BfknMUrXjZ..."
+}
+```
+
+<Warning>
+Save the `userId` - you'll need it for all subsequent API calls.
+</Warning>
+
+## Step 2: Fund Your Wallet
+
+Send tokens to the wallet address for the venue you want to trade on.
+
+<Tabs>
+  <Tab title="Polymarket">
+    Send **USDC.e** on Polygon to your `polymarketWalletAddress`.
+
+    | Token | Chain | Contract Address |
+    |-------|-------|------------------|
+    | USDC.e | Polygon (137) | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` |
+
+    <Note>
+    You can also use the [Bridge API](/trading-api/funds/deposit-info) to deposit from other chains (Ethereum, Solana, Bitcoin).
+    </Note>
+  </Tab>
+  <Tab title="Kalshi">
+    Send **both USDC and SOL** on Solana to your `kalshiWalletAddress`.
+
+    | Token | Purpose | Contract Address |
+    |-------|---------|------------------|
+    | USDC | Trading funds | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
+    | SOL | Gas for transactions | Native token |
+
+    <Warning>
+    Kalshi trades require SOL for Solana transaction fees. We recommend sending at least **0.05 SOL** to cover multiple trades.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Step 3: Find a Market
+
+Use the Data API to find a market you want to trade.
+
+<Tabs>
+  <Tab title="Polymarket">
+    Get markets from the [List Markets](/api-reference/markets/list-markets) endpoint:
+
+    ```bash
+    curl -H "x-api-key: YOUR_API_KEY" \
+      "https://api.predexon.com/v1/markets?status=active&sort=volume&limit=5"
+    ```
+
+    Find the `token_id` in the `outcomes` array for the side you want to trade:
+
+    ```json
+    {
+      "markets": [{
+        "question": "Will Bitcoin reach $100k?",
+        "outcomes": [
+          { "label": "Yes", "token_id": "71321045679252..." },
+          { "label": "No", "token_id": "48331043336612..." }
+        ]
+      }]
+    }
+    ```
+  </Tab>
+  <Tab title="Kalshi">
+    Get markets from the [Kalshi List Markets](/api-reference/kalshi/list-markets) endpoint:
+
+    ```bash
+    curl -H "x-api-key: YOUR_API_KEY" \
+      "https://api.predexon.com/v1/kalshi/markets?status=open&sort=volume&limit=5"
+    ```
+
+    Use the `ticker` field with `outcome` set to `"Yes"` or `"No"`:
+
+    ```json
+    {
+      "markets": [{
+        "ticker": "KXBTC-25JAN10-B100000",
+        "title": "Bitcoin above $100,000?"
+      }]
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Step 4: Place an Order
+
+Now place your first trade.
+
+<Tabs>
+  <Tab title="Polymarket">
+    ```python Python
+    import requests
+
+    user_id = "YOUR_USER_ID"
+
+    # Place a limit order to buy "Yes" shares at $0.65
+    response = requests.post(
+        f"https://trade.predexon.com/api/users/{user_id}/orders",
+        headers={
+            "x-api-key": "YOUR_API_KEY",
+            "Content-Type": "application/json"
+        },
+        json={
+            "venue": "polymarket",
+            "tokenId": "71321045679252...",  # From Step 3
+            "side": "buy",
+            "amount": "10.00",  # Spend $10 USDC
+            "price": "0.65",
+            "type": "limit"
+        }
+    )
+
+    order = response.json()
+    print(f"Order placed: {order['orderId']}")
+    print(f"Status: {order['status']}")
+    ```
+
+    <Note>
+    **Limit orders** sit on the orderbook until matched. Use `"type": "market"` for immediate execution at best available price.
+    </Note>
+  </Tab>
+  <Tab title="Kalshi">
+    ```python Python
+    import requests
+
+    user_id = "YOUR_USER_ID"
+
+    # Buy "Yes" on a Kalshi market
+    response = requests.post(
+        f"https://trade.predexon.com/api/users/{user_id}/orders",
+        headers={
+            "x-api-key": "YOUR_API_KEY",
+            "Content-Type": "application/json"
+        },
+        json={
+            "venue": "kalshi",
+            "ticker": "KXBTC-25JAN10-B100000",  # From Step 3
+            "outcome": "Yes",
+            "side": "buy",
+            "amount": "10.00"  # Spend $10 USDC
+        }
+    )
+
+    order = response.json()
+    print(f"Order filled: {order['orderId']}")
+    print(f"Price: {order['price']}")
+    ```
+
+    <Note>
+    Kalshi orders execute instantly as atomic swaps - no orderbook, no waiting.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Step 5: Check Your Position
+
+View your positions to see your holdings and P&L.
+
+```python Python
+response = requests.get(
+    f"https://trade.predexon.com/api/users/{user_id}/positions",
+    headers={"x-api-key": "YOUR_API_KEY"}
+)
+
+positions = response.json()["positions"]
+for pos in positions:
+    print(f"{pos['title']} - {pos['outcome']}")
+    print(f"  Shares: {pos['size']} @ avg ${pos['averagePrice']}")
+    print(f"  Current value: ${pos['currentValue']}")
+    print(f"  P&L: ${pos['pnl']}")
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Place Order" icon="paper-plane" href="/trading-api/trading/place-order">
+    Learn about order types and constraints
+  </Card>
+  <Card title="Get Balance" icon="wallet" href="/trading-api/trading/get-balance">
+    Check your available funds
+  </Card>
+  <Card title="Redeem Positions" icon="money-bill" href="/trading-api/positions/redeem-position">
+    Cash out winning positions
+  </Card>
+  <Card title="How It Works" icon="book" href="/concepts/custody">
+    Understand wallet management and execution
+  </Card>
+</CardGroup>
+
+## Complete Example
+
+Here's a full Python script to place your first trade:
+
+```python Python
+import requests
+
+API_KEY = "YOUR_API_KEY"
+BASE_URL = "https://trade.predexon.com"
+DATA_URL = "https://api.predexon.com"
+HEADERS = {"x-api-key": API_KEY, "Content-Type": "application/json"}
+
+# 1. Create user
+user = requests.post(f"{BASE_URL}/api/users/create", headers=HEADERS).json()
+user_id = user["userId"]
+print(f"Created user: {user_id}")
+print(f"Fund Polymarket wallet: {user['polymarketWalletAddress']}")
+
+# 2. (Manual step) Send USDC.e to the Polymarket wallet address
+
+# 3. Get a market
+markets = requests.get(
+    f"{DATA_URL}/v1/markets",
+    headers=HEADERS,
+    params={"status": "active", "sort": "volume", "limit": 1}
+).json()
+
+market = markets["markets"][0]
+token_id = market["outcomes"][0]["token_id"]  # Buy "Yes" side
+print(f"Trading: {market['question']}")
+
+# 4. Check balance
+balance = requests.get(
+    f"{BASE_URL}/api/users/{user_id}/balance",
+    headers=HEADERS
+).json()
+print(f"Available balance: ${balance['balances'][0]['available']}")
+
+# 5. Place order
+order = requests.post(
+    f"{BASE_URL}/api/users/{user_id}/orders",
+    headers=HEADERS,
+    json={
+        "venue": "polymarket",
+        "tokenId": token_id,
+        "side": "buy",
+        "amount": "5.00",
+        "price": "0.50",
+        "type": "limit"
+    }
+).json()
+print(f"Order placed: {order['orderId']} - {order['status']}")
+
+# 6. Check positions
+positions = requests.get(
+    f"{BASE_URL}/api/users/{user_id}/positions",
+    headers=HEADERS
+).json()
+print(f"Total positions: {len(positions['positions'])}")
+```

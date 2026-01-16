@@ -1,0 +1,188 @@
+---
+title: "Trading API Reference"
+description: "Complete reference for the Predexon Trading API"
+---
+
+<Info>
+**Request your private beta API key** on [Discord](https://discord.com/invite/dxwzMcs8hX) to start trading programmatically.
+</Info>
+
+## Overview
+
+Predexon Trading API provides a unified interface for trading on prediction markets across multiple venues. Users don't manage their own wallets - the API handles wallet creation, key management, and transaction signing on their behalf.
+
+## Base URL
+
+```
+https://trade.predexon.com
+```
+
+## Supported Venues
+
+<CardGroup cols={2}>
+  <Card title="Polymarket" icon="chart-line">
+    Polygon blockchain. Supports limit and market orders on the orderbook.
+  </Card>
+  <Card title="Kalshi" icon="bolt">
+    Solana blockchain with atomic swaps. Instant execution with no persistent orderbook.
+  </Card>
+</CardGroup>
+
+| Venue | Blockchain | Order Execution |
+|-------|------------|-----------------|
+| `polymarket` | Polygon | Orderbook (limit/market orders) |
+| `kalshi` | Solana | Atomic swaps |
+
+## Authentication
+
+All requests require an API key passed via the `x-api-key` header:
+
+```bash
+curl -H "x-api-key: YOUR_API_KEY" \
+  https://trade.predexon.com/api/users/create
+```
+
+### Security
+
+All wallet private keys are managed by [Turnkey](https://turnkey.com) - Predexon never stores or has access to user private keys. Keys are generated and stored in Turnkey's secure hardware enclaves.
+
+### Ownership Model
+
+- Each API key can create multiple users
+- Users are "owned" by the API key that created them
+- API keys can only access their own users (403 Forbidden otherwise)
+
+## Endpoint Categories
+
+<CardGroup cols={2}>
+  <Card title="User Management" icon="user" href="/trading-api/users/create-user">
+    Create users, manage wallets, and handle authentication.
+  </Card>
+  <Card title="Trading" icon="arrow-right-arrow-left" href="/trading-api/trading/place-order">
+    Place orders, check balances, and manage open orders.
+  </Card>
+  <Card title="Positions" icon="chart-pie" href="/trading-api/positions/get-positions">
+    View positions and redeem resolved markets.
+  </Card>
+  <Card title="Funds" icon="wallet" href="/trading-api/funds/withdraw">
+    Deposits, withdrawals, and cross-chain bridging.
+  </Card>
+</CardGroup>
+
+## Order Constraints
+
+### Polymarket
+
+| Constraint | Value |
+|------------|-------|
+| Price tick size | 0.01 (can vary by market) |
+| Min limit order | > 5 shares (amount / price) |
+| Min market order | > 1 USDC |
+| Amount precision | 2 decimal places |
+
+<Warning>
+Orders with prices that don't match the tick size (e.g., 0.333, 0.505) will be rejected by Polymarket.
+</Warning>
+
+### Kalshi
+
+| Constraint | Value |
+|------------|-------|
+| Min order | > 1 USDC |
+| Outcome values | "Yes" or "No" (case-sensitive) |
+| Execution | Atomic swaps (instant) |
+
+### Amount Semantics
+
+| Side | Amount Represents |
+|------|-------------------|
+| `buy` | USDC to spend |
+| `sell` | Shares to sell |
+
+## Response Format
+
+### Success Responses
+
+All successful responses return appropriate HTTP status codes with JSON body:
+
+```json
+{
+  "orderId": "0x1234...",
+  "venue": "polymarket",
+  "status": "live"
+}
+```
+
+### Error Responses
+
+Errors return appropriate HTTP status codes with a JSON body:
+
+```json
+{
+  "error": "Insufficient balance",
+  "message": "not enough balance / allowance"
+}
+```
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Bad Request - Invalid parameters or insufficient funds |
+| 401 | Unauthorized - Missing API key |
+| 403 | Forbidden - User not owned by this API key or geo-restricted |
+| 404 | Not Found - User or resource doesn't exist |
+| 500 | Internal Server Error |
+
+## Geo-Restrictions
+
+In compliance with Kalshi's regulatory requirements, Kalshi trading is unavailable in certain regions. Affected endpoints return:
+
+```json
+{
+  "error": "Kalshi trading is not available in your region",
+  "code": "GEO_RESTRICTED"
+}
+```
+
+<Accordion title="Blocked Countries (63 total)">
+Afghanistan, Algeria, Angola, Australia, Belarus, Belgium, Bolivia, Bulgaria, Burkina Faso, Cameroon, Canada, Central African Republic, China, Côte d'Ivoire, Cuba, Democratic Republic of the Congo, Ethiopia, France, Haiti, Iran, Iraq, Italy, Kenya, Laos, Lebanon, Libya, Mali, Monaco, Mozambique, Myanmar, Namibia, Nicaragua, Niger, North Korea, Poland, Russia, Singapore, Somalia, South Sudan, Sudan, Switzerland, Syria, Taiwan, Thailand, Ukraine, United Arab Emirates, United Kingdom, United States, Venezuela, Yemen, Zimbabwe
+</Accordion>
+
+**Affected Endpoints:**
+- `POST /api/users/create` (creates both Polymarket and Kalshi wallets)
+- Any endpoint with `venue=kalshi`
+
+## Polymarket vs Kalshi
+
+| Feature | Polymarket | Kalshi |
+|---------|------------|--------|
+| Blockchain | Polygon | Solana |
+| Order Types | Limit & Market | Atomic swaps |
+| Market Identifier | `tokenId` | `ticker` + `outcome` |
+| Gas Fees | Gasless relay | User pays SOL |
+| Cancel Orders | Yes | No (atomic execution) |
+
+<Note>
+Get Polymarket `tokenId` from the [List Markets](/api-reference/markets/list-markets) endpoint - each outcome has a unique ID in the `outcomes` array. For Kalshi, use the market `ticker` from [Kalshi List Markets](/api-reference/kalshi/list-markets) with `outcome` set to `"Yes"` or `"No"`.
+</Note>
+
+## Token Addresses
+
+Reference addresses for tokens used across venues.
+
+### Polygon (Polymarket)
+
+| Token | Chain ID | Address |
+|-------|----------|---------|
+| USDC.e | 137 | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` |
+
+### Solana (Kalshi)
+
+| Token | Address |
+|-------|---------|
+| USDC | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
+| SOL | Native token (no contract address) |
+
+<Note>
+Send **USDC on Solana** and **SOL** to your Kalshi wallet. Do not send USDC from other chains directly. SOL is required for transaction fees.
+</Note>
+
