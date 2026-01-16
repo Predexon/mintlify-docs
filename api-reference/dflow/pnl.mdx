@@ -4,48 +4,7 @@ openapi: "GET /v1/dflow/wallet/pnl/{wallet_address}"
 description: "Fetch realized profit and loss history for a Dflow wallet"
 ---
 
-## Overview
-
-Fetch realized profit and loss (PnL) history for a specific wallet address on Dflow. Returns cumulative realized PnL over time with data points for every interval in the specified granularity.
-
-<ParamField path="wallet_address" type="string" required>
-  Wallet address to fetch PnL for
-</ParamField>
-
-<ParamField query="granularity" type="string" required>
-  Time granularity for PnL data: `day`, `week`, `month`, `year`, or `all`
-</ParamField>
-
-<ParamField query="start_time" type="integer">
-  Unix timestamp (seconds) for start of range
-</ParamField>
-
-<ParamField query="end_time" type="integer">
-  Unix timestamp (seconds) for end of range
-</ParamField>
-
-<ResponseField name="wallet_address" type="string">
-  The wallet address
-</ResponseField>
-
-<ResponseField name="granularity" type="string">
-  The requested granularity
-</ResponseField>
-
-<ResponseField name="start_time" type="integer">
-  Start of the time range (Unix timestamp)
-</ResponseField>
-
-<ResponseField name="end_time" type="integer">
-  End of the time range (Unix timestamp)
-</ResponseField>
-
-<ResponseField name="pnl_over_time" type="array">
-  <Expandable title="PnL data point">
-    <ResponseField name="timestamp" type="integer">Unix timestamp in seconds</ResponseField>
-    <ResponseField name="pnl_to_date" type="number">Cumulative realized PnL in USD up to this point</ResponseField>
-  </Expandable>
-</ResponseField>
+Fetch cumulative realized P&L over time for a Dflow wallet.
 
 <RequestExample>
 ```bash cURL
@@ -61,10 +20,7 @@ response = requests.get(
     headers={"x-api-key": "YOUR_API_KEY"},
     params={"granularity": "day"}
 )
-
-data = response.json()
-for point in data["pnl_over_time"]:
-    print(f"{point['timestamp']}: ${point['pnl_to_date']:.2f}")
+pnl_data = response.json()["pnl_over_time"]
 ```
 
 ```typescript TypeScript
@@ -73,10 +29,6 @@ const response = await fetch(
   { headers: { "x-api-key": "YOUR_API_KEY" } }
 );
 const { pnl_over_time } = await response.json();
-
-pnl_over_time.forEach(point => {
-  console.log(`${point.timestamp}: $${point.pnl_to_date}`);
-});
 ```
 </RequestExample>
 
@@ -88,22 +40,10 @@ pnl_over_time.forEach(point => {
   "start_time": 1704067200,
   "end_time": 1705420800,
   "pnl_over_time": [
-    {
-      "timestamp": 1704067200,
-      "pnl_to_date": 0
-    },
-    {
-      "timestamp": 1704153600,
-      "pnl_to_date": 125.50
-    },
-    {
-      "timestamp": 1704240000,
-      "pnl_to_date": 89.25
-    },
-    {
-      "timestamp": 1704326400,
-      "pnl_to_date": 234.75
-    }
+    {"timestamp": 1704067200, "pnl_to_date": 0},
+    {"timestamp": 1704153600, "pnl_to_date": 125.50},
+    {"timestamp": 1704240000, "pnl_to_date": 89.25},
+    {"timestamp": 1704326400, "pnl_to_date": 234.75}
   ]
 }
 ```

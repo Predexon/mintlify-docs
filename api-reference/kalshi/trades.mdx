@@ -4,99 +4,23 @@ openapi: "GET /v1/kalshi/trades"
 description: "Fetch historical Kalshi trade data"
 ---
 
-## Overview
-
-Query historical trade data from Kalshi markets with flexible filtering by ticker, event, time range, and taker side.
-
-<ParamField query="ticker" type="string">
-  Filter by market ticker (exact match)
-</ParamField>
-
-<ParamField query="event_ticker" type="string">
-  Filter by event ticker (prefix match - returns all markets in the event)
-</ParamField>
-
-<ParamField query="taker_side" type="string">
-  Filter by taker side: `yes` or `no`
-</ParamField>
-
-<ParamField query="start_time" type="integer">
-  Unix timestamp (seconds) for start of range
-</ParamField>
-
-<ParamField query="end_time" type="integer">
-  Unix timestamp (seconds) for end of range
-</ParamField>
-
-<ParamField query="min_count" type="integer">
-  Minimum contract count per trade
-</ParamField>
-
-<ParamField query="order" type="string" default="desc">
-  Sort order: `asc` or `desc` by timestamp
-</ParamField>
-
-<ParamField query="limit" type="integer" default="100">
-  Number of trades to return (1-1000)
-</ParamField>
-
-<ParamField query="offset" type="integer" default="0">
-  Number of trades to skip for pagination (max 100000)
-</ParamField>
-
-<Warning>
-At least one of `ticker` or `event_ticker` is required.
-</Warning>
-
-<ResponseField name="trades" type="array">
-  <Expandable title="Trade object">
-    <ResponseField name="trade_id" type="string">Unique trade identifier</ResponseField>
-    <ResponseField name="ticker" type="string">Market ticker</ResponseField>
-    <ResponseField name="count" type="integer">Number of contracts traded</ResponseField>
-    <ResponseField name="yes_price" type="number">Yes price (0-1)</ResponseField>
-    <ResponseField name="no_price" type="number">No price (0-1)</ResponseField>
-    <ResponseField name="taker_side" type="string">`yes` or `no`</ResponseField>
-    <ResponseField name="created_time" type="integer">Unix timestamp in seconds</ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  <Expandable>
-    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
-    <ResponseField name="offset" type="integer">Current offset</ResponseField>
-    <ResponseField name="total" type="integer">Total matching trades</ResponseField>
-    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
-  </Expandable>
-</ResponseField>
+Fetch historical trade data from Kalshi markets. Requires at least one of `ticker` or `event_ticker`.
 
 <RequestExample>
 ```bash cURL
-# Trades for a specific market
 curl -H "x-api-key: YOUR_API_KEY" \
   "https://api.predexon.com/v1/kalshi/trades?ticker=KXBTC-25JAN10-B100000&limit=50"
-
-# Trades for all markets in an event
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/kalshi/trades?event_ticker=KXBTC-25JAN10&limit=100"
 ```
 
 ```python Python
 import requests
 
-# Get recent trades for a market
 response = requests.get(
     "https://api.predexon.com/v1/kalshi/trades",
     headers={"x-api-key": "YOUR_API_KEY"},
-    params={
-        "ticker": "KXBTC-25JAN10-B100000",
-        "order": "desc",
-        "limit": 50
-    }
+    params={"ticker": "KXBTC-25JAN10-B100000", "order": "desc", "limit": 50}
 )
-
-for trade in response.json()["trades"]:
-    side_emoji = "📈" if trade["taker_side"] == "yes" else "📉"
-    print(f"{side_emoji} {trade['taker_side'].upper()} {trade['count']} @ {trade['yes_price']:.2f}")
+trades = response.json()["trades"]
 ```
 
 ```typescript TypeScript
@@ -120,15 +44,6 @@ const { trades } = await response.json();
       "no_price": 0.47,
       "taker_side": "yes",
       "created_time": 1704153600
-    },
-    {
-      "trade_id": "ghi789jkl012",
-      "ticker": "KXBTC-25JAN10-B100000",
-      "count": 100,
-      "yes_price": 0.52,
-      "no_price": 0.48,
-      "taker_side": "no",
-      "created_time": 1704153550
     }
   ],
   "pagination": {
@@ -139,28 +54,4 @@ const { trades } = await response.json();
   }
 }
 ```
-
-```json 400
-{
-  "error": "Missing required filter",
-  "message": "At least one of ticker or event_ticker must be provided"
-}
-```
 </ResponseExample>
-
-## Use Cases
-
-<CardGroup cols={2}>
-  <Card title="Trade History" icon="clock-rotate-left">
-    Get complete trade history for a Kalshi market
-  </Card>
-  <Card title="Volume Analysis" icon="chart-bar">
-    Analyze trading patterns and flow across events
-  </Card>
-  <Card title="Event Monitoring" icon="radar">
-    Monitor all trades across an event using event_ticker
-  </Card>
-  <Card title="Price Discovery" icon="magnifying-glass-dollar">
-    Track price movements through trade data
-  </Card>
-</CardGroup>

@@ -4,76 +4,7 @@ openapi: "GET /v1/polymarket/trades"
 description: "Fetch historical trade data"
 ---
 
-## Overview
-
-Query historical trade data with flexible filtering by market, token, user, and time range.
-
-<ParamField query="market_slug" type="string">
-  Filter by market slug
-</ParamField>
-
-<ParamField query="condition_id" type="string">
-  Filter by condition ID
-</ParamField>
-
-<ParamField query="token_id" type="string">
-  Filter by specific token ID
-</ParamField>
-
-<ParamField query="user" type="string">
-  Filter by user wallet address
-</ParamField>
-
-<ParamField query="start_time" type="integer">
-  Unix timestamp (seconds) for start of range
-</ParamField>
-
-<ParamField query="end_time" type="integer">
-  Unix timestamp (seconds) for end of range
-</ParamField>
-
-<ParamField query="order" type="string" default="desc">
-  Sort order: `asc` or `desc` by timestamp
-</ParamField>
-
-<ParamField query="limit" type="integer" default="100">
-  Number of orders to return (1-1000)
-</ParamField>
-
-<ParamField query="offset" type="integer" default="0">
-  Number of trades to skip for pagination (max 100000)
-</ParamField>
-
-<Warning>
-At least one of `market_slug`, `condition_id`, `token_id`, or `user` is required.
-Only one of `market_slug`, `condition_id`, or `token_id` can be provided.
-</Warning>
-
-<ResponseField name="orders" type="array">
-  <Expandable title="Order object">
-    <ResponseField name="token_id" type="string">Token ID that was traded</ResponseField>
-    <ResponseField name="side" type="string">`BUY` or `SELL`</ResponseField>
-    <ResponseField name="market_slug" type="string">Market slug</ResponseField>
-    <ResponseField name="condition_id" type="string">Market condition ID</ResponseField>
-    <ResponseField name="shares" type="number">Number of shares traded</ResponseField>
-    <ResponseField name="shares_normalized" type="number">Shares normalized (raw / 1,000,000)</ResponseField>
-    <ResponseField name="price" type="number">Trade price (0-1)</ResponseField>
-    <ResponseField name="tx_hash" type="string">Transaction hash</ResponseField>
-    <ResponseField name="title" type="string">Market title</ResponseField>
-    <ResponseField name="timestamp" type="integer">Unix timestamp</ResponseField>
-    <ResponseField name="order_hash" type="string">Order hash</ResponseField>
-    <ResponseField name="user" type="string">Maker wallet address</ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  <Expandable>
-    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
-    <ResponseField name="offset" type="integer">Current offset</ResponseField>
-    <ResponseField name="total" type="integer">Total matching trades</ResponseField>
-    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
-  </Expandable>
-</ResponseField>
+Query historical trade data with flexible filtering by market, token, user, and time range. At least one of `market_slug`, `condition_id`, `token_id`, or `user` is required.
 
 <RequestExample>
 ```bash cURL
@@ -149,20 +80,3 @@ const { orders } = await response.json();
 }
 ```
 </ResponseExample>
-
-## Use Cases
-
-<CardGroup cols={2}>
-  <Card title="Trade History" icon="clock-rotate-left">
-    Get complete trade history for a market or user
-  </Card>
-  <Card title="Volume Analysis" icon="chart-bar">
-    Analyze trading patterns and flow
-  </Card>
-  <Card title="Whale Tracking" icon="fish">
-    Monitor large trades by filtering on shares
-  </Card>
-  <Card title="User Analytics" icon="user-chart">
-    Analyze a specific trader's activity
-  </Card>
-</CardGroup>

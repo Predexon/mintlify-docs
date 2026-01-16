@@ -4,57 +4,12 @@ openapi: "GET /v1/polymarket/markets/{condition_id}/open_interest"
 description: "Get historical open interest data for a market"
 ---
 
-## Overview
-
-Fetch historical time series of open interest for a market. Open interest represents the total value of tokens circulating from split, merge, redeem, and conversion events.
-
-<ParamField path="condition_id" type="string" required>
-  The condition ID for the market
-</ParamField>
-
-<ParamField query="granularity" type="string" default="day">
-  Time granularity: `day`, `week`, `month`, `year`, or `all`
-</ParamField>
-
-<ParamField query="start_time" type="integer">
-  Unix timestamp (seconds) for start of range
-</ParamField>
-
-<ParamField query="end_time" type="integer">
-  Unix timestamp (seconds) for end of range
-</ParamField>
-
-<ResponseField name="condition_id" type="string">
-  The requested condition ID
-</ResponseField>
-
-<ResponseField name="granularity" type="string">
-  The time granularity used
-</ResponseField>
-
-<ResponseField name="start_time" type="integer">
-  Actual start time of returned data
-</ResponseField>
-
-<ResponseField name="end_time" type="integer">
-  Actual end time of returned data
-</ResponseField>
-
-<ResponseField name="open_interest_over_time" type="array">
-  <Expandable title="Open interest data point">
-    <ResponseField name="timestamp" type="integer">
-      Unix timestamp for this data point
-    </ResponseField>
-    <ResponseField name="open_interest_usd" type="number">
-      Open interest value in USD at this point (may be null if no data)
-    </ResponseField>
-  </Expandable>
-</ResponseField>
+Fetch historical open interest for a market. Open interest represents total outstanding positions (can increase or decrease, unlike cumulative volume).
 
 <RequestExample>
 ```bash cURL
 curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/polymarket/markets/0x1234.../open_interest?granularity=day"
+  "https://api.predexon.com/v1/polymarket/markets/0x1234.../open_interest?granularity=week"
 ```
 
 ```python Python
@@ -63,11 +18,7 @@ import requests
 response = requests.get(
     f"https://api.predexon.com/v1/polymarket/markets/{condition_id}/open_interest",
     headers={"x-api-key": "YOUR_API_KEY"},
-    params={
-        "granularity": "week",
-        "start_time": 1704067200,
-        "end_time": 1735689600
-    }
+    params={"granularity": "week"}
 )
 oi_data = response.json()["open_interest_over_time"]
 ```
@@ -89,33 +40,10 @@ const { open_interest_over_time } = await response.json();
   "start_time": 1704067200,
   "end_time": 1735689600,
   "open_interest_over_time": [
-    {
-      "timestamp": 1704067200,
-      "open_interest_usd": 5250000.00
-    },
-    {
-      "timestamp": 1704672000,
-      "open_interest_usd": 5890000.00
-    },
-    {
-      "timestamp": 1705276800,
-      "open_interest_usd": 6120000.00
-    }
+    {"timestamp": 1704067200, "open_interest_usd": 5250000.00},
+    {"timestamp": 1704672000, "open_interest_usd": 5890000.00},
+    {"timestamp": 1705276800, "open_interest_usd": 6120000.00}
   ]
 }
 ```
 </ResponseExample>
-
-## Understanding Open Interest
-
-**Open Interest** differs from volume:
-- **Volume**: Total USD traded over time (cumulative)
-- **Open Interest**: Current outstanding positions (can go up or down)
-
-Open interest increases when:
-- New positions are created (splits)
-- Collateral is converted to shares
-
-Open interest decreases when:
-- Positions are redeemed or merged
-- Markets are resolved

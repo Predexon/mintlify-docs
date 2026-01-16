@@ -4,148 +4,13 @@ openapi: "GET /v1/dflow/wallet/positions/{wallet_address}"
 description: "Fetch current positions for a Dflow wallet"
 ---
 
-## Overview
-
-Fetch current positions for a wallet address on Dflow. Returns all positions with total cost basis, realized PnL, and fees paid.
-
-- **Open positions**: Currently holding tokens (`total_qty_bought > total_qty_sold`)
-- **Closed positions**: No longer holding but has trading history
-
-Enriched with market metadata (title, subtitles) from PostgreSQL.
-
-<ParamField path="wallet_address" type="string" required>
-  Wallet address to fetch positions for
-</ParamField>
-
-<ParamField query="status" type="string">
-  Filter by position status: `open`, `closed`, or `all` (default)
-</ParamField>
-
-<ParamField query="outcome_mint" type="string">
-  Filter by specific outcome mint address
-</ParamField>
-
-<ParamField query="market_ticker" type="string">
-  Filter by market ticker (case-insensitive)
-</ParamField>
-
-<ParamField query="sort_by" default="total_cost_basis" type="string">
-  Field to sort by: `total_qty_bought`, `total_cost_basis`, `realized_pnl`, `fees_paid`
-</ParamField>
-
-<ParamField query="order" default="desc" type="string">
-  Sort order: `asc` or `desc`
-</ParamField>
-
-<ParamField query="limit" default="100" type="integer">
-  Maximum number of positions to return (1-500)
-</ParamField>
-
-<ParamField query="offset" default="0" type="integer">
-  Number of positions to skip for pagination
-</ParamField>
-
-<ResponseField name="wallet" type="string">
-  The wallet address
-</ResponseField>
-
-<ResponseField name="positions" type="array">
-  <Expandable title="Position object">
-    <ResponseField name="outcome_mint" type="string">
-      Outcome mint address
-    </ResponseField>
-    <ResponseField name="market_ticker" type="string">
-      Market ticker
-    </ResponseField>
-    <ResponseField name="market_title" type="string">
-      Market title
-    </ResponseField>
-    <ResponseField name="yes_subtitle" type="string">
-      Yes outcome subtitle
-    </ResponseField>
-    <ResponseField name="no_subtitle" type="string">
-      No outcome subtitle
-    </ResponseField>
-    <ResponseField name="outcome" type="string">
-      Outcome side (yes/no)
-    </ResponseField>
-    <ResponseField name="status" type="string">
-      Position status: `open` or `closed`
-    </ResponseField>
-    <ResponseField name="total_cost_basis" type="number">
-      Total cost basis in USD
-    </ResponseField>
-    <ResponseField name="avg_entry_price" type="number">
-      Average entry price (0-1)
-    </ResponseField>
-    <ResponseField name="realized_pnl" type="number">
-      Realized profit/loss in USD
-    </ResponseField>
-    <ResponseField name="fees_paid" type="number">
-      Total fees paid in USD
-    </ResponseField>
-    <ResponseField name="total_qty_bought" type="number">
-      Total quantity bought
-    </ResponseField>
-    <ResponseField name="total_qty_sold" type="number">
-      Total quantity sold
-    </ResponseField>
-    <ResponseField name="first_trade_at" type="integer">
-      Timestamp of first trade
-    </ResponseField>
-    <ResponseField name="last_trade_at" type="integer">
-      Timestamp of last trade
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="summary" type="object">
-  <Expandable>
-    <ResponseField name="total_positions" type="integer">
-      Total number of positions
-    </ResponseField>
-    <ResponseField name="open_positions" type="integer">
-      Number of open positions
-    </ResponseField>
-    <ResponseField name="closed_positions" type="integer">
-      Number of closed positions
-    </ResponseField>
-    <ResponseField name="total_cost_basis" type="number">
-      Sum of all cost bases
-    </ResponseField>
-    <ResponseField name="total_realized_pnl" type="number">
-      Sum of all realized PnL
-    </ResponseField>
-    <ResponseField name="total_fees_paid" type="number">
-      Sum of all fees paid
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  <Expandable>
-    <ResponseField name="limit" type="integer">
-      Requested limit
-    </ResponseField>
-    <ResponseField name="offset" type="integer">
-      Current offset
-    </ResponseField>
-    <ResponseField name="total" type="integer">
-      Total matching positions
-    </ResponseField>
-    <ResponseField name="has_more" type="boolean">
-      Whether more results are available
-    </ResponseField>
-  </Expandable>
-</ResponseField>
+Fetch positions for a wallet on Dflow. Returns cost basis, realized PnL, and fees. Open positions have `total_qty_bought > total_qty_sold`.
 
 <RequestExample>
-
 ```bash cURL
 curl -H "x-api-key: YOUR_API_KEY" \
   "https://api.predexon.com/v1/dflow/wallet/positions/YOUR_WALLET_ADDRESS?status=open"
 ```
-
 
 ```python Python
 import requests
@@ -155,29 +20,19 @@ response = requests.get(
     headers={"x-api-key": "YOUR_API_KEY"},
     params={"status": "open"}
 )
-
 data = response.json()
-for pos in data["positions"]:
-    print(f"{pos['market_title']}: {pos['quantity']} shares, PnL: ${pos['realized_pnl']:.2f}")
 ```
-
 
 ```typescript TypeScript
 const response = await fetch(
   `https://api.predexon.com/v1/dflow/wallet/positions/${walletAddress}?status=open`,
   { headers: { "x-api-key": "YOUR_API_KEY" } }
 );
-const { positions, summary } = await response.json();
-
-positions.forEach(pos => {
-  console.log(`${pos.market_title}: ${pos.quantity} shares, PnL: $${pos.realized_pnl}`);
-});
+const data = await response.json();
 ```
-
 </RequestExample>
 
 <ResponseExample>
-
 ```json 200
 {
   "wallet": "7vfCXTUXx...",
@@ -198,48 +53,22 @@ positions.forEach(pos => {
       "total_qty_sold": 0,
       "first_trade_at": 1705420800,
       "last_trade_at": 1705420800
-    },
-    {
-      "outcome_mint": "9yRsN4...",
-      "market_ticker": "ETHPRICE-26FEB",
-      "market_title": "Ethereum above $5k by Feb 2026?",
-      "yes_subtitle": "Yes, ETH will be above $5k",
-      "no_subtitle": "No, ETH will be at or below $5k",
-      "outcome": "no",
-      "status": "open",
-      "total_cost_basis": 80.00,
-      "avg_entry_price": 0.40,
-      "realized_pnl": 25.50,
-      "fees_paid": 2.10,
-      "total_qty_bought": 300,
-      "total_qty_sold": 100,
-      "first_trade_at": 1705334400,
-      "last_trade_at": 1705507200
     }
   ],
   "summary": {
-    "total_positions": 2,
-    "open_positions": 2,
+    "total_positions": 1,
+    "open_positions": 1,
     "closed_positions": 0,
-    "total_cost_basis": 177.50,
-    "total_realized_pnl": 25.50,
-    "total_fees_paid": 4.05
+    "total_cost_basis": 97.50,
+    "total_realized_pnl": 0,
+    "total_fees_paid": 1.95
   },
   "pagination": {
     "limit": 100,
     "offset": 0,
-    "total": 2,
+    "total": 1,
     "has_more": false
   }
 }
 ```
-
-
-```json 400
-{
-  "error": "Bad Request",
-  "message": "Invalid wallet address format"
-}
-```
-
 </ResponseExample>
