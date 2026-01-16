@@ -378,16 +378,6 @@
             "description": "Unique identifier for the user"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RedeemRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Position redeemed",
@@ -450,16 +440,6 @@
             "description": "Unique identifier for the user"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WithdrawRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Withdrawal completed",
@@ -924,12 +904,15 @@
       },
       "WithdrawSolRequest": {
         "type": "object",
+        "required": ["destinationAddress", "amount"],
         "properties": {
           "destinationAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "Recipient Solana wallet address (base58 format)"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "description": "SOL amount to withdraw (e.g., \"0.05\")"
           }
         }
       },

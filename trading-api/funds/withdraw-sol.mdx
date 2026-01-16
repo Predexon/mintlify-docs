@@ -4,24 +4,6 @@ title: "Withdraw SOL"
 description: "Withdraw SOL from a user's Kalshi wallet to an external address"
 ---
 
-## Overview
-
-Withdraws SOL from the user's Kalshi wallet to an external Solana address. Use this to recover unused SOL from transaction fees.
-
-<ParamField path="userId" type="string">
-  Unique identifier for the user.
-</ParamField>
-
-## Request Body
-
-<ParamField body="destinationAddress" type="string" required>
-  Recipient Solana wallet address (base58 format).
-</ParamField>
-
-<ParamField body="amount" type="string" required>
-  SOL amount to withdraw (e.g., `"0.05"`).
-</ParamField>
-
 <RequestExample>
 ```bash cURL
 curl -X POST \
@@ -31,68 +13,22 @@ curl -X POST \
     "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
     "amount": "0.05"
   }' \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/withdraw/withdraw-sol"
+  "https://trade.predexon.com/api/users/USER_ID/withdraw/withdraw-sol"
 ```
 
 ```python Python
 import requests
 
-user_id = "550e8400-e29b-41d4-a716-446655440000"
-HEADERS = {
-    "x-api-key": "YOUR_API_KEY",
-    "Content-Type": "application/json"
-}
-
 response = requests.post(
     f"https://trade.predexon.com/api/users/{user_id}/withdraw/withdraw-sol",
-    headers=HEADERS,
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
     json={
         "destinationAddress": "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
         "amount": "0.05"
     }
 )
-
-result = response.json()
-print(f"Withdrawal complete: {result['transactionHash']}")
-```
-
-```typescript TypeScript
-const userId = "550e8400-e29b-41d4-a716-446655440000";
-
-const response = await fetch(
-  `https://trade.predexon.com/api/users/${userId}/withdraw/withdraw-sol`,
-  {
-    method: "POST",
-    headers: {
-      "x-api-key": "YOUR_API_KEY",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      destinationAddress: "7BfknMUrXjZ96swfM4uLzDXi9QgtcdjQKiWcG4QxW2So",
-      amount: "0.05"
-    })
-  }
-);
-
-const result = await response.json();
 ```
 </RequestExample>
-
-<ResponseField name="success" type="boolean">
-  Whether the withdrawal was successful.
-</ResponseField>
-
-<ResponseField name="transactionHash" type="string">
-  Solana transaction signature.
-</ResponseField>
-
-<ResponseField name="amount" type="string">
-  SOL amount withdrawn.
-</ResponseField>
-
-<ResponseField name="destinationAddress" type="string">
-  Recipient wallet address.
-</ResponseField>
 
 <ResponseExample>
 ```json 200 OK

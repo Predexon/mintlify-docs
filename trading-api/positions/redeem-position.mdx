@@ -4,39 +4,14 @@ title: "Redeem Position"
 description: "Redeem a resolved position for USDC"
 ---
 
-## Overview
-
-Redeems a resolved position, converting winning tokens back to USDC. Only positions with status `redeemable` and result `won` will return USDC - losing positions have no value to redeem.
-
-<ParamField path="userId" type="string">
-  Unique identifier for the user.
-</ParamField>
-
 ## Request Body
 
-### Polymarket Redemption
-
-<ParamField body="venue" type="string" required>
-  Must be `polymarket`
-</ParamField>
-
-<ParamField body="tokenId" type="string" required>
-  The token ID of the position to redeem.
-</ParamField>
-
-### Kalshi Redemption
-
-<ParamField body="venue" type="string" required>
-  Must be `kalshi`
-</ParamField>
-
-<ParamField body="ticker" type="string" required>
-  Market ticker (e.g., `PRES-2024-DJT`)
-</ParamField>
-
-<ParamField body="outcome" type="string" required>
-  Must be `Yes` or `No` (case-sensitive)
-</ParamField>
+| Parameter | Type | Polymarket | Kalshi |
+|-----------|------|------------|--------|
+| `venue` | string | Required (`polymarket`) | Required (`kalshi`) |
+| `tokenId` | string | Required | - |
+| `ticker` | string | - | Required |
+| `outcome` | string | - | Required (`Yes` or `No`) |
 
 <RequestExample>
 ```bash cURL (Polymarket)
@@ -47,7 +22,7 @@ curl -X POST \
     "venue": "polymarket",
     "tokenId": "71321045679252212594626385..."
   }' \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/redeem"
+  "https://trade.predexon.com/api/users/USER_ID/redeem"
 ```
 
 ```bash cURL (Kalshi)
@@ -59,99 +34,32 @@ curl -X POST \
     "ticker": "PRES-2024-DJT",
     "outcome": "Yes"
   }' \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/redeem"
+  "https://trade.predexon.com/api/users/USER_ID/redeem"
 ```
 
-```python Python
+```python Python (Polymarket)
 import requests
 
-user_id = "550e8400-e29b-41d4-a716-446655440000"
-HEADERS = {
-    "x-api-key": "YOUR_API_KEY",
-    "Content-Type": "application/json"
-}
-
-# Redeem Polymarket position
 response = requests.post(
     f"https://trade.predexon.com/api/users/{user_id}/redeem",
-    headers=HEADERS,
-    json={
-        "venue": "polymarket",
-        "tokenId": "71321045679252212594626385..."
-    }
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={"venue": "polymarket", "tokenId": "71321045679252212594626385..."}
 )
-
-result = response.json()
-print(f"Redeemed {result['sizeRedeemed']} tokens for ${result['amountRedeemed']} USDC")
-print(f"Transaction: {result['transactionHash']}")
 ```
 
-```typescript TypeScript
-const userId = "550e8400-e29b-41d4-a716-446655440000";
+```python Python (Kalshi)
+import requests
 
-// Redeem Kalshi position
-const response = await fetch(
-  `https://trade.predexon.com/api/users/${userId}/redeem`,
-  {
-    method: "POST",
-    headers: {
-      "x-api-key": "YOUR_API_KEY",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      venue: "kalshi",
-      ticker: "PRES-2024-DJT",
-      outcome: "Yes"
-    })
-  }
-);
-
-const result = await response.json();
+response = requests.post(
+    f"https://trade.predexon.com/api/users/{user_id}/redeem",
+    headers={"x-api-key": "YOUR_API_KEY", "Content-Type": "application/json"},
+    json={"venue": "kalshi", "ticker": "PRES-2024-DJT", "outcome": "Yes"}
+)
 ```
 </RequestExample>
 
-<ResponseField name="transactionHash" type="string">
-  Blockchain transaction hash for the redemption.
-</ResponseField>
-
-<ResponseField name="venue" type="string">
-  Trading venue where the redemption occurred.
-</ResponseField>
-
-<ResponseField name="tokenId" type="string">
-  Polymarket token ID (Polymarket redemptions only).
-</ResponseField>
-
-<ResponseField name="ticker" type="string">
-  Kalshi market ticker (Kalshi redemptions only).
-</ResponseField>
-
-<ResponseField name="title" type="string">
-  Market question/title.
-</ResponseField>
-
-<ResponseField name="outcome" type="string">
-  The outcome side that was redeemed.
-</ResponseField>
-
-<ResponseField name="sizeRedeemed" type="string">
-  Number of tokens that were burned.
-</ResponseField>
-
-<ResponseField name="result" type="string">
-  Position result: `won` or `lost`
-</ResponseField>
-
-<ResponseField name="amountRedeemed" type="string">
-  USDC received from redemption. For winning positions, this equals `sizeRedeemed`. For losing positions, this is `0`.
-</ResponseField>
-
-<ResponseField name="status" type="string">
-  Always `completed` for successful redemptions.
-</ResponseField>
-
 <ResponseExample>
-```json 200 OK (Winning Position)
+```json 200 OK (Won)
 {
   "transactionHash": "0x1234567890abcdef...",
   "venue": "polymarket",
@@ -165,7 +73,7 @@ const result = await response.json();
 }
 ```
 
-```json 200 OK (Losing Position)
+```json 200 OK (Lost)
 {
   "transactionHash": "0xabcdef1234567890...",
   "venue": "polymarket",
@@ -190,18 +98,6 @@ const result = await response.json();
   "error": "Market is not resolved yet (status: active)"
 }
 ```
-
-```json 400 No Position
-{
-  "error": "No tokens to redeem"
-}
-```
-
-```json 400 Redemption Closed
-{
-  "error": "Redemption not available (status: closed)"
-}
-```
 </ResponseExample>
 
 ## Redemption Flow
@@ -224,14 +120,3 @@ const result = await response.json();
 <Note>
 You can redeem losing positions to clear them from your portfolio, but you'll receive 0 USDC since they're worthless.
 </Note>
-
-## Use Cases
-
-<CardGroup cols={2}>
-  <Card title="Automated Redemption" icon="robot">
-    Periodically scan for and redeem all winning positions
-  </Card>
-  <Card title="Portfolio Cleanup" icon="broom">
-    Clear resolved positions (both wins and losses)
-  </Card>
-</CardGroup>

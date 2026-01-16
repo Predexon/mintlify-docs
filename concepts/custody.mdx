@@ -42,9 +42,9 @@ When you create a user, the API generates managed wallets for each venue:
 | Venue | Deposit Address | Blockchain |
 |-------|-----------------|------------|
 | Polymarket | `polymarketWalletAddress` | Polygon (USDC.e) |
-| Kalshi | `kalshiWalletAddress` | Solana (USDC) |
+| Kalshi | `kalshiWalletAddress` | Solana (USDC + SOL) |
 
-Send USDC.e (Polygon) or USDC (Solana) to the appropriate address to fund trading. The API handles all transaction signing automatically.
+Send USDC.e to Polygon for Polymarket, or USDC on Solana (plus SOL for fees) for Kalshi. The API handles all transaction signing automatically.
 
 ### Key Security
 
