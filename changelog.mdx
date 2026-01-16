@@ -10,8 +10,9 @@ description: "API updates, new features, and breaking changes"
 #### New Features
 
 <Card title="Dflow Support" icon="bolt">
-  Added support for Dflow prediction market platform with two new endpoints:
+  Added support for Dflow prediction market platform with three new endpoints:
   - `GET /v1/dflow/trades` - Fetch trade history for a wallet
+  - `GET /v1/dflow/wallet/positions/{wallet_address}` - Get current positions with cost basis and PnL
   - `GET /v1/dflow/wallet/pnl/{wallet_address}` - Get realized PnL history
 </Card>
 

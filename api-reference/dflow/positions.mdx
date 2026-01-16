@@ -1,0 +1,169 @@
+---
+title: "Wallet Positions"
+openapi: "GET /v1/dflow/wallet/positions/{wallet_address}"
+description: "Fetch current positions for a Dflow wallet"
+---
+
+## Overview
+
+Fetch current positions for a wallet address on Dflow. Returns all positions with cost basis, realized PnL, and fees paid.
+
+- **Open positions**: `qty > 0` (still holding tokens)
+- **Closed positions**: `qty = 0` but has realized PnL history
+
+Enriched with market metadata (title, category) from the database.
+
+<ParamField path="wallet_address" type="string" required>
+  Wallet address to fetch positions for
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by position status: `open`, `closed`, or `all` (default)
+</ParamField>
+
+<ParamField query="outcome_mint" type="string">
+  Filter by specific outcome mint address
+</ParamField>
+
+<ParamField query="market_ticker" type="string">
+  Filter by market ticker (case-insensitive)
+</ParamField>
+
+<ParamField query="sort_by" type="string" default="quantity">
+  Field to sort by: `quantity`, `cost_basis`, `realized_pnl`, `fees_paid`
+</ParamField>
+
+<ParamField query="order" type="string" default="desc">
+  Sort order: `asc` or `desc`
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+  Maximum number of positions to return (1-500)
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of positions to skip for pagination
+</ParamField>
+
+<ResponseField name="wallet_address" type="string">
+  The wallet address
+</ResponseField>
+
+<ResponseField name="positions" type="array">
+  <Expandable title="Position object">
+    <ResponseField name="outcome_mint" type="string">Outcome mint address</ResponseField>
+    <ResponseField name="market_ticker" type="string">Market ticker</ResponseField>
+    <ResponseField name="title" type="string">Market title</ResponseField>
+    <ResponseField name="category" type="string">Market category</ResponseField>
+    <ResponseField name="side" type="string">Position side (YES/NO)</ResponseField>
+    <ResponseField name="qty" type="number">Current quantity held</ResponseField>
+    <ResponseField name="cost_basis" type="number">Total cost basis in USD</ResponseField>
+    <ResponseField name="avg_entry_price" type="number">Average entry price (0-1)</ResponseField>
+    <ResponseField name="realized_pnl" type="number">Realized profit/loss in USD</ResponseField>
+    <ResponseField name="fees_paid" type="number">Total fees paid in USD</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="summary" type="object">
+  <Expandable>
+    <ResponseField name="total_positions" type="integer">Total number of positions</ResponseField>
+    <ResponseField name="total_cost_basis" type="number">Sum of all cost bases</ResponseField>
+    <ResponseField name="total_realized_pnl" type="number">Sum of all realized PnL</ResponseField>
+    <ResponseField name="total_fees_paid" type="number">Sum of all fees paid</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable>
+    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
+    <ResponseField name="offset" type="integer">Current offset</ResponseField>
+    <ResponseField name="total" type="integer">Total matching positions</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -H "x-api-key: YOUR_API_KEY" \
+  "https://api.predexon.com/v1/dflow/wallet/positions/YOUR_WALLET_ADDRESS?status=open"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    f"https://api.predexon.com/v1/dflow/wallet/positions/{wallet_address}",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    params={"status": "open"}
+)
+
+data = response.json()
+for pos in data["positions"]:
+    print(f"{pos['title']}: {pos['qty']} shares, PnL: ${pos['realized_pnl']:.2f}")
+```
+
+```typescript TypeScript
+const response = await fetch(
+  `https://api.predexon.com/v1/dflow/wallet/positions/${walletAddress}?status=open`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } }
+);
+const { positions, summary } = await response.json();
+
+positions.forEach(pos => {
+  console.log(`${pos.title}: ${pos.qty} shares, PnL: $${pos.realized_pnl}`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "wallet_address": "7vfCXTUXx...",
+  "positions": [
+    {
+      "outcome_mint": "8xPqM3...",
+      "market_ticker": "BTCPRICE-26JAN",
+      "title": "Bitcoin above $100k by Jan 2026?",
+      "category": "Crypto",
+      "side": "YES",
+      "qty": 150,
+      "cost_basis": 97.50,
+      "avg_entry_price": 0.65,
+      "realized_pnl": 0,
+      "fees_paid": 1.95
+    },
+    {
+      "outcome_mint": "9yRsN4...",
+      "market_ticker": "ETHPRICE-26FEB",
+      "title": "Ethereum above $5k by Feb 2026?",
+      "category": "Crypto",
+      "side": "NO",
+      "qty": 200,
+      "cost_basis": 80.00,
+      "avg_entry_price": 0.40,
+      "realized_pnl": 25.50,
+      "fees_paid": 2.10
+    }
+  ],
+  "summary": {
+    "total_positions": 2,
+    "total_cost_basis": 177.50,
+    "total_realized_pnl": 25.50,
+    "total_fees_paid": 4.05
+  },
+  "pagination": {
+    "limit": 100,
+    "offset": 0,
+    "total": 2,
+    "has_more": false
+  }
+}
+```
+
+```json 400
+{
+  "error": "Bad Request",
+  "message": "Invalid wallet address format"
+}
+```
+</ResponseExample>

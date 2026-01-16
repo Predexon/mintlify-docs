@@ -2561,6 +2561,175 @@
         }
       }
     },
+    "/v1/dflow/wallet/positions/{wallet_address}": {
+      "get": {
+        "tags": [
+          "dflow",
+          "dflow"
+        ],
+        "summary": "Get Dflow Wallet Positions",
+        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with cost basis, realized PnL, and fees paid.\n\n- **Open positions**: qty > 0 (still holding tokens)\n- **Closed positions**: qty = 0 but has realized PnL history\n\nEnriched with market metadata (title, category) from PostgreSQL.",
+        "operationId": "get_dflow_wallet_positions_v1_dflow_wallet_positions__wallet_address__get",
+        "parameters": [
+          {
+            "name": "wallet_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Wallet address to fetch positions for",
+              "title": "Wallet Address"
+            },
+            "description": "Wallet address to fetch positions for"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DflowPositionStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by position status: open, closed, or all (default)",
+              "title": "Status"
+            },
+            "description": "Filter by position status: open, closed, or all (default)"
+          },
+          {
+            "name": "outcome_mint",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by specific outcome mint",
+              "title": "Outcome Mint"
+            },
+            "description": "Filter by specific outcome mint"
+          },
+          {
+            "name": "market_ticker",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by market ticker (case-insensitive)",
+              "title": "Market Ticker"
+            },
+            "description": "Filter by market ticker (case-insensitive)"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DflowPositionSortBy",
+              "description": "Field to sort by",
+              "default": "quantity"
+            },
+            "description": "Field to sort by"
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/app__models__schemas__OrderDirection",
+              "description": "Sort order: asc or desc",
+              "default": "desc"
+            },
+            "description": "Sort order: asc or desc"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "description": "Maximum number of positions to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Maximum number of positions to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of positions to skip for pagination",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of positions to skip for pagination"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DflowWalletPositionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Root",
@@ -2803,6 +2972,199 @@
         "title": "DflowPnLDataPoint",
         "description": "Individual dflow PnL data point."
       },
+      "DflowPosition": {
+        "properties": {
+          "outcome_mint": {
+            "type": "string",
+            "title": "Outcome Mint",
+            "description": "Outcome token mint address"
+          },
+          "market_ticker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Ticker",
+            "description": "Market ticker identifier"
+          },
+          "market_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Title",
+            "description": "Human-readable market title"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome",
+            "description": "Outcome side: yes or no"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DflowPositionStatus",
+            "description": "Position status: open or closed"
+          },
+          "quantity": {
+            "type": "number",
+            "title": "Quantity",
+            "description": "Current quantity of tokens held"
+          },
+          "cost_basis": {
+            "type": "number",
+            "title": "Cost Basis",
+            "description": "Current cost basis in USD"
+          },
+          "total_cost_basis": {
+            "type": "number",
+            "title": "Total Cost Basis",
+            "description": "Total historical cost basis in USD"
+          },
+          "avg_entry_price": {
+            "type": "number",
+            "title": "Avg Entry Price",
+            "description": "Average entry price per token"
+          },
+          "realized_pnl": {
+            "type": "number",
+            "title": "Realized Pnl",
+            "description": "Realized PnL in USD"
+          },
+          "fees_paid": {
+            "type": "number",
+            "title": "Fees Paid",
+            "description": "Total fees paid in USD"
+          },
+          "total_qty_bought": {
+            "type": "number",
+            "title": "Total Qty Bought",
+            "description": "Total quantity ever bought"
+          },
+          "total_qty_sold": {
+            "type": "number",
+            "title": "Total Qty Sold",
+            "description": "Total quantity ever sold"
+          },
+          "first_trade_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Trade At",
+            "description": "Unix timestamp of first trade"
+          },
+          "last_trade_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Trade At",
+            "description": "Unix timestamp of last trade"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome_mint",
+          "status",
+          "quantity",
+          "cost_basis",
+          "total_cost_basis",
+          "avg_entry_price",
+          "realized_pnl",
+          "fees_paid",
+          "total_qty_bought",
+          "total_qty_sold"
+        ],
+        "title": "DflowPosition",
+        "description": "Individual dflow position."
+      },
+      "DflowPositionSortBy": {
+        "type": "string",
+        "enum": [
+          "quantity",
+          "cost_basis",
+          "realized_pnl",
+          "fees_paid"
+        ],
+        "title": "DflowPositionSortBy",
+        "description": "Sort options for dflow positions."
+      },
+      "DflowPositionStatus": {
+        "type": "string",
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "title": "DflowPositionStatus",
+        "description": "Dflow position status enum."
+      },
+      "DflowPositionsSummary": {
+        "properties": {
+          "total_positions": {
+            "type": "integer",
+            "title": "Total Positions",
+            "description": "Total number of positions"
+          },
+          "open_positions": {
+            "type": "integer",
+            "title": "Open Positions",
+            "description": "Number of open positions"
+          },
+          "closed_positions": {
+            "type": "integer",
+            "title": "Closed Positions",
+            "description": "Number of closed positions"
+          },
+          "total_cost_basis": {
+            "type": "number",
+            "title": "Total Cost Basis",
+            "description": "Total cost basis across all positions"
+          },
+          "total_realized_pnl": {
+            "type": "number",
+            "title": "Total Realized Pnl",
+            "description": "Total realized PnL"
+          },
+          "total_fees_paid": {
+            "type": "number",
+            "title": "Total Fees Paid",
+            "description": "Total fees paid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_positions",
+          "open_positions",
+          "closed_positions",
+          "total_cost_basis",
+          "total_realized_pnl",
+          "total_fees_paid"
+        ],
+        "title": "DflowPositionsSummary",
+        "description": "Summary of all dflow positions."
+      },
       "DflowTrade": {
         "properties": {
           "signature": {
@@ -2979,6 +3341,37 @@
         ],
         "title": "DflowWalletPnLResponse",
         "description": "Dflow wallet PnL endpoint response."
+      },
+      "DflowWalletPositionsResponse": {
+        "properties": {
+          "wallet": {
+            "type": "string",
+            "title": "Wallet",
+            "description": "Wallet address"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/DflowPosition"
+            },
+            "type": "array",
+            "title": "Positions"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DflowPositionsSummary"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        },
+        "type": "object",
+        "required": [
+          "wallet",
+          "positions",
+          "summary",
+          "pagination"
+        ],
+        "title": "DflowWalletPositionsResponse",
+        "description": "Dflow wallet positions endpoint response."
       },
       "ErrorResponse": {
         "properties": {

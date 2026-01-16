@@ -61,6 +61,7 @@
             "group": "Dflow",
             "pages": [
               "api-reference/dflow/trades",
+              "api-reference/dflow/positions",
               "api-reference/dflow/pnl"
             ]
           }
