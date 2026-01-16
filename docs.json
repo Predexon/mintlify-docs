@@ -94,7 +94,8 @@
             "group": "Trading",
             "pages": [
               "trading-api/trading/get-balance",
-              "trading-api/trading/place-order",
+              "trading-api/trading/place-order-polymarket",
+              "trading-api/trading/place-order-kalshi",
               "trading-api/trading/get-orders",
               "trading-api/trading/cancel-order",
               "trading-api/trading/cancel-all-orders"

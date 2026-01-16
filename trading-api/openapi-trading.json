@@ -165,45 +165,6 @@
           }
         }
       },
-      "post": {
-        "tags": ["Trading"],
-        "summary": "Place Order",
-        "description": "Place a buy or sell order on a prediction market",
-        "operationId": "place_order",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Unique identifier for the user"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PlaceOrderRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Order placed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          }
-        }
-      },
       "delete": {
         "tags": ["Trading"],
         "summary": "Cancel All Orders",
@@ -237,6 +198,88 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CancelAllResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders/polymarket": {
+      "post": {
+        "tags": ["Trading"],
+        "summary": "Place Order (Polymarket)",
+        "description": "Place a buy or sell order on Polymarket",
+        "operationId": "place_order_polymarket",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolymarketOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolymarketOrder"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/orders/kalshi": {
+      "post": {
+        "tags": ["Trading"],
+        "summary": "Place Order (Kalshi)",
+        "description": "Place a buy or sell order on Kalshi",
+        "operationId": "place_order_kalshi",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KalshiOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KalshiOrder"
                 }
               }
             }
@@ -566,32 +609,139 @@
           }
         }
       },
-      "PlaceOrderRequest": {
+      "PolymarketOrderRequest": {
         "type": "object",
+        "required": ["tokenId", "side", "amount", "type"],
         "properties": {
-          "venue": {
-            "type": "string"
-          },
           "tokenId": {
-            "type": "string"
-          },
-          "ticker": {
-            "type": "string"
-          },
-          "outcome": {
-            "type": "string"
+            "type": "string",
+            "description": "The outcome token ID from List Markets"
           },
           "side": {
-            "type": "string"
+            "type": "string",
+            "enum": ["buy", "sell"],
+            "description": "Buy or sell"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
           },
           "price": {
-            "type": "string"
+            "type": "string",
+            "description": "Price per share (0-1). Required for limit orders. Must match tick size (default 0.01)"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "enum": ["limit", "market"],
+            "description": "Order type"
+          }
+        }
+      },
+      "KalshiOrderRequest": {
+        "type": "object",
+        "required": ["ticker", "outcome", "side", "amount"],
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker from Kalshi List Markets"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["Yes", "No"],
+            "description": "Yes or No (case-sensitive)"
+          },
+          "side": {
+            "type": "string",
+            "enum": ["buy", "sell"],
+            "description": "Buy or sell"
+          },
+          "amount": {
+            "type": "string",
+            "description": "USDC to spend (buy) or shares to sell (sell)"
+          }
+        }
+      },
+      "PolymarketOrder": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order identifier"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Always 'polymarket'"
+          },
+          "tokenId": {
+            "type": "string",
+            "description": "The outcome token ID"
+          },
+          "side": {
+            "type": "string",
+            "description": "Buy or sell"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "The outcome name (e.g., 'Yes')"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Order amount"
+          },
+          "price": {
+            "type": "string",
+            "description": "Order price"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["live", "filled", "matched"],
+            "description": "Order status"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Order creation timestamp"
+          }
+        }
+      },
+      "KalshiOrder": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique order identifier"
+          },
+          "venue": {
+            "type": "string",
+            "description": "Always 'kalshi'"
+          },
+          "ticker": {
+            "type": "string",
+            "description": "Market ticker"
+          },
+          "side": {
+            "type": "string",
+            "description": "Buy or sell"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Yes or No"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Order amount"
+          },
+          "price": {
+            "type": "string",
+            "description": "Execution price"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["filled"],
+            "description": "Order status (always filled for Kalshi)"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Order creation timestamp"
           }
         }
       },
