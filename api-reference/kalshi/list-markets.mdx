@@ -74,8 +74,11 @@ This endpoint does not include Multi Variate Event (MVE) markets such as parlays
     <ResponseField name="title" type="string">
       Market title/question
     </ResponseField>
-    <ResponseField name="subtitle" type="string">
-      Market subtitle (Yes outcome description)
+    <ResponseField name="yes_subtitle" type="string">
+      Yes outcome subtitle/description
+    </ResponseField>
+    <ResponseField name="no_subtitle" type="string">
+      No outcome subtitle/description
     </ResponseField>
     <ResponseField name="status" type="string">
       Market status: `open`, `closed`, `determined`, `settled`
@@ -169,7 +172,8 @@ const data = await response.json();
       "event_ticker": "KXBTC-25JAN10",
       "market_id": "abc123",
       "title": "Bitcoin above $100,000?",
-      "subtitle": "Yes",
+      "yes_subtitle": "Bitcoin above $100,000",
+      "no_subtitle": "Bitcoin at or below $100,000",
       "status": "open",
       "result": null,
       "open_time": "2025-01-01T00:00:00Z",

@@ -3003,6 +3003,30 @@
             "title": "Market Title",
             "description": "Human-readable market title"
           },
+          "yes_subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yes Subtitle",
+            "description": "Yes outcome subtitle"
+          },
+          "no_subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Subtitle",
+            "description": "No outcome subtitle"
+          },
           "outcome": {
             "anyOf": [
               {

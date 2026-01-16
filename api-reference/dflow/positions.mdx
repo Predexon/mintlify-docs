@@ -53,14 +53,21 @@ Enriched with market metadata (title, category) from the database.
   <Expandable title="Position object">
     <ResponseField name="outcome_mint" type="string">Outcome mint address</ResponseField>
     <ResponseField name="market_ticker" type="string">Market ticker</ResponseField>
-    <ResponseField name="title" type="string">Market title</ResponseField>
-    <ResponseField name="category" type="string">Market category</ResponseField>
-    <ResponseField name="side" type="string">Position side (YES/NO)</ResponseField>
-    <ResponseField name="qty" type="number">Current quantity held</ResponseField>
-    <ResponseField name="cost_basis" type="number">Total cost basis in USD</ResponseField>
+    <ResponseField name="market_title" type="string">Market title</ResponseField>
+    <ResponseField name="yes_subtitle" type="string">Yes outcome subtitle</ResponseField>
+    <ResponseField name="no_subtitle" type="string">No outcome subtitle</ResponseField>
+    <ResponseField name="outcome" type="string">Outcome side (yes/no)</ResponseField>
+    <ResponseField name="status" type="string">Position status</ResponseField>
+    <ResponseField name="quantity" type="number">Current quantity held</ResponseField>
+    <ResponseField name="cost_basis" type="number">Cost basis per share</ResponseField>
+    <ResponseField name="total_cost_basis" type="number">Total cost basis in USD</ResponseField>
     <ResponseField name="avg_entry_price" type="number">Average entry price (0-1)</ResponseField>
     <ResponseField name="realized_pnl" type="number">Realized profit/loss in USD</ResponseField>
     <ResponseField name="fees_paid" type="number">Total fees paid in USD</ResponseField>
+    <ResponseField name="total_qty_bought" type="number">Total quantity bought</ResponseField>
+    <ResponseField name="total_qty_sold" type="number">Total quantity sold</ResponseField>
+    <ResponseField name="first_trade_at" type="integer">Timestamp of first trade</ResponseField>
+    <ResponseField name="last_trade_at" type="integer">Timestamp of last trade</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -99,7 +106,7 @@ response = requests.get(
 
 data = response.json()
 for pos in data["positions"]:
-    print(f"{pos['title']}: {pos['qty']} shares, PnL: ${pos['realized_pnl']:.2f}")
+    print(f"{pos['market_title']}: {pos['quantity']} shares, PnL: ${pos['realized_pnl']:.2f}")
 ```
 
 ```typescript TypeScript
@@ -110,7 +117,7 @@ const response = await fetch(
 const { positions, summary } = await response.json();
 
 positions.forEach(pos => {
-  console.log(`${pos.title}: ${pos.qty} shares, PnL: $${pos.realized_pnl}`);
+  console.log(`${pos.market_title}: ${pos.quantity} shares, PnL: $${pos.realized_pnl}`);
 });
 ```
 </RequestExample>
@@ -123,26 +130,40 @@ positions.forEach(pos => {
     {
       "outcome_mint": "8xPqM3...",
       "market_ticker": "BTCPRICE-26JAN",
-      "title": "Bitcoin above $100k by Jan 2026?",
-      "category": "Crypto",
-      "side": "YES",
-      "qty": 150,
-      "cost_basis": 97.50,
+      "market_title": "Bitcoin above $100k by Jan 2026?",
+      "yes_subtitle": "Yes, Bitcoin will be above $100k",
+      "no_subtitle": "No, Bitcoin will be at or below $100k",
+      "outcome": "yes",
+      "status": "open",
+      "quantity": 150,
+      "cost_basis": 0.65,
+      "total_cost_basis": 97.50,
       "avg_entry_price": 0.65,
       "realized_pnl": 0,
-      "fees_paid": 1.95
+      "fees_paid": 1.95,
+      "total_qty_bought": 150,
+      "total_qty_sold": 0,
+      "first_trade_at": 1705420800,
+      "last_trade_at": 1705420800
     },
     {
       "outcome_mint": "9yRsN4...",
       "market_ticker": "ETHPRICE-26FEB",
-      "title": "Ethereum above $5k by Feb 2026?",
-      "category": "Crypto",
-      "side": "NO",
-      "qty": 200,
-      "cost_basis": 80.00,
+      "market_title": "Ethereum above $5k by Feb 2026?",
+      "yes_subtitle": "Yes, ETH will be above $5k",
+      "no_subtitle": "No, ETH will be at or below $5k",
+      "outcome": "no",
+      "status": "open",
+      "quantity": 200,
+      "cost_basis": 0.40,
+      "total_cost_basis": 80.00,
       "avg_entry_price": 0.40,
       "realized_pnl": 25.50,
-      "fees_paid": 2.10
+      "fees_paid": 2.10,
+      "total_qty_bought": 300,
+      "total_qty_sold": 100,
+      "first_trade_at": 1705334400,
+      "last_trade_at": 1705507200
     }
   ],
   "summary": {
