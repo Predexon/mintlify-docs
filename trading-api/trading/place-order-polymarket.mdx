@@ -1,7 +1,7 @@
 ---
 title: "Place Order (Polymarket)"
 description: "Place a buy or sell order on Polymarket"
-api: "POST /api/users/{userId}/orders"
+openapi: "POST /api/users/{userId}/orders"
 ---
 
 ## Endpoint
@@ -58,74 +58,6 @@ Orders with prices that don't match the tick size will be rejected. Valid: `0.01
 <Note>
 Get the `tokenId` from [List Markets](/api-reference/markets/list-markets). Each outcome (Yes/No) has its own token ID.
 </Note>
-
-<RequestExample>
-```bash cURL
-curl -X POST \
-  -H "x-api-key: YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "venue": "polymarket",
-    "tokenId": "71321045679252212594626385...",
-    "side": "buy",
-    "amount": "50.00",
-    "price": "0.65",
-    "type": "limit"
-  }' \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders"
-```
-
-```python Python
-import requests
-
-user_id = "550e8400-e29b-41d4-a716-446655440000"
-
-response = requests.post(
-    f"https://trade.predexon.com/api/users/{user_id}/orders",
-    headers={
-        "x-api-key": "YOUR_API_KEY",
-        "Content-Type": "application/json"
-    },
-    json={
-        "venue": "polymarket",
-        "tokenId": "71321045679252212594626385...",
-        "side": "buy",
-        "amount": "50.00",
-        "price": "0.65",
-        "type": "limit"
-    }
-)
-
-order = response.json()
-print(f"Order ID: {order['orderId']}")
-print(f"Status: {order['status']}")
-```
-
-```typescript TypeScript
-const userId = "550e8400-e29b-41d4-a716-446655440000";
-
-const response = await fetch(
-  `https://trade.predexon.com/api/users/${userId}/orders`,
-  {
-    method: "POST",
-    headers: {
-      "x-api-key": "YOUR_API_KEY",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      venue: "polymarket",
-      tokenId: "71321045679252212594626385...",
-      side: "buy",
-      amount: "50.00",
-      price: "0.65",
-      type: "limit"
-    })
-  }
-);
-
-const order = await response.json();
-```
-</RequestExample>
 
 <ResponseExample>
 ```json 201 Created

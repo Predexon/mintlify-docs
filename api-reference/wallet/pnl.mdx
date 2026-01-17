@@ -6,32 +6,6 @@ description: "Get realized P&L time series for a wallet"
 
 Fetch cumulative realized P&L over time for a wallet. For unrealized P&L, use the [Positions endpoint](/api-reference/wallet/positions).
 
-<RequestExample>
-```bash cURL
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/polymarket/wallet/pnl/0x1234...?granularity=day"
-```
-
-```python Python
-import requests
-
-response = requests.get(
-    f"https://api.predexon.com/v1/polymarket/wallet/pnl/{wallet}",
-    headers={"x-api-key": "YOUR_API_KEY"},
-    params={"granularity": "week", "start_time": 1704067200, "end_time": 1735689600}
-)
-pnl_data = response.json()["pnl_over_time"]
-```
-
-```typescript TypeScript
-const response = await fetch(
-  `https://api.predexon.com/v1/polymarket/wallet/pnl/${walletAddress}?granularity=month`,
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { pnl_over_time } = await response.json();
-```
-</RequestExample>
-
 <ResponseExample>
 ```json 200
 {

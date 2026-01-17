@@ -6,32 +6,6 @@ description: "Fetch historical Kalshi trade data"
 
 Fetch historical trade data from Kalshi markets. Requires at least one of `ticker` or `event_ticker`.
 
-<RequestExample>
-```bash cURL
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/kalshi/trades?ticker=KXBTC-25JAN10-B100000&limit=50"
-```
-
-```python Python
-import requests
-
-response = requests.get(
-    "https://api.predexon.com/v1/kalshi/trades",
-    headers={"x-api-key": "YOUR_API_KEY"},
-    params={"ticker": "KXBTC-25JAN10-B100000", "order": "desc", "limit": 50}
-)
-trades = response.json()["trades"]
-```
-
-```typescript TypeScript
-const response = await fetch(
-  "https://api.predexon.com/v1/kalshi/trades?event_ticker=KXBTC-25JAN10&limit=100",
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { trades } = await response.json();
-```
-</RequestExample>
-
 <ResponseExample>
 ```json 200
 {

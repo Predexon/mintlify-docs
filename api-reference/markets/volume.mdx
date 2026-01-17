@@ -6,32 +6,6 @@ description: "Get historical cumulative volume data for a market"
 
 Fetch historical cumulative trading volume for a token.
 
-<RequestExample>
-```bash cURL
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/polymarket/markets/21742633.../volume?granularity=day"
-```
-
-```python Python
-import requests
-
-response = requests.get(
-    f"https://api.predexon.com/v1/polymarket/markets/{token_id}/volume",
-    headers={"x-api-key": "YOUR_API_KEY"},
-    params={"granularity": "day", "start_time": 1704067200, "end_time": 1706745600}
-)
-volume_data = response.json()["volume_over_time"]
-```
-
-```typescript TypeScript
-const response = await fetch(
-  `https://api.predexon.com/v1/polymarket/markets/${tokenId}/volume?granularity=day`,
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { volume_over_time } = await response.json();
-```
-</RequestExample>
-
 <ResponseExample>
 ```json 200
 {

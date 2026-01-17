@@ -6,32 +6,6 @@ description: "Get historical open interest data for a market"
 
 Fetch historical open interest for a market. Open interest represents total outstanding positions (can increase or decrease, unlike cumulative volume).
 
-<RequestExample>
-```bash cURL
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/polymarket/markets/0x1234.../open_interest?granularity=week"
-```
-
-```python Python
-import requests
-
-response = requests.get(
-    f"https://api.predexon.com/v1/polymarket/markets/{condition_id}/open_interest",
-    headers={"x-api-key": "YOUR_API_KEY"},
-    params={"granularity": "week"}
-)
-oi_data = response.json()["open_interest_over_time"]
-```
-
-```typescript TypeScript
-const response = await fetch(
-  `https://api.predexon.com/v1/polymarket/markets/${conditionId}/open_interest?granularity=week`,
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { open_interest_over_time } = await response.json();
-```
-</RequestExample>
-
 <ResponseExample>
 ```json 200
 {

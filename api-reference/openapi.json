@@ -1132,6 +1132,28 @@
             "description": "Filter by market slug(s)"
           },
           {
+            "name": "token_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 50
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by token ID(s)",
+              "title": "Token Id"
+            },
+            "description": "Filter by token ID(s)"
+          },
+          {
             "name": "sort",
             "in": "query",
             "required": false,

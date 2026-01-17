@@ -6,45 +6,6 @@ description: "Fetch historical trade data"
 
 Query historical trade data with flexible filtering by market, token, user, and time range. At least one of `market_slug`, `condition_id`, `token_id`, or `user` is required.
 
-<RequestExample>
-```bash cURL
-# Trades for a specific market
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/polymarket/trades?market_slug=will-donald-trump-win-the-2024-us-presidential-election&limit=50"
-
-# Trades for a specific user
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://api.predexon.com/v1/polymarket/trades?user=0x1234...&limit=100"
-```
-
-```python Python
-import requests
-
-# Get recent trades for a market
-response = requests.get(
-    "https://api.predexon.com/v1/polymarket/trades",
-    headers={"x-api-key": "YOUR_API_KEY"},
-    params={
-        "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-        "order": "desc",
-        "limit": 50
-    }
-)
-
-for order in response.json()["orders"]:
-    side_emoji = "📈" if order["side"] == "BUY" else "📉"
-    print(f"{side_emoji} {order['side']} {order['shares']:.2f} @ {order['price']:.4f}")
-```
-
-```typescript TypeScript
-const response = await fetch(
-  "https://api.predexon.com/v1/polymarket/trades?user=0x1234...&limit=100",
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { orders } = await response.json();
-```
-</RequestExample>
-
 <ResponseExample>
 ```json 200
 {
