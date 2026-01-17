@@ -5,6 +5,20 @@ description: "API updates, new features, and breaking changes"
 
 ## January 2026
 
+### January 16, 2026
+
+#### New Features
+
+<Card title="Trading API" icon="chart-line">
+  Added support for trading on Polymarket and Kalshi prediction markets:
+  - `POST /api/users/{userId}/orders` - Place buy or sell orders
+  - `GET /api/users/{userId}/positions` - Get current positions with PnL
+  - `GET /api/users/{userId}/balance` - Get available balances
+  - `POST /api/users/{userId}/redeem` - Redeem resolved positions
+</Card>
+
+---
+
 ### January 15, 2026
 
 #### Schema Updates
