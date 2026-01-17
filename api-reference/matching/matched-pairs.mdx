@@ -26,51 +26,6 @@ All pairs returned by this endpoint have a similarity score of **95 or higher** 
 **For maximum accuracy:** Filter with `min_similarity=98` when precision is critical (e.g., automated trading systems). The 95-97 range is generally reliable but may contain occasional false positives where resolution criteria have minor discrepancies.
 </Info>
 
-<ParamField query="min_similarity" type="integer">
-  Minimum similarity score filter (0-100). Only return pairs with similarity >= this value.
-</ParamField>
-
-<ParamField query="limit" type="integer" default="50">
-  Maximum number of pairs to return (1-50)
-</ParamField>
-
-<ParamField query="pagination_key" type="string">
-  Pagination key for cursor-based pagination (from previous response)
-</ParamField>
-
-<ResponseField name="pairs" type="array">
-  <Expandable title="Matched pair">
-    <ResponseField name="POLYMARKET" type="object">
-      <Expandable>
-        <ResponseField name="market_slug" type="string">Polymarket market slug</ResponseField>
-        <ResponseField name="title" type="string">Market title</ResponseField>
-      </Expandable>
-    </ResponseField>
-    <ResponseField name="KALSHI" type="object">
-      <Expandable>
-        <ResponseField name="market_ticker" type="string">Kalshi market ticker</ResponseField>
-        <ResponseField name="title" type="string">Market title</ResponseField>
-        <ResponseField name="yes_subtitle" type="string">Yes outcome subtitle</ResponseField>
-      </Expandable>
-    </ResponseField>
-    <ResponseField name="similarity" type="integer">
-      Similarity score (0-100). May be `null` for older matches.
-    </ResponseField>
-    <ResponseField name="explanation" type="string">
-      Why these markets are considered an exact match. May be `null` for older matches.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  <Expandable>
-    <ResponseField name="limit" type="integer">Requested limit</ResponseField>
-    <ResponseField name="count" type="integer">Number of pairs returned</ResponseField>
-    <ResponseField name="pagination_key" type="string">Key for next page (null if no more)</ResponseField>
-    <ResponseField name="has_more" type="boolean">Whether more results are available</ResponseField>
-  </Expandable>
-</ResponseField>
-
 <RequestExample>
 ```bash cURL
 # Get top matched pairs
