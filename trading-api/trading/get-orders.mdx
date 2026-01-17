@@ -4,43 +4,6 @@ title: "Get Orders"
 description: "Get open orders for a user"
 ---
 
-<RequestExample>
-```bash cURL
-# Get all open orders
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders"
-
-# Get Polymarket orders only
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/orders?venue=polymarket"
-```
-
-```python Python
-import requests
-
-user_id = "550e8400-e29b-41d4-a716-446655440000"
-
-response = requests.get(
-    f"https://trade.predexon.com/api/users/{user_id}/orders",
-    headers={"x-api-key": "YOUR_API_KEY"}
-)
-orders = response.json()["orders"]
-
-for order in orders:
-    print(f"{order['side']} {order['amount']} @ {order['price']} - {order['status']}")
-```
-
-```typescript TypeScript
-const userId = "550e8400-e29b-41d4-a716-446655440000";
-
-const response = await fetch(
-  `https://trade.predexon.com/api/users/${userId}/orders`,
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { orders } = await response.json();
-```
-</RequestExample>
-
 <ResponseExample>
 ```json 200 OK
 {

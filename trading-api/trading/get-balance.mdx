@@ -4,49 +4,6 @@ title: "Get Balance"
 description: "Get USDC balance across trading venues"
 ---
 
-<RequestExample>
-
-```bash cURL
-# Get all balances
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/balance"
-
-# Get Polymarket balance only
-curl -H "x-api-key: YOUR_API_KEY" \
-  "https://trade.predexon.com/api/users/550e8400-e29b-41d4-a716-446655440000/balance?venue=polymarket"
-```
-
-
-```python Python
-import requests
-
-user_id = "550e8400-e29b-41d4-a716-446655440000"
-HEADERS = {"x-api-key": "YOUR_API_KEY"}
-
-# Get all balances
-response = requests.get(
-    f"https://trade.predexon.com/api/users/{user_id}/balance",
-    headers=HEADERS
-)
-balances = response.json()["balances"]
-
-for balance in balances:
-    print(f"{balance['venue']}: ${balance['available']} available, ${balance['locked']} locked")
-```
-
-
-```typescript TypeScript
-const userId = "550e8400-e29b-41d4-a716-446655440000";
-
-const response = await fetch(
-  `https://trade.predexon.com/api/users/${userId}/balance`,
-  { headers: { "x-api-key": "YOUR_API_KEY" } }
-);
-const { balances } = await response.json();
-```
-
-</RequestExample>
-
 <ResponseExample>
 
 ```json 200 OK
