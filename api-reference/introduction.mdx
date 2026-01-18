@@ -166,9 +166,10 @@ The complete OpenAPI 3.0 specification is available for generating client SDKs:
 
 ## Rate Limits
 
-| Tier | Rate | Quota |
-|------|------|-------|
-| Free | 1 req/sec | 100k/month |
-| Pro | 20 req/sec (40 burst) | Unlimited |
+| Tier | Rate Limit | Monthly Requests | Price |
+|------|------------|------------------|-------|
+| Free | 1 req/sec | 25,000 | $0/month |
+| Pro | 20 req/sec (40 burst) | Unlimited | $129/month |
+| Desk | 100 req/sec (200 burst) | Unlimited | $499/month |
 
-Implement exponential backoff when you receive 429 responses.
+Implement exponential backoff when you receive 429 responses. See [predexon.com/pricing](https://predexon.com/pricing) for full details.
