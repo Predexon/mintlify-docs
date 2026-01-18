@@ -31,14 +31,18 @@ You can use the [Bridge API](/trading-api/funds/deposit-info) to deposit from Et
 
 | Constraint | Value |
 |------------|-------|
-| Price tick size | 0.01 (can vary by market) |
+| Price | Must be a multiple of the market's `tick_size` |
 | Min limit order | > 5 shares (amount / price) |
 | Min market order | > 1 USDC |
 | Amount precision | 2 decimal places |
 
-<Warning>
-Orders with prices that don't match the tick size will be rejected. Valid: `0.01`, `0.25`, `0.50`, `0.99`. Invalid: `0.333`, `0.505`.
-</Warning>
+<Note>
+Tick size varies by market. A price is valid if `price / tick_size` is an integer.
+- `tick_size = 0.01` → `0.65` valid, `0.655` invalid
+- `tick_size = 0.001` → `0.655` valid
+
+You can fetch `tick_size` from the [orderbook endpoint](/api-reference/markets/orderbooks).
+</Note>
 
 ## Order Status
 
