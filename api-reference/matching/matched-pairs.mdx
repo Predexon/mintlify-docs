@@ -8,6 +8,10 @@ description: "Get all active exact-matched market pairs across Polymarket and Ka
 
 Get all active exact-matched market pairs between Polymarket and Kalshi. This endpoint returns pre-computed pairs where both markets are currently active, ordered by similarity score (highest first).
 
+<Warning>
+**LLM-Based Matching**: Market matching is powered by large language models (LLMs). There is a small percentage of markets where hallucinations may occur, resulting in invalid or incorrect matches. Always verify matches before making trading decisions.
+</Warning>
+
 ## What is an "Exact" Match?
 
 An **exact match** refers to market pairs that track the same real-world outcome and will resolve identically - when one resolves YES, the other will also resolve YES (and vice versa for NO). These are markets asking fundamentally the same question, even if the wording differs slightly between platforms.
