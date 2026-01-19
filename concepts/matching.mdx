@@ -14,11 +14,15 @@ Predexon market matching API helps you discover equivalent or related markets ac
 
 ## How Matching Works
 
-Our matching algorithm uses a knowledge graph built from:
+Our matching algorithm is **LLM-based**, using a knowledge graph built from:
 - Event metadata and descriptions
 - Resolution criteria
 - Time constraints
 - Semantic similarity
+
+<Warning>
+**LLM-Based Matching Limitations**: Because market matching relies on large language models (LLMs), there is a small percentage of markets where hallucinations may occur, resulting in invalid or incorrect market matches. Always verify matches before making trading decisions, especially for high-stakes arbitrage opportunities.
+</Warning>
 
 ### Match Types
 
