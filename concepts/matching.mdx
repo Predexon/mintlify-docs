@@ -28,8 +28,8 @@ Our matching algorithm is **LLM-based**, using a knowledge graph built from:
 
 | Type | Description | Similarity Score |
 |------|-------------|------------------|
-| **Exact** | Same underlying event with identical resolution criteria — will always resolve identically | >= 0.95 |
-| **Related** | Similar events or correlated outcomes (same entity different outcome, or same event different candidate) | 0.90 - 0.95 |
+| **Exact** | Same underlying event with equivalent or near-equivalent resolution criteria | >= 95 |
+| **Related** | Similar events or correlated outcomes (same entity different outcome, or same event different candidate) | 80 - 95 |
 
 <Info>
 The `similarity` field may be `null` for matches created before January 4th, 2025.
@@ -70,13 +70,14 @@ for match in data['matches']['KALSHI']['related']:
 ```python
 response = requests.get(
     f"{BASE_URL}/v1/matching-markets",
-    params={"kalshi_market_ticker": "KXNHLMETROPOLITAN-26-CAR"}
+    params={"kalshi_market_ticker": "KXPERFORMGRAMMYS-26-CHA"}
 )
 
 data = response.json()
 
 for match in data['matches']['POLYMARKET']['exact']:
     print(f"  {match['title']}")
+    print(f"    Condition ID: {match['condition_id']}")
     print(f"    Slug: {match['market_slug']}")
     print(f"    Explanation: {match['explanation']}")
     print(f"    Similarity: {match['similarity']}")
@@ -88,70 +89,34 @@ for match in data['matches']['POLYMARKET']['exact']:
 {
   "query": {
     "platform": "KALSHI",
-    "market_ticker": "KXNHLMETROPOLITAN-26-CAR",
-    "title": "Will Carolina Hurricanes win the NHL Metropolitan Division?",
-    "yes_subtitle": "Carolina Hurricanes",
+    "market_ticker": "KXPERFORMGRAMMYS-26-CHA",
+    "title": "Who will perform at the 68th Grammy Awards?",
+    "yes_subtitle": "Chappell Roan",
     "status": "active"
   },
   "matches": {
     "POLYMARKET": {
       "exact": [
         {
-          "market_slug": "will-the-carolina-hurricanes-win-the-metropolitan-division-123",
-          "title": "Will the Carolina Hurricanes win the Metropolitan Division?",
+          "condition_id": "0x6f14e52f...",
+          "market_slug": "will-chappell-roan-perform-at-the-2026-grammy-awards",
+          "market_id": "1137275",
+          "title": "Will Chappell Roan perform at the 2026 Grammy Awards?",
           "status": "active",
-          "explanation": "Same entity (Carolina Hurricanes), same outcome (win the 2025–26 NHL Metropolitan Division), same timeframe (2025–26 regular season) — will always resolve identically.",
-          "similarity": 0.97
+          "similarity": 96,
+          "explanation": "..."
         }
       ],
-      "related": [
-        {
-          "market_slug": "will-the-carolina-hurricanes-win-the-2026-nhl-stanley-cup",
-          "title": "Will the Carolina Hurricanes win the 2026 NHL Stanley Cup?",
-          "status": "active",
-          "explanation": "Same entity (Carolina Hurricanes) but different outcome/event (win the 2026 Stanley Cup vs win the 2025–26 Metropolitan Division).",
-          "similarity": 0.94
-        },
-        {
-          "market_slug": "will-the-new-jersey-devils-win-the-metropolitan-division-424",
-          "title": "Will the New Jersey Devils win the Metropolitan Division?",
-          "status": "active",
-          "explanation": "Same event (which team wins the 2025–26 Metropolitan Division) but different candidate/team (New Jersey Devils vs Carolina Hurricanes) — competitive and thus correlated.",
-          "similarity": 0.92
-        }
-      ]
+      "related": []
     }
   },
   "summary": {
-    "total_matches": 3,
+    "total_matches": 1,
     "exact_matches": 1,
-    "related_matches": 2,
+    "related_matches": 0,
     "platforms": ["POLYMARKET"]
   }
 }
-```
-
-## Batch Matching
-
-For efficiency, query multiple markets at once:
-
-```python
-response = requests.get(
-    f"{BASE_URL}/v1/matching-markets/batch",
-    params={
-        "polymarket_market_slugs": [
-            "will-donald-trump-win-the-2024-us-presidential-election",
-            "will-fed-cut-rates-january",
-            "will-btc-hit-100k"
-        ]
-    }
-)
-
-data = response.json()
-
-for slug, result in data['markets'].items():
-    print(f"\n{slug}:")
-    print(f"  Matches: {result['summary']['total_matches']}")
 ```
 
 ## Arbitrage Detection Example

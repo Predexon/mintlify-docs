@@ -16,6 +16,24 @@
         "operationId": "get_matching_markets_v1_matching_markets_get",
         "parameters": [
           {
+            "name": "polymarket_condition_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Polymarket condition ID (hex)",
+              "title": "Polymarket Condition ID"
+            },
+            "description": "Polymarket condition ID (hex)"
+          },
+          {
             "name": "polymarket_market_slug",
             "in": "query",
             "required": false,
@@ -28,11 +46,28 @@
                   "type": "null"
                 }
               ],
-              "description": "Polymarket market slug to find matches for",
+              "description": "Polymarket market slug",
               "title": "Polymarket Market Slug"
             },
-            "description": "Polymarket market slug to find matches for",
-            "example": "bitcoin-up-or-down-july-25-8pm-et"
+            "description": "Polymarket market slug"
+          },
+          {
+            "name": "polymarket_market_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Polymarket market ID",
+              "title": "Polymarket Market ID"
+            },
+            "description": "Polymarket market ID"
           },
           {
             "name": "kalshi_market_ticker",
@@ -47,11 +82,30 @@
                   "type": "null"
                 }
               ],
-              "description": "Kalshi market ticker to find matches for",
+              "description": "Kalshi market ticker",
               "title": "Kalshi Market Ticker"
             },
-            "description": "Kalshi market ticker to find matches for",
-            "example": "KXNFLGAME-25AUG16ARIDEN"
+            "description": "Kalshi market ticker"
+          },
+          {
+            "name": "match_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": ["exact", "related", "all"]
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by match type: exact, related, or all",
+              "default": "all",
+              "title": "Match Type"
+            },
+            "description": "Filter by match type: exact, related, or all (default: all)"
           }
         ],
         "responses": {
@@ -151,10 +205,10 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 50,
+              "maximum": 1000,
               "minimum": 1,
               "description": "Maximum number of pairs to return",
-              "default": 50,
+              "default": 100,
               "title": "Limit"
             },
             "description": "Maximum number of pairs to return"
@@ -3924,6 +3978,11 @@
           "KALSHI": {
             "$ref": "#/components/schemas/KalshiPairInfo"
           },
+          "match_type": {
+            "type": "string",
+            "title": "Match Type",
+            "description": "Type of match: exact or related"
+          },
           "similarity": {
             "anyOf": [
               {
@@ -3950,10 +4009,11 @@
         "type": "object",
         "required": [
           "POLYMARKET",
-          "KALSHI"
+          "KALSHI",
+          "match_type"
         ],
         "title": "MatchedPair",
-        "description": "A matched pair of markets (exact matches only)."
+        "description": "A matched pair of markets."
       },
       "MatchedPairsPagination": {
         "properties": {
@@ -4029,6 +4089,124 @@
         "type": "object",
         "title": "MatchesByType",
         "description": "Matches grouped by exact/related."
+      },
+      "PolymarketMatchItem": {
+        "properties": {
+          "condition_id": {
+            "type": "string",
+            "title": "Condition ID",
+            "description": "Polymarket condition ID (hex)"
+          },
+          "market_slug": {
+            "type": "string",
+            "title": "Market Slug"
+          },
+          "market_id": {
+            "type": "string",
+            "title": "Market ID"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Market status: active or closed"
+          },
+          "similarity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Similarity",
+            "description": "Similarity score (0-100)"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "condition_id",
+          "market_slug",
+          "market_id",
+          "title",
+          "status"
+        ],
+        "title": "PolymarketMatchItem",
+        "description": "Polymarket market match info."
+      },
+      "KalshiMatchItem": {
+        "properties": {
+          "market_ticker": {
+            "type": "string",
+            "title": "Market Ticker"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "yes_subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yes Subtitle"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Market status: active or closed"
+          },
+          "similarity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Similarity",
+            "description": "Similarity score (0-100)"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "market_ticker",
+          "title",
+          "status"
+        ],
+        "title": "KalshiMatchItem",
+        "description": "Kalshi market match info."
       },
       "OffsetPagination": {
         "properties": {
@@ -4445,9 +4623,19 @@
       },
       "PolymarketPairInfo": {
         "properties": {
+          "condition_id": {
+            "type": "string",
+            "title": "Condition ID",
+            "description": "Polymarket condition ID (hex)"
+          },
           "market_slug": {
             "type": "string",
             "title": "Market Slug"
+          },
+          "market_id": {
+            "type": "string",
+            "title": "Market ID",
+            "description": "Polymarket market ID"
           },
           "title": {
             "type": "string",
@@ -4456,7 +4644,9 @@
         },
         "type": "object",
         "required": [
+          "condition_id",
           "market_slug",
+          "market_id",
           "title"
         ],
         "title": "PolymarketPairInfo",
@@ -4469,9 +4659,19 @@
             "title": "Platform",
             "default": "POLYMARKET"
           },
+          "condition_id": {
+            "type": "string",
+            "title": "Condition ID",
+            "description": "Polymarket condition ID (hex)"
+          },
           "market_slug": {
             "type": "string",
             "title": "Market Slug"
+          },
+          "market_id": {
+            "type": "string",
+            "title": "Market ID",
+            "description": "Polymarket market ID"
           },
           "title": {
             "type": "string",
@@ -4484,7 +4684,9 @@
         },
         "type": "object",
         "required": [
+          "condition_id",
           "market_slug",
+          "market_id",
           "title",
           "status"
         ],

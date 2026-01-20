@@ -5,6 +5,20 @@ description: "API updates, new features, and breaking changes"
 
 ## January 2026
 
+### January 19, 2026
+
+#### Schema Updates
+
+| Endpoint | Change |
+|----------|--------|
+| `/v1/matching-markets` | Added `polymarket_condition_id` and `polymarket_market_id` query parameters |
+| `/v1/matching-markets` | Added `match_type` query parameter to filter by `exact`, `related`, or `all` |
+| `/v1/matching-markets` | Response now includes `condition_id` and `market_id` fields for Polymarket markets |
+| `/v1/matching-markets/pairs` | Response now includes `condition_id` and `market_id` fields for Polymarket markets |
+| `/v1/matching-markets/pairs` | Response now includes `match_type` field for each pair |
+
+---
+
 ### January 16, 2026
 
 #### New Features
