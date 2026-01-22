@@ -4,7 +4,7 @@ description: "Use Predexon API with AI assistants via Model Context Protocol"
 ---
 
 <Info>
-The Predexon MCP server lets AI assistants like Claude, Cursor, Windsurf, and others directly query prediction market data from Polymarket, Kalshi, and Dflow.
+The Predexon MCP server lets AI assistants like Claude, Cursor, Windsurf, Codex, and others directly query prediction market data from Polymarket, Kalshi, and Dflow.
 </Info>
 
 ## What is MCP?
@@ -160,6 +160,23 @@ npx predexon-mcp
     ```
 
     [Cline MCP Docs](https://docs.cline.bot/mcp/configuring-mcp-servers)
+  </Tab>
+
+  <Tab title="Codex">
+    OpenAI Codex CLI uses TOML configuration. Edit `~/.codex/config.toml`:
+
+    ```toml
+    [mcp_servers.predexon]
+    command = "npx"
+    args = ["-y", "predexon-mcp"]
+    ```
+
+    Or add via CLI:
+    ```bash
+    codex mcp add predexon -- npx -y predexon-mcp
+    ```
+
+    [Codex MCP Docs](https://developers.openai.com/codex/mcp/)
   </Tab>
 </Tabs>
 
