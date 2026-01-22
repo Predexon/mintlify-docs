@@ -188,8 +188,12 @@ The MCP server exposes all Predexon Data API endpoints as tools. Your API key is
 
 | Tool | Description |
 |------|-------------|
-| `find_matching_markets` | Find equivalent markets across Polymarket and Kalshi |
-| `get_matched_pairs` | Get all active matched market pairs |
+| `find_matching_markets` | Find equivalent markets across Polymarket and Kalshi (LLM-powered) |
+| `get_matched_pairs` | Get all active matched market pairs (LLM-powered) |
+
+<Note>
+Market matching is LLM-powered. While highly accurate, a small number of matches may be incorrect—verify critical matches independently.
+</Note>
 
 ### Polymarket
 
