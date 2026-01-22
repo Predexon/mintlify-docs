@@ -1,0 +1,265 @@
+---
+title: "MCP Server"
+description: "Use Predexon API with AI assistants via Model Context Protocol"
+---
+
+<Info>
+The Predexon MCP server lets AI assistants like Claude, Cursor, Windsurf, and others directly query prediction market data from Polymarket, Kalshi, and Dflow.
+</Info>
+
+## What is MCP?
+
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io) is an open standard that allows AI assistants to interact with external tools and data sources. With the Predexon MCP server, you can ask your AI assistant questions like:
+
+- "What are the top prediction markets by volume?"
+- "Show me the price history for this market"
+- "Find matching markets across Polymarket and Kalshi"
+- "What positions does this wallet hold?"
+
+## Installation
+
+Install the Predexon MCP server from npm:
+
+```bash
+npm install -g predexon-mcp
+```
+
+Or run directly with npx (no installation required):
+
+```bash
+npx predexon-mcp
+```
+
+## Configuration
+
+<Tabs>
+  <Tab title="Claude Desktop">
+    Edit your Claude Desktop configuration file:
+
+    **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+    **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+    ```json
+    {
+      "mcpServers": {
+        "predexon": {
+          "command": "npx",
+          "args": ["-y", "predexon-mcp"]
+        }
+      }
+    }
+    ```
+
+    Restart Claude Desktop after saving.
+  </Tab>
+
+  <Tab title="Claude Code">
+    Add the MCP server via CLI:
+
+    ```bash
+    claude mcp add predexon npx predexon-mcp
+    ```
+
+    Or manually edit `~/.claude.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "predexon": {
+          "command": "npx",
+          "args": ["-y", "predexon-mcp"]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Cursor">
+    Cursor supports both global and project-specific MCP configuration.
+
+    **Global** (all projects): `~/.cursor/mcp.json`
+
+    **Project-specific**: `.cursor/mcp.json` in your project root
+
+    ```json
+    {
+      "mcpServers": {
+        "predexon": {
+          "command": "npx",
+          "args": ["-y", "predexon-mcp"]
+        }
+      }
+    }
+    ```
+
+    Verify the connection in **Settings > Cursor Settings > MCP**. A green dot indicates the server is connected.
+
+    [Cursor MCP Docs](https://cursor.com/docs/context/mcp)
+  </Tab>
+
+  <Tab title="Windsurf">
+    Edit the Windsurf MCP configuration file:
+
+    **Path**: `~/.codeium/windsurf/mcp_config.json`
+
+    ```json
+    {
+      "mcpServers": {
+        "predexon": {
+          "command": "npx",
+          "args": ["-y", "predexon-mcp"]
+        }
+      }
+    }
+    ```
+
+    You can also add MCP servers from the MCP icon in the Cascade panel, or via **Windsurf Settings > Cascade > MCP Servers**.
+
+    [Windsurf MCP Docs](https://docs.windsurf.com/windsurf/cascade/mcp)
+  </Tab>
+
+  <Tab title="VS Code">
+    VS Code supports MCP servers through GitHub Copilot.
+
+    **Global**: Open your user `mcp.json` via Command Palette
+
+    **Project-specific**: `.vscode/mcp.json` in your workspace
+
+    ```json
+    {
+      "servers": {
+        "predexon": {
+          "command": "npx",
+          "args": ["-y", "predexon-mcp"]
+        }
+      }
+    }
+    ```
+
+    Or add via CLI:
+    ```bash
+    code --add-mcp '{"name":"predexon","command":"npx","args":["-y","predexon-mcp"]}'
+    ```
+
+    [VS Code MCP Docs](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
+  </Tab>
+
+  <Tab title="Cline">
+    In Cline, click the **MCP Servers** icon in the sidebar, then click **Edit MCP Settings** to open the configuration file. Add:
+
+    ```json
+    {
+      "mcpServers": {
+        "predexon": {
+          "command": "npx",
+          "args": ["-y", "predexon-mcp"]
+        }
+      }
+    }
+    ```
+
+    [Cline MCP Docs](https://docs.cline.bot/mcp/configuring-mcp-servers)
+  </Tab>
+</Tabs>
+
+## Available Tools
+
+The MCP server exposes all Predexon Data API endpoints as tools. Your API key is passed per-request, allowing multi-user setups.
+
+### Cross-Platform Matching
+
+| Tool | Description |
+|------|-------------|
+| `find_matching_markets` | Find equivalent markets across Polymarket and Kalshi |
+| `get_matched_pairs` | Get all active matched market pairs |
+
+### Polymarket
+
+| Tool | Description |
+|------|-------------|
+| `list_polymarket_markets` | List markets with filtering and sorting |
+| `get_polymarket_price` | Get current or historical price for a token |
+| `get_polymarket_candlesticks` | Get OHLCV candlestick data |
+| `get_polymarket_volume` | Get historical volume time series |
+| `get_polymarket_open_interest` | Get historical open interest |
+| `get_polymarket_orderbooks` | Get historical orderbook snapshots |
+| `get_polymarket_trades` | Query historical trade data |
+| `get_polymarket_activity` | Get trading activity for a wallet |
+| `get_polymarket_positions` | Get positions for a wallet |
+| `get_polymarket_pnl` | Get realized P&L history for a wallet |
+
+### Kalshi
+
+| Tool | Description |
+|------|-------------|
+| `list_kalshi_markets` | List markets with filtering and sorting |
+| `get_kalshi_trades` | Fetch historical trade data |
+| `get_kalshi_orderbooks` | Fetch historical orderbook snapshots |
+
+### Dflow
+
+| Tool | Description |
+|------|-------------|
+| `get_dflow_trades` | Fetch trade history for a wallet |
+| `get_dflow_positions` | Get current positions for a wallet |
+| `get_dflow_pnl` | Get cumulative P&L history |
+
+## Example Usage
+
+Once configured, you can ask your AI assistant questions naturally:
+
+<CodeGroup>
+```text Query Markets
+"What are the top 5 Polymarket markets by volume right now?"
+```
+
+```text Price History
+"Show me the price history for the Trump 2024 election market over the last week"
+```
+
+```text Cross-Platform
+"Find the Kalshi equivalent of this Polymarket market: will-bitcoin-hit-100k-in-2024"
+```
+
+```text Wallet Analysis
+"What positions does wallet 0x1234... hold on Polymarket?"
+```
+</CodeGroup>
+
+## Authentication
+
+Each tool call requires an `api_key` parameter. When using the MCP server, include your API key when making requests:
+
+```text
+"Using API key abc123, show me the top markets on Polymarket"
+```
+
+<Tip>
+Get your free API key at [dashboard.predexon.com](https://dashboard.predexon.com)
+</Tip>
+
+## Source Code
+
+The MCP server is open source:
+
+- **npm**: [npmjs.com/package/predexon-mcp](https://www.npmjs.com/package/predexon-mcp)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/introduction"
+  >
+    Explore all available endpoints
+  </Card>
+  <Card
+    title="Get API Key"
+    icon="key"
+    href="https://dashboard.predexon.com"
+  >
+    Sign up for free access
+  </Card>
+</CardGroup>
