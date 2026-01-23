@@ -1,0 +1,272 @@
+---
+title: "TypeScript"
+description: "Type exports, interfaces, and module formats"
+---
+
+The SDK is written in TypeScript and exports all types for full type safety.
+
+## Importing Types
+
+```typescript
+import type {
+  // Core types
+  Venue,
+  OrderSide,
+
+  // Request types
+  PlaceOrderRequest,
+  PrepareOrderRequest,
+  EnableTradingRequest,
+  RedeemRequest,
+
+  // Response types
+  PlaceOrderResponse,
+  EnableTradingResponse,
+  RedeemResponse,
+  OpenOrder,
+  Position,
+  Balance,
+
+  // Flags
+  PolymarketFlags,
+  KalshiFlags,
+
+  // Wallet types
+  EvmSigner,
+  SolanaSigner,
+  PrivySigner,
+  Eip712TypedData,
+  EvmTransactionRequest,
+
+  // Config
+  PredexonSdkConfig,
+
+  // Order types
+  PolymarketOrder,
+  KalshiOrderParams,
+
+  // Approval types
+  ApprovalStatus,
+  ApprovalTransaction,
+} from '@predexon/trade-sdk';
+```
+
+## Core Types
+
+### Venue
+
+```typescript
+type Venue = 'polymarket' | 'kalshi';
+```
+
+### OrderSide
+
+```typescript
+type OrderSide = 'buy' | 'sell';
+```
+
+## Request Types
+
+### PlaceOrderRequest
+
+```typescript
+interface PlaceOrderRequest {
+  core: {
+    venue: Venue;
+    wallet: string;
+    side: OrderSide;
+    type: 'market' | 'limit';
+    amount?: string;  // USDC amount (market buy)
+    size?: string;    // Share count
+    price?: string;   // Price per share (limit orders)
+  };
+  flags: PolymarketFlags | KalshiFlags;
+  idempotencyKey?: string;
+}
+```
+
+### EnableTradingRequest
+
+```typescript
+interface EnableTradingRequest {
+  core: {
+    venue: Venue;
+    wallet: string;
+  };
+  approvals?: 'auto' | 'manual' | 'skip'; // Polymarket only
+}
+```
+
+## Response Types
+
+### PlaceOrderResponse
+
+```typescript
+interface PlaceOrderResponse {
+  orderId: string;
+  venue: Venue;
+  status: 'filled' | 'pending' | 'canceled' | 'failed' | 'reverted';
+  price: string | null;
+  amount?: string;
+  size?: string;
+  filledAmount?: string;
+  createdAt: string;
+  message?: string;
+}
+```
+
+### Position
+
+```typescript
+interface Position {
+  venue: Venue;
+  tokenId?: string;        // Polymarket
+  ticker?: string;         // Kalshi
+  title?: string | null;
+  outcome: string;
+  size: string;
+  status: 'active' | 'resolved' | 'redeemable';
+  result?: 'won' | 'lost' | null;
+  averagePrice?: string | null;
+  currentPrice?: string | null;
+  currentValue?: string | null;
+  pnl?: string | null;
+}
+```
+
+### Balance
+
+```typescript
+interface Balance {
+  venue: Venue;
+  available: string;
+  locked: string;
+  total: string;
+}
+```
+
+## Wallet Types
+
+### EvmSigner
+
+```typescript
+interface EvmSigner {
+  getAddress(): Promise<string>;
+  signTypedData(typedData: Eip712TypedData): Promise<string>;
+  signTransaction(tx: EvmTransactionRequest): Promise<string>;
+}
+```
+
+### SolanaSigner
+
+```typescript
+interface SolanaSigner {
+  signSolanaTransaction(transactionBase64: string): Promise<string>;
+  signSolanaMessage?(message: string): Promise<string>;
+}
+```
+
+### Eip712TypedData
+
+```typescript
+interface Eip712TypedData {
+  domain: Record<string, unknown>;
+  types: Record<string, Array<{ name: string; type: string }>>;
+  primaryType: string;
+  message: Record<string, unknown>;
+}
+```
+
+### EvmTransactionRequest
+
+```typescript
+interface EvmTransactionRequest {
+  to: string;
+  data: string;
+  value: string;
+  chainId?: number;
+  nonce?: number;
+}
+```
+
+## Flag Types
+
+### PolymarketFlags
+
+```typescript
+interface PolymarketFlags {
+  tokenId: string;
+  feeRateBps?: string;
+  expiration?: string;
+}
+```
+
+### KalshiFlags
+
+```typescript
+interface KalshiFlags {
+  ticker: string;
+  outcome: 'Yes' | 'No';
+  executionMode?: 'sync' | 'async';
+}
+```
+
+## Module Formats
+
+The SDK ships as dual ESM/CJS:
+
+<CodeGroup>
+```typescript ESM (recommended)
+import { PredexonSDK } from '@predexon/trade-sdk';
+```
+
+```javascript CommonJS
+const { PredexonSDK } = require('@predexon/trade-sdk');
+```
+</CodeGroup>
+
+## Type-Safe Usage Example
+
+```typescript
+import {
+  PredexonSDK,
+  createEvmAdapter,
+  type PlaceOrderRequest,
+  type PlaceOrderResponse,
+  type PolymarketFlags,
+} from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  wallet: createEvmAdapter(walletClient),
+});
+
+// Fully typed request
+const request: PlaceOrderRequest = {
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    amount: '10',
+    type: 'market',
+  },
+  flags: {
+    tokenId: '12345...',
+  } as PolymarketFlags,
+};
+
+// Fully typed response
+const response: PlaceOrderResponse = await sdk.placeOrder(request);
+console.log(response.orderId, response.status);
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    See all SDK methods
+  </Card>
+  <Card title="Examples" icon="file-code" href="/sdk/examples">
+    Complete code examples
+  </Card>
+</CardGroup>

@@ -1,0 +1,181 @@
+---
+title: "Order Semantics"
+description: "Required fields, constraints, and flags by venue and order type"
+---
+
+## Polymarket Order Parameters
+
+| Order Type | Side | Required | Description |
+|------------|------|----------|-------------|
+| Market | BUY | `amount` OR `size` | Specify USDC to spend OR shares to buy |
+| Market | SELL | `size` | Number of shares to sell |
+| Limit | BUY | `size` + `price` | Shares to buy at specified price |
+| Limit | SELL | `size` + `price` | Shares to sell at specified price |
+
+### Parameter Definitions
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `amount` | `string` | USDC value (how much to spend) |
+| `size` | `string` | Number of shares |
+| `price` | `string` | Price per share (must be > 0 and ≤ 1) |
+
+<Warning>
+For market BUY orders, provide either `amount` or `size`, not both.
+</Warning>
+
+## Kalshi Order Parameters
+
+| Order Type | Side | Required | Description |
+|------------|------|----------|-------------|
+| Market | BUY | `amount` | USDC amount to spend |
+| Market | SELL | `size` | Number of tokens to sell |
+
+<Info>
+Kalshi only supports market orders. Limit orders are not available.
+</Info>
+
+---
+
+## Flags Reference
+
+### PolymarketFlags
+
+```typescript
+interface PolymarketFlags {
+  tokenId: string;       // Required: The outcome token ID
+  feeRateBps?: string;   // Optional: Fee rate in basis points (default: '0')
+  expiration?: string;   // Optional: Order expiration timestamp (default: '0' = no expiration)
+}
+```
+
+| Flag | Required | Default | Description |
+|------|----------|---------|-------------|
+| `tokenId` | Yes | - | The outcome token ID for the market |
+| `feeRateBps` | No | `'0'` | Fee rate in basis points |
+| `expiration` | No | `'0'` | Unix timestamp for order expiration (`'0'` = no expiration) |
+
+### KalshiFlags
+
+```typescript
+interface KalshiFlags {
+  ticker: string;                    // Required: Market ticker symbol
+  outcome: 'Yes' | 'No';             // Required: Which outcome to trade
+  executionMode?: 'sync' | 'async';  // Optional: Execution mode (default: 'sync')
+}
+```
+
+| Flag | Required | Default | Description |
+|------|----------|---------|-------------|
+| `ticker` | Yes | - | Market ticker symbol (e.g., `'PRES-2024-DEM'`) |
+| `outcome` | Yes | - | Which outcome to trade: `'Yes'` or `'No'` |
+| `executionMode` | No | `'sync'` | Execution mode: `'sync'` or `'async'` |
+
+---
+
+## Validation Rules
+
+### Polymarket Validation
+
+| Rule | Description |
+|------|-------------|
+| tokenId required | Must be a non-empty string |
+| Price range | Must be > 0 and ≤ 1 |
+| Wallet match | Signer address must match wallet parameter |
+| Market BUY | Requires `amount` OR `size` (not both) |
+| Market SELL | Requires `size` only |
+| Limit orders | Requires `size` and `price` |
+| Min order size | Validated against orderbook minimum |
+
+### Kalshi Validation
+
+| Rule | Description |
+|------|-------------|
+| ticker required | Must be non-empty |
+| outcome required | Must be `'Yes'` or `'No'` |
+| Market orders only | Limit orders not supported |
+| Market BUY | Requires `amount` (USDC) |
+| Market SELL | Requires `size` (tokens) |
+| Positive amounts | All amounts must be > 0 |
+
+---
+
+## Examples
+
+### Polymarket Market Buy (by USDC amount)
+
+```typescript
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    amount: '100', // Spend $100 USDC
+    type: 'market',
+  },
+  flags: { tokenId: '12345...' },
+});
+```
+
+### Polymarket Market Buy (by share size)
+
+```typescript
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    size: '50', // Buy 50 shares
+    type: 'market',
+  },
+  flags: { tokenId: '12345...' },
+});
+```
+
+### Polymarket Limit Order
+
+```typescript
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    size: '100',
+    price: '0.65', // Must be > 0 and ≤ 1
+    type: 'limit',
+  },
+  flags: {
+    tokenId: '12345...',
+    expiration: '1735689600', // Optional: expires Jan 1, 2025
+  },
+});
+```
+
+### Kalshi Market Order
+
+```typescript
+await sdk.placeOrder({
+  core: {
+    venue: 'kalshi',
+    wallet: 'SolanaPublicKey...',
+    side: 'buy',
+    amount: '50',
+    type: 'market',
+  },
+  flags: {
+    ticker: 'PRES-2024-DEM',
+    outcome: 'Yes',
+  },
+});
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    See all SDK methods
+  </Card>
+  <Card title="Idempotency" icon="rotate" href="/sdk/idempotency">
+    Retry-safe order placement
+  </Card>
+</CardGroup>

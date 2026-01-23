@@ -1,0 +1,57 @@
+---
+title: "Changelog"
+description: "SDK release notes and version history"
+---
+
+## v0.0.2
+
+<Info>
+This release focuses on security improvements and validation enhancements.
+</Info>
+
+### Security Enhancements
+
+- **Local Polymarket redemption transaction construction** - Redemption transactions are now built locally using only the conditionId from the server, reducing trust requirements
+- **Kalshi Solana transaction signer validation** - Validates that your wallet is a required signer and no unexpected signers are present
+- **Echo field validation for Kalshi prepare responses** - Verifies that ticker, outcome, side, and amount in server responses match your original request
+
+### Dependencies
+
+- Added `@solana/web3.js` dependency for Solana transaction parsing and validation
+
+---
+
+## v0.0.1
+
+<Info>
+Initial release of the Predexon Trade SDK.
+</Info>
+
+### Features
+
+- **Polymarket support** - Full trading support including market and limit orders
+- **Kalshi support** - Market order support via DFlow infrastructure
+- **Local order construction** - Orders are built and signed locally using `@polymarket/clob-client`
+- **Wallet adapters** - Built-in adapters for EVM (viem, ethers.js, wagmi) and Privy wallets
+- **Comprehensive input validation** - All inputs validated before signing
+- **Typed error classes** - Specific error types for different failure scenarios
+
+### Core Methods
+
+- `enableTrading()` - One-time setup for venue trading
+- `placeOrder()` - Build, sign, and submit orders
+- `prepareOrder()` - Build and sign without submitting
+- `submitOrder()` - Submit a prepared order
+- `getOpenOrders()` - List open orders
+- `cancelOrder()` - Cancel a specific order
+- `cancelAllOrders()` - Cancel all open orders
+- `getPositions()` - Get current positions
+- `getBalance()` - Get wallet balance
+- `redeem()` - Redeem resolved positions
+
+### Security
+
+- Hard-locked API endpoint (`https://trade.predexon.com`)
+- No HTTP redirects allowed
+- HTTPS only
+- Local-first signing (keys never leave device)

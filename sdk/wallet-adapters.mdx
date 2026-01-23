@@ -1,0 +1,144 @@
+---
+title: "Wallet Adapters"
+description: "Adapters for EVM, Solana, and embedded wallets"
+---
+
+The SDK provides adapters to normalize different wallet implementations into a unified interface.
+
+## createEvmAdapter
+
+Adapts standard EVM wallets (ethers.js, viem, wagmi) to the SDK interface.
+
+```typescript
+import { createEvmAdapter } from '@predexon/trade-sdk';
+
+// With viem WalletClient
+const wallet = createEvmAdapter(walletClient);
+
+// With ethers.js Signer
+const wallet = createEvmAdapter(ethersSigner);
+
+// With wagmi
+const wallet = createEvmAdapter(wagmiWalletClient);
+```
+
+### Supported Wallet Shapes
+
+| Method | viem | ethers.js |
+|--------|------|-----------|
+| Get address | `address` property | `getAddress()` |
+| Sign typed data | `signTypedData(typedData)` | `_signTypedData(domain, types, value)` |
+| Sign transaction | `signTransaction(tx)` | `signTransaction(tx)` |
+
+## createPrivyAdapter
+
+Adapts Privy embedded wallets.
+
+```typescript
+import { createPrivyAdapter } from '@predexon/trade-sdk';
+
+const wallet = createPrivyAdapter(privyEmbeddedWallet);
+```
+
+## Custom Wallet Implementation
+
+You can implement the wallet interface directly for custom wallet providers:
+
+```typescript
+const customWallet = {
+  async getAddress(): Promise<string> {
+    return '0x...';
+  },
+  async signTypedData(typedData: Eip712TypedData): Promise<string> {
+    // Sign EIP-712 typed data
+    return signature;
+  },
+  async signTransaction(tx: EvmTransactionRequest): Promise<string> {
+    // Sign and serialize transaction
+    return signedTxHex;
+  },
+  // For Kalshi support:
+  async signSolanaTransaction(base64Tx: string): Promise<string> {
+    // Sign Solana transaction, return base64
+    return signedBase64;
+  },
+  async signSolanaMessage(message: string): Promise<string> {
+    // Sign arbitrary message
+    return signature;
+  },
+};
+```
+
+## Wallet Interface Types
+
+### EvmSigner (Polymarket)
+
+```typescript
+interface EvmSigner {
+  getAddress(): Promise<string>;
+  signTypedData(typedData: Eip712TypedData): Promise<string>;
+  signTransaction(tx: EvmTransactionRequest): Promise<string>;
+}
+
+interface Eip712TypedData {
+  domain: Record<string, unknown>;
+  types: Record<string, Array<{ name: string; type: string }>>;
+  primaryType: string;
+  message: Record<string, unknown>;
+}
+
+interface EvmTransactionRequest {
+  to: string;
+  data: string;
+  value: string;
+  chainId?: number;
+  nonce?: number;
+}
+```
+
+### SolanaSigner (Kalshi)
+
+```typescript
+interface SolanaSigner {
+  signSolanaTransaction(transactionBase64: string): Promise<string>;
+  signSolanaMessage?(message: string): Promise<string>; // Required for enableTrading
+}
+```
+
+<Note>
+The `signSolanaMessage` method is required for `enableTrading` on Kalshi to verify wallet ownership.
+</Note>
+
+## Browser Wallet Connection
+
+For browser-based applications:
+
+<CodeGroup>
+```typescript wagmi/viem
+import { getWalletClient } from '@wagmi/core';
+import { createEvmAdapter } from '@predexon/trade-sdk';
+
+const walletClient = await getWalletClient();
+const wallet = createEvmAdapter(walletClient);
+```
+
+```typescript Privy
+import { usePrivy } from '@privy-io/react-auth';
+import { createPrivyAdapter } from '@predexon/trade-sdk';
+
+const { user } = usePrivy();
+const embeddedWallet = user.wallet;
+const wallet = createPrivyAdapter(embeddedWallet);
+```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Use the SDK with your wallet
+  </Card>
+  <Card title="Security" icon="shield" href="/sdk/security">
+    Understand signing security
+  </Card>
+</CardGroup>

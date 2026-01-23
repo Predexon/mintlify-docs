@@ -1,0 +1,85 @@
+---
+title: "Configuration"
+description: "SDK constructor options and configuration"
+---
+
+## Constructor Options
+
+```typescript
+interface PredexonSdkConfig {
+  apiKey: string;                    // Required: Your Predexon API key
+  wallet?: EvmSigner & SolanaSigner; // Optional: Wallet for signing
+  timeouts?: {
+    requestMs?: number;              // Request timeout (default: 30000ms)
+  };
+}
+```
+
+## Configuration Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `apiKey` | `string` | Yes | - | Your Predexon API key |
+| `wallet` | `EvmSigner & SolanaSigner` | No | - | Wallet adapter for signing |
+| `timeouts.requestMs` | `number` | No | `30000` | Request timeout in milliseconds |
+
+## Basic Configuration
+
+```typescript
+import { PredexonSDK, createEvmAdapter } from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: 'pk_live_xxxxx',
+  wallet: createEvmAdapter(walletClient),
+});
+```
+
+## Custom Timeout
+
+```typescript
+const sdk = new PredexonSDK({
+  apiKey: 'pk_live_xxxxx',
+  wallet: createEvmAdapter(walletClient),
+  timeouts: {
+    requestMs: 60000, // 60 second timeout
+  },
+});
+```
+
+## Read-Only Configuration
+
+Some operations don't require a wallet. You can create a read-only SDK instance:
+
+```typescript
+const sdk = new PredexonSDK({
+  apiKey: 'pk_live_xxxxx',
+});
+
+// These work without a wallet
+const positions = await sdk.getPositions({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+
+const balance = await sdk.getBalance({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+
+const orders = await sdk.getOpenOrders({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+```
+
+<Warning>
+Placing orders, enabling trading, and redemption require a wallet to be configured.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Wallet Adapters" icon="wallet" href="/sdk/wallet-adapters">
+    Configure wallet signing
+  </Card>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Explore SDK methods
+  </Card>
+</CardGroup>

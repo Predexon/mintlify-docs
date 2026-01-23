@@ -1,0 +1,121 @@
+---
+title: "Security"
+description: "Local-first signing, endpoint hardcoding, and response validation"
+---
+
+The SDK is designed with security as a priority. This page describes the security architecture and validation measures.
+
+## Architecture
+
+<CardGroup cols={2}>
+  <Card title="Local-First Signing" icon="key">
+    Private keys never leave your device. All order signing happens locally.
+  </Card>
+  <Card title="Hard-Locked Endpoint" icon="lock">
+    The SDK only communicates with `https://trade.predexon.com`. This cannot be overridden.
+  </Card>
+  <Card title="No Redirects" icon="ban">
+    HTTP redirects are rejected to prevent API key leakage.
+  </Card>
+  <Card title="HTTPS Only" icon="shield-check">
+    All connections use HTTPS. HTTP is never used.
+  </Card>
+</CardGroup>
+
+## Why Hard-Lock the Endpoint?
+
+The SDK hard-locks to `https://trade.predexon.com` to prevent man-in-the-middle attacks. A compromised or malicious base URL could:
+
+- Steal your API key
+- Serve malicious transactions for signing
+- Intercept your trading activity
+
+<Warning>
+The SDK does not allow overriding the API base URL. This is an intentional security measure.
+</Warning>
+
+## Server Response Validation
+
+The SDK validates server responses before signing to ensure you're not signing malicious data.
+
+### Polymarket Validation
+
+| Validation | Description |
+|------------|-------------|
+| CLOB auth typed data domain | Validates name, version, and chainId match expected values |
+| Redemption transaction allowlist | Only whitelisted contract addresses are allowed |
+| Local redemption construction | Server only provides conditionId; transaction is built locally |
+
+### Kalshi Validation
+
+| Validation | Description |
+|------------|-------------|
+| Prepare response echo validation | Ticker, outcome, side, and amount must match your request |
+| Solana transaction signer validation | See below |
+
+### Solana Transaction Signer Validation
+
+Before signing a Kalshi transaction, the SDK validates:
+
+1. **Expected wallet is a required signer** - Your wallet must be listed as a required signer
+2. **No unexpected signers** - No unknown addresses can be required signers
+3. **Fee payer validation** - Fee payer must be your wallet or a known sponsor address
+
+## Polymarket Contract Addresses
+
+The SDK uses hardcoded, verified contract addresses for Polymarket on Polygon:
+
+| Contract | Address |
+|----------|---------|
+| USDC | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` |
+| CTF | `0x4D97DCd97eC945f40cF65F87097ACe5EA0476045` |
+| CTF Exchange | `0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E` |
+| NegRisk CTF Exchange | `0xC5d563A36AE78145C45a50134d48A1215220f80a` |
+| NegRisk Adapter | `0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296` |
+
+<Info>
+These addresses are hardcoded in the SDK and cannot be overridden. Only transactions interacting with these contracts are allowed for approval and redemption flows.
+</Info>
+
+## Best Practices
+
+### API Key Security
+
+- Store API keys in environment variables, never in code
+- Use separate API keys for development and production
+- Rotate keys if you suspect compromise
+
+```typescript
+// Good: API key from environment
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+});
+
+// Bad: Hardcoded API key
+const sdk = new PredexonSDK({
+  apiKey: 'pk_live_xxxxx', // Don't do this!
+});
+```
+
+### Wallet Security
+
+- Never expose private keys in client-side code
+- Use hardware wallets or secure key management for production
+- Consider using embedded wallets (like Privy) for user-facing applications
+
+### Transaction Review
+
+- For high-value transactions, consider using `prepareOrder` + `submitOrder` flow
+- This allows you to inspect the transaction before signing
+- The SDK validates transactions automatically, but additional review adds defense in depth
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Wallet Adapters" icon="wallet" href="/sdk/wallet-adapters">
+    Configure secure wallet signing
+  </Card>
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/errors">
+    Handle security-related errors
+  </Card>
+</CardGroup>

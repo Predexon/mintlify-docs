@@ -1,0 +1,123 @@
+---
+title: "Idempotency"
+description: "Retry-safe order placement with automatic and custom idempotency keys"
+---
+
+Idempotency keys ensure that retrying a failed request doesn't create duplicate orders. The SDK provides built-in support for idempotency.
+
+## Automatic Key Generation
+
+The SDK automatically generates cryptographically secure idempotency keys when not provided:
+
+```typescript
+// Idempotency key is auto-generated
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    amount: '10',
+    type: 'market',
+  },
+  flags: { tokenId: '12345...' },
+});
+```
+
+**Key format:** `sdk-order:{timestamp}:{random}`
+
+## Custom Idempotency Keys
+
+You can provide your own idempotency key for tracking or retry logic:
+
+```typescript
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    amount: '10',
+    type: 'market',
+  },
+  flags: { tokenId: '12345...' },
+  idempotencyKey: 'my-custom-key-12345',
+});
+```
+
+## Manual Key Generation
+
+To generate keys manually:
+
+```typescript
+import { generateIdempotencyKey } from '@predexon/trade-sdk';
+
+// Default prefix
+const key = generateIdempotencyKey();
+// Example: "sdk-order:lq2abc:a1b2c3d4e5f6..."
+
+// Custom prefix
+const customKey = generateIdempotencyKey('my-prefix');
+// Example: "my-prefix:lq2abc:a1b2c3d4e5f6..."
+```
+
+## Use Cases
+
+### Retry Logic
+
+```typescript
+const idempotencyKey = `user-${userId}-order-${Date.now()}`;
+
+async function placeOrderWithRetry(request: PlaceOrderRequest, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await sdk.placeOrder({
+        ...request,
+        idempotencyKey,
+      });
+    } catch (error) {
+      if (error instanceof NetworkError && attempt < maxRetries) {
+        // Safe to retry with same idempotency key
+        await sleep(1000 * attempt);
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+```
+
+### Order Tracking
+
+```typescript
+const idempotencyKey = `order-${orderId}`;
+
+// Place order
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '10', type: 'market' },
+  flags: { tokenId: '12345...' },
+  idempotencyKey,
+});
+
+// Store the key for reference
+await db.orders.update(orderId, { idempotencyKey });
+```
+
+## How It Works
+
+1. When you submit an order, the idempotency key is included in the request
+2. If the same key is submitted again within a time window, the server returns the original response
+3. This prevents duplicate orders from network retries or application errors
+
+<Info>
+Auto-generated keys are unique per request. If you need to retry the same logical order, provide a custom key.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/errors">
+    Handle errors and retries
+  </Card>
+  <Card title="Examples" icon="file-code" href="/sdk/examples">
+    See complete trading flows
+  </Card>
+</CardGroup>

@@ -1,0 +1,48 @@
+---
+title: "Overview"
+description: "Local-first, noncustodial TypeScript SDK for trading on prediction markets"
+---
+
+The Predexon Trade SDK is a **local-first, noncustodial** TypeScript SDK for trading on prediction markets. All signing happens on the client, and private keys never leave your device.
+
+## Supported Venues
+
+| Venue | Blockchain | Order Types | Status |
+|-------|------------|-------------|--------|
+| Polymarket | Polygon (EVM) | Market, Limit | Full support |
+| Kalshi | Solana (DFlow) | Market only | Full support |
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Local Signing" icon="key">
+    Order construction and signing happens locally. Keys never leave your device.
+  </Card>
+  <Card title="Unified API" icon="code">
+    Single API for trading across Polymarket and Kalshi.
+  </Card>
+  <Card title="Wallet Adapters" icon="wallet">
+    Built-in adapters for viem, ethers.js, wagmi, and Privy.
+  </Card>
+  <Card title="Security First" icon="shield">
+    Server response validation, hardcoded endpoints, and no redirects.
+  </Card>
+</CardGroup>
+
+## Additional Features
+
+- **Automatic idempotency key generation** - Retry-safe order placement out of the box
+- **Comprehensive input validation** - Catch errors before they hit the network
+- **Typed errors** - Handle failures with specific error classes
+- **TypeScript native** - Full type exports for all request and response shapes
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/sdk/installation">
+    Install the SDK and set up your project
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/sdk/quickstart">
+    Place your first order in minutes
+  </Card>
+</CardGroup>

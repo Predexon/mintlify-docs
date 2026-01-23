@@ -1,0 +1,106 @@
+---
+title: "Quickstart"
+description: "Get up and trading in minutes"
+---
+
+## Polymarket (EVM)
+
+<Steps>
+  <Step title="Create the SDK instance">
+    ```typescript
+    import { PredexonSDK, createEvmAdapter } from '@predexon/trade-sdk';
+
+    const sdk = new PredexonSDK({
+      apiKey: 'your-api-key',
+      wallet: createEvmAdapter(yourWalletClient),
+    });
+    ```
+  </Step>
+  <Step title="Enable trading (one-time setup)">
+    ```typescript
+    await sdk.enableTrading({
+      core: { venue: 'polymarket', wallet: walletAddress },
+      approvals: 'auto',
+    });
+    ```
+  </Step>
+  <Step title="Place a market order">
+    ```typescript
+    const result = await sdk.placeOrder({
+      core: {
+        venue: 'polymarket',
+        wallet: walletAddress,
+        side: 'buy',
+        amount: '10', // $10 USDC
+        type: 'market',
+      },
+      flags: { tokenId: 'your-token-id' },
+    });
+
+    console.log('Order placed:', result.orderId, result.status);
+    ```
+  </Step>
+</Steps>
+
+## Kalshi (Solana)
+
+<Steps>
+  <Step title="Create the SDK with Solana signing">
+    ```typescript
+    import { PredexonSDK, createEvmAdapter } from '@predexon/trade-sdk';
+
+    const sdk = new PredexonSDK({
+      apiKey: 'your-api-key',
+      wallet: {
+        ...createEvmAdapter(evmWallet),
+        signSolanaTransaction: async (base64Tx) => {
+          // Sign and return base64
+        },
+        signSolanaMessage: async (message) => {
+          // Sign and return signature
+        },
+      },
+    });
+    ```
+  </Step>
+  <Step title="Enable trading (wallet registration)">
+    ```typescript
+    await sdk.enableTrading({
+      core: { venue: 'kalshi', wallet: solanaWalletAddress },
+    });
+    ```
+  </Step>
+  <Step title="Place a market order">
+    ```typescript
+    const result = await sdk.placeOrder({
+      core: {
+        venue: 'kalshi',
+        wallet: solanaWalletAddress,
+        side: 'buy',
+        amount: '10', // $10 USDC
+        type: 'market',
+      },
+      flags: { ticker: 'TICKER-SYMBOL', outcome: 'Yes' },
+    });
+
+    console.log('Order placed:', result.orderId, result.status);
+    ```
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="/sdk/configuration">
+    Learn about SDK options
+  </Card>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Explore all SDK methods
+  </Card>
+  <Card title="Order Semantics" icon="list-check" href="/sdk/order-semantics">
+    Understand order parameters
+  </Card>
+  <Card title="Examples" icon="file-code" href="/sdk/examples">
+    See complete trading flows
+  </Card>
+</CardGroup>
