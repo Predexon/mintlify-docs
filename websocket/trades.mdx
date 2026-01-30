@@ -5,19 +5,20 @@ description: "Real-time trade message format and fields"
 
 ## Message Format
 
-When a trade matches your subscription, you receive a message with `type: "trade"`:
+When a trade matches your subscription, you receive a message with `type: "event"`:
 
 ```json
 {
-  "type": "trade",
-  "subscription_id": "sub_a1b2c3d4",
+  "type": "event",
+  "subscription_id": "sub_a1b2c3d4e5f6",
   "data": {
-    "platform": "polymarket",
-    "asset_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+    "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
+    "token_label": "Yes",
+    "side": "BUY",
     "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
     "condition_id": "0x123...",
-    "shares": 100.5,
-    "shares_normalized": 100.5,
+    "shares": 100,
+    "shares_normalized": 100.0,
     "price": 0.65,
     "tx_hash": "0xabc...",
     "title": "Will Trump win the 2024 election?",
@@ -37,21 +38,22 @@ When a trade matches your subscription, you receive a message with `type: "trade
 | Field | Type | Description |
 |-------|------|-------------|
 | `subscription_id` | string | Which subscription matched this trade |
-| `asset_id` | string | Token ID for the outcome |
-| `condition_id` | string | Market condition ID |
+| `token_id` | string | Token ID for the outcome |
+| `condition_id` | string \| null | Market condition ID |
 | `market_slug` | string | URL-friendly market identifier |
-| `order_hash` | string | Unique order identifier |
-| `tx_hash` | string | Ethereum transaction hash |
+| `order_hash` | string \| null | Unique order identifier |
+| `tx_hash` | string | Transaction hash |
 
 ### Trade Details
 
 | Field | Type | Description |
 |-------|------|-------------|
+| `side` | string | Trade direction: `"BUY"` or `"SELL"` |
 | `shares` | number | Number of shares traded |
 | `shares_normalized` | number | Shares normalized for display |
 | `price` | number | Price per share (0.00 - 1.00) |
-| `outcome` | string | Outcome label (e.g., "Yes", "No") |
-| `timestamp` | number | Unix timestamp in seconds |
+| `outcome` | string \| null | Outcome label (e.g., "Yes", "No") |
+| `timestamp` | number | Unix timestamp |
 
 ### Participants
 
@@ -64,8 +66,8 @@ When a trade matches your subscription, you receive a message with `type: "trade
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `platform` | string | Always `"polymarket"` |
-| `title` | string | Market question/title |
+| `token_label` | string \| null | Token label for the outcome |
+| `title` | string \| null | Market question/title |
 
 ## Example: Processing Trades
 
@@ -73,11 +75,11 @@ When a trade matches your subscription, you receive a message with `type: "trade
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
 
-  if (msg.type === 'trade') {
+  if (msg.type === 'event') {
     const trade = msg.data;
     const value = trade.shares * trade.price;
 
-    console.log(`${trade.outcome} ${trade.shares} @ ${trade.price}`);
+    console.log(`${trade.side} ${trade.outcome} ${trade.shares} @ ${trade.price}`);
     console.log(`Market: ${trade.title}`);
     console.log(`Value: $${value.toFixed(2)}`);
     console.log(`Maker: ${trade.user}`);
@@ -92,14 +94,14 @@ If you have multiple subscriptions, use `subscription_id` to determine which fil
 
 ```javascript
 const subscriptions = {
-  'sub_abc123': 'whale-tracker',
-  'sub_def456': 'btc-markets'
+  'sub_abc123def456': 'whale-tracker',
+  'sub_789012345678': 'btc-markets'
 };
 
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
 
-  if (msg.type === 'trade') {
+  if (msg.type === 'event') {
     const source = subscriptions[msg.subscription_id];
     console.log(`[${source}]`, msg.data.title, msg.data.price);
   }

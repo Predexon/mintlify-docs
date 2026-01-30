@@ -43,7 +43,7 @@ ws.onopen = () => {
 
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
-  if (msg.type === 'trade') {
+  if (msg.type === 'event') {
     console.log('Trade:', msg.data);
   }
 };
@@ -121,7 +121,8 @@ All errors follow this format:
 
 | Code | Description |
 |------|-------------|
-| `INVALID_API_KEY` | API key not found or invalid |
+| `AUTH_REQUIRED` | No API key provided |
+| `AUTH_FAILED` | API key not found or invalid |
 | `INVALID_FILTERS` | Missing or malformed filters |
 | `SUBSCRIPTION_LIMIT` | Maximum subscriptions reached |
 | `ITEMS_LIMIT` | Maximum total items reached |
@@ -130,6 +131,9 @@ All errors follow this format:
 | `WILDCARD_CONNECTION_LIMIT` | Wildcard allows only one connection |
 | `CONNECTION_LIMIT` | Too many connections for this API key |
 | `SUBSCRIPTION_NOT_FOUND` | Subscription ID doesn't exist |
+| `PARSE_ERROR` | Invalid JSON message |
+| `UNKNOWN_ACTION` | Unrecognized action field |
+| `CAPACITY_EXCEEDED` | Send buffer full (client too slow) |
 
 ### Close Codes
 
