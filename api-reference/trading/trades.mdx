@@ -4,7 +4,7 @@ openapi: "GET /v1/polymarket/trades"
 description: "Fetch historical trade data"
 ---
 
-Query historical trade data with flexible filtering by market, token, user, and time range. At least one of `market_slug`, `condition_id`, `token_id`, or `user` is required.
+Query historical trade data with flexible filtering by market, token, wallet, and time range. At least one of `market_slug`, `condition_id`, `token_id`, or `wallet` is required.
 
 <ResponseExample>
 ```json 200
@@ -22,14 +22,13 @@ Query historical trade data with flexible filtering by market, token, user, and 
       "title": "Will Donald Trump win the 2024 Presidential Election?",
       "timestamp": 1704153600,
       "order_hash": "0xdef456...",
-      "user": "0x9876543210..."
+      "wallet": "0x9876543210..."
     }
   ],
   "pagination": {
     "limit": 50,
-    "offset": 0,
-    "total": 12345,
-    "has_more": true
+    "has_more": true,
+    "next_pagination_key": "eyJ0aW1lc3RhbXAiOjE3MDQxNTM2MDB9"
   }
 }
 ```

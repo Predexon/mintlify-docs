@@ -1,0 +1,32 @@
+---
+title: "Candles"
+openapi: "GET /v1/binance/candles/{symbol}"
+description: "Get OHLCV candlestick data for a Binance trading pair"
+---
+
+Fetch OHLCV candlestick data derived from Binance book ticker mid-prices. Intervals `1s` and `1m` read from pre-aggregated materialized views. Larger intervals (`5m`, `15m`, `1h`, `4h`, `1d`) are aggregated on-the-fly from 1m candles.
+
+Useful for backtesting crypto up/down prediction markets:
+- `15m` for 15-minute markets
+- `1h` for 1-hour markets
+- `4h` and `1d` for longer timeframes
+
+<ResponseExample>
+```json 200
+{
+  "symbol": "BTCUSDT",
+  "interval": "15m",
+  "candles": [
+    {
+      "timestamp": 1706745600,
+      "open": 103250.12,
+      "high": 103300.50,
+      "low": 103200.00,
+      "close": 103275.30,
+      "tick_count": 15420,
+      "avg_spread": 0.1
+    }
+  ]
+}
+```
+</ResponseExample>

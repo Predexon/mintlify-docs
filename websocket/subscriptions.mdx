@@ -5,7 +5,7 @@ description: "Create and manage WebSocket subscriptions"
 
 ## Subscribe
 
-Create a subscription to receive trade alerts matching your filters.
+Create a subscription to receive real-time alerts matching your filters.
 
 ### Request
 
@@ -14,18 +14,30 @@ Create a subscription to receive trade alerts matching your filters.
   "action": "subscribe",
   "platform": "polymarket",
   "version": 1,
-  "type": "orders",
+  "type": "orders|activity|lifecycle",
   "filters": {
-    "<filter_type>": ["<value1>", "<value2>", ...]
+    "users": ["0x..."],
+    "condition_ids": ["0x..."],
+    "market_slugs": ["slug"]
   }
 }
 ```
+
+### Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `action` | Yes | `"subscribe"` |
+| `platform` | Yes | `"polymarket"` |
+| `version` | Yes | `1` |
+| `type` | Yes | Channel: `"orders"`, `"activity"`, or `"lifecycle"` |
+| `filters` | Yes | At least one filter type required |
 
 ### Filter Types
 
 | Filter | Description | Example |
 |--------|-------------|---------|
-| `users` | Wallet addresses (maker) | `["0x123...", "0xabc..."]` |
+| `users` | Wallet addresses | `["0x123...", "0xabc..."]` |
 | `condition_ids` | Market condition IDs | `["0x456...", "0x789..."]` |
 | `market_slugs` | Market URL slugs | `["will-donald-trump-win-the-2024-us-presidential-election"]` |
 
@@ -34,7 +46,8 @@ Create a subscription to receive trade alerts matching your filters.
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_a1b2c3d4",
+  "channel": "trades"
 }
 ```
 
@@ -44,7 +57,7 @@ Save the `subscription_id` to update or unsubscribe later.
 
 ## Examples
 
-### Subscribe to wallets
+### Subscribe to trade alerts for wallets
 
 Track trades from specific wallet addresses:
 
@@ -63,37 +76,39 @@ Track trades from specific wallet addresses:
 }
 ```
 
-### Subscribe to a market by slug
+### Subscribe to activity for a market
 
-Track all trades in a specific market:
-
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "market_slugs": ["will-donald-trump-win-the-2024-us-presidential-election"]
-  }
-}
-```
-
-### Subscribe to a market by condition ID
+Track splits, merges, and redemptions on a specific market:
 
 ```json
 {
   "action": "subscribe",
   "platform": "polymarket",
   "version": 1,
-  "type": "orders",
+  "type": "activity",
   "filters": {
     "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
   }
 }
 ```
 
-### Wildcard subscription (Pro only)
+### Subscribe to lifecycle events by slug
+
+Track token registrations and market resolutions:
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "lifecycle",
+  "filters": {
+    "market_slugs": ["will-donald-trump-win-the-2024-us-presidential-election"]
+  }
+}
+```
+
+### Wildcard subscription (Pro/Desk only)
 
 Subscribe to **all** trades across Polymarket:
 
@@ -110,7 +125,9 @@ Subscribe to **all** trades across Polymarket:
 ```
 
 <Warning>
-Wildcard must be the only subscription on the connection and allows only one connection per API key.
+**Pro:** Wildcard must be the only subscription on the connection. One wildcard connection per API key.
+
+**Desk:** Wildcard can be mixed with other subscriptions. Up to 10 wildcard connections per API key.
 </Warning>
 
 ---

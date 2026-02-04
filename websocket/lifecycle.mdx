@@ -1,0 +1,148 @@
+---
+title: "Lifecycle Events"
+description: "Real-time token registrations and market resolutions"
+---
+
+## Event Types
+
+The lifecycle channel delivers two event types:
+
+| `event_type` | Description |
+|--------------|-------------|
+| `condition_resolution` | A market has been resolved - winning/losing outcomes determined |
+| `token_registered` | New outcome tokens have been registered on-chain |
+
+---
+
+## Condition Resolution
+
+Fired when an oracle resolves a market. The `tokens` array indicates which outcome won.
+
+```json
+{
+  "type": "event",
+  "subscription_id": "sub_...",
+  "data": {
+    "event_type": "condition_resolution",
+    "condition_id": "0x...",
+    "oracle": "0x...",
+    "question_id": "0x...",
+    "tx_hash": "0x...",
+    "log_index": "0xcd",
+    "block_number": "0x4eb0b92",
+    "timestamp": 1770145578,
+    "title": "Will the highest temperature in Atlanta be between 50-51\u00b0F?",
+    "market_slug": "highest-temperature-...",
+    "market_id": "1312704",
+    "image": "https://...",
+    "tokens": [
+      {"token_id": "...", "label": "Yes", "won": false},
+      {"token_id": "...", "label": "No", "won": true}
+    ],
+    "is_neg_risk": true
+  }
+}
+```
+
+## Token Registered
+
+Fired when new outcome tokens are created on-chain. These often appear before market metadata is available.
+
+```json
+{
+  "type": "event",
+  "subscription_id": "sub_...",
+  "data": {
+    "event_type": "token_registered",
+    "condition_id": "0x...",
+    "oracle": null,
+    "question_id": null,
+    "tx_hash": "0x...",
+    "log_index": "0x3c",
+    "block_number": "0x4eb0ba2",
+    "timestamp": 1770145610,
+    "title": null,
+    "market_slug": null,
+    "market_id": null,
+    "image": null,
+    "tokens": [
+      {"token_id": "...", "label": "Unknown"},
+      {"token_id": "...", "label": "Unknown"}
+    ],
+    "is_neg_risk": false
+  }
+}
+```
+
+<Note>
+`token_registered` events may have `null` metadata fields (`title`, `market_slug`, `market_id`) when the token is registered before the market is created in Polymarket's system.
+</Note>
+
+## Field Reference
+
+### Resolution Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_type` | string | `"condition_resolution"` or `"token_registered"` |
+| `condition_id` | string | Market condition ID |
+| `oracle` | string \| null | Oracle contract address |
+| `question_id` | string \| null | Question ID for the oracle |
+| `is_neg_risk` | boolean | Whether the market uses neg-risk framework |
+
+### Token Details
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tokens[].token_id` | string | Outcome token ID |
+| `tokens[].label` | string | Outcome label (e.g., "Yes", "No", "Unknown") |
+| `tokens[].won` | boolean | Whether this outcome won (resolution only) |
+
+### Transaction Details
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tx_hash` | string | Transaction hash |
+| `log_index` | string | Log index within the transaction |
+| `block_number` | string | Block number (hex) |
+| `timestamp` | number | Unix timestamp |
+
+### Market Metadata
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string \| null | Market question/title |
+| `market_slug` | string \| null | URL-friendly market identifier |
+| `market_id` | string \| null | Numeric market ID |
+| `image` | string \| null | Market image URL |
+
+## Subscribe to Lifecycle Events
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "lifecycle",
+  "filters": {
+    "condition_ids": ["0x..."]
+  }
+}
+```
+
+## Example: Monitoring Resolutions
+
+```javascript
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+
+  if (msg.type === 'event' && msg.data.event_type === 'condition_resolution') {
+    const data = msg.data;
+    const winner = data.tokens.find(t => t.won);
+
+    console.log(`Market resolved: ${data.title}`);
+    console.log(`Winner: ${winner?.label}`);
+    console.log(`Condition: ${data.condition_id}`);
+  }
+};
+```

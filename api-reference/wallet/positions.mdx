@@ -1,6 +1,6 @@
 ---
 title: "Wallet Positions"
-openapi: "GET /v1/polymarket/wallet/positions/{wallet_address}"
+openapi: "GET /v1/polymarket/wallet/positions/{wallet}"
 description: "Get open and historical positions for a wallet address"
 ---
 
@@ -45,9 +45,8 @@ Fetch positions for a Polymarket wallet with cost basis, current value, and P&L.
   },
   "pagination": {
     "limit": 50,
-    "offset": 0,
-    "total": 15,
-    "has_more": false
+    "has_more": false,
+    "next_pagination_key": null
   }
 }
 ```

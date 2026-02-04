@@ -1,13 +1,13 @@
 ---
 title: "Overview"
-description: "Real-time Polymarket trade alerts via WebSocket"
+description: "Real-time Polymarket trade, activity, and lifecycle alerts via WebSocket"
 ---
 
 <Info>
 **Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com) - required for WebSocket connections.
 </Info>
 
-Get real-time trade notifications from Polymarket markets. Subscribe to specific wallets, markets, or receive all trades with a Pro plan using the wildcard subscription.
+Get real-time notifications from Polymarket markets. Subscribe to trades, activity (splits/merges/redemptions), and lifecycle events (token registrations, market resolutions) for specific wallets, markets, or the entire platform with wildcard subscriptions.
 
 ## Use Cases
 
@@ -16,13 +16,13 @@ Get real-time trade notifications from Polymarket markets. Subscribe to specific
     Subscribe to top traders' wallets and get instant notifications when they make trades to mirror their positions.
   </Card>
   <Card title="Market Monitoring" icon="chart-line">
-    Track specific markets for price movements and trading activity in real-time.
+    Track specific markets for price movements, trading activity, and resolution events in real-time.
   </Card>
   <Card title="Portfolio Alerts" icon="bell">
-    Monitor your own wallet or watchlist for trade confirmations and activity.
+    Monitor your own wallet for trade confirmations, splits, merges, and redemptions.
   </Card>
   <Card title="Analytics & Research" icon="magnifying-glass-chart">
-    Stream all trades (Pro) to build datasets, analyze market dynamics, and identify trends.
+    Stream all events (Pro/Desk) to build datasets, analyze market dynamics, and identify trends.
   </Card>
 </CardGroup>
 
@@ -57,11 +57,7 @@ ws.onmessage = (event) => {
 wss://wss.predexon.com/v1/<API_KEY>
 ```
 
-Include your API key in the URL path. The server validates the key and returns your plan tier.
-
-### Connection Response
-
-On successful connection:
+API key in the URL path. On connect the server sends:
 
 ```json
 {
@@ -74,23 +70,35 @@ On successful connection:
 
 Connections with no active subscriptions are closed after **120 seconds**. Subscribe to at least one filter to keep the connection alive.
 
+## Channels
+
+| Channel | `type` value | Events |
+|---------|-------------|--------|
+| Trades | `"orders"` | Order fills (BUY/SELL) |
+| Activity | `"activity"` | Splits, merges, redemptions |
+| Lifecycle | `"lifecycle"` | Token registrations, condition resolutions |
+
 ## Plans & Limits
 
-| Feature | Free | Pro |
-|---------|------|-----|
-| Subscriptions | 2 | 100 |
-| Items per subscription | 5 | 500 |
-| Total items | 10 | 50,000 |
-| Wildcard (all trades) | No | Yes |
+| Feature | Free | Pro | Desk |
+|---------|------|-----|------|
+| Subscriptions | 2 | 100 | 1,000 |
+| Items per subscription | 5 | 500 | 500 |
+| Total items | 10 | 50,000 | 500,000 |
+| Wildcard | No | Yes (exclusive) | Yes (can mix) |
+| Wildcard connections | 0 | 1 | 10 |
 
-### Wildcard Subscription (Pro only)
+### Wildcard Subscriptions
 
-Pro users can subscribe to **all trades** across the entire platform using the wildcard subscription. This is ideal for building comprehensive datasets, real-time analytics dashboards, or monitoring market-wide activity.
+Pro and Desk users can subscribe to **all events** across the platform using the wildcard filter `{"users": ["*"]}`.
 
-**Wildcard rules:**
-- Wildcard must be the **only** subscription on the connection
-- Wildcard allows only **one active connection** per API key
-- Cannot add other subscriptions while wildcard is active
+**Pro rules:**
+- Wildcard must be the **only** subscription on the connection (exclusive)
+- Only **1 wildcard connection** per API key
+
+**Desk rules:**
+- Wildcard can be **mixed** with other subscriptions on the same connection
+- Up to **10 wildcard connections** per API key
 
 **Example wildcard subscription:**
 ```json
@@ -127,8 +135,8 @@ All errors follow this format:
 | `SUBSCRIPTION_LIMIT` | Maximum subscriptions reached |
 | `ITEMS_LIMIT` | Maximum total items reached |
 | `ITEMS_PER_SUB_LIMIT` | Too many items in single subscription |
-| `WILDCARD_NOT_ALLOWED` | Wildcard requires Pro plan |
-| `WILDCARD_CONNECTION_LIMIT` | Wildcard allows only one connection |
+| `WILDCARD_NOT_ALLOWED` | Wildcard requires Pro or Desk plan |
+| `WILDCARD_CONNECTION_LIMIT` | Maximum wildcard connections reached |
 | `CONNECTION_LIMIT` | Too many connections for this API key |
 | `SUBSCRIPTION_NOT_FOUND` | Subscription ID doesn't exist |
 | `PARSE_ERROR` | Invalid JSON message |

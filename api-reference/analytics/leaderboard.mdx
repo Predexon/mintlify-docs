@@ -1,0 +1,36 @@
+---
+title: "Global Leaderboard"
+openapi: "GET /v1/polymarket/leaderboard"
+description: "Get the global leaderboard of smart wallets"
+---
+
+Ranked list of wallets by trading performance. Supports filtering by trading style (WHALE, MARKET_MAKER, ACTIVE_TRADER, etc.), PnL range, minimum volume, win rate, and more. Uses PostgreSQL for all-time data, ClickHouse for rolling windows.
+
+<ResponseExample>
+```json 200
+{
+  "leaderboard": [
+    {
+      "wallet": "0x1234567890abcdef...",
+      "rank": 1,
+      "pnl": 125000.00,
+      "volume": 2500000.00,
+      "trades": 3420,
+      "roi": 0.285,
+      "win_rate": 0.68,
+      "profit_factor": 2.15,
+      "sharpe_ratio": 1.82,
+      "primary_trading_style": "WHALE",
+      "avg_buy_price": 0.42,
+      "avg_sell_price": 0.61
+    }
+  ],
+  "window": "all_time",
+  "pagination": {
+    "limit": 100,
+    "has_more": true,
+    "next_pagination_key": "eyJ3YWxsZXQiOiIweDEyMzQifQ=="
+  }
+}
+```
+</ResponseExample>

@@ -1,0 +1,33 @@
+---
+title: "Wallet Markets"
+openapi: "GET /v1/polymarket/wallet/{wallet}/markets"
+description: "Get per-market performance breakdown for a wallet"
+---
+
+Shows performance metrics for each market the wallet has traded in. Sort by PnL, volume, ROI, or other metrics to find a wallet's best and worst trades.
+
+<ResponseExample>
+```json 200
+{
+  "wallet": "0x1234567890abcdef...",
+  "markets": [
+    {
+      "condition_id": "0xabc123...",
+      "title": "Will Donald Trump win the 2024 Presidential Election?",
+      "pnl": 4500.00,
+      "volume": 12000.00,
+      "trades": 28,
+      "roi": 0.375,
+      "win_rate": 0.71,
+      "avg_buy_price": 0.42,
+      "avg_sell_price": 0.61
+    }
+  ],
+  "pagination": {
+    "limit": 100,
+    "has_more": false,
+    "next_pagination_key": null
+  }
+}
+```
+</ResponseExample>

@@ -1,0 +1,35 @@
+---
+title: "Smart Activity Markets"
+openapi: "GET /v1/polymarket/markets/smart-activity"
+description: "Discover markets where high-performing wallets are active"
+---
+
+Find alpha by seeing where profitable traders are putting their money. Define "smart wallets" using filter criteria (min PnL, win rate, etc.), then see which markets they're trading and rank by smart wallet activity.
+
+<ResponseExample>
+```json 200
+{
+  "markets": [
+    {
+      "condition_id": "0xabc123...",
+      "title": "Will Donald Trump win the 2024 Presidential Election?",
+      "smart_wallet_count": 42,
+      "smart_volume": 850000.00,
+      "smart_pnl": 125000.00,
+      "net_smart_sentiment": 0.72,
+      "yes_price": 0.62,
+      "total_volume": 5000000.00
+    }
+  ],
+  "filters_applied": {
+    "min_pnl": 10000,
+    "window": "all_time"
+  },
+  "pagination": {
+    "limit": 100,
+    "has_more": true,
+    "next_pagination_key": "eyJjb25kaXRpb25faWQiOiIweGFiYyJ9"
+  }
+}
+```
+</ResponseExample>

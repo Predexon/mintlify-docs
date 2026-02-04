@@ -1,6 +1,6 @@
 ---
 title: "Wallet Positions"
-openapi: "GET /v1/dflow/wallet/positions/{wallet_address}"
+openapi: "GET /v1/dflow/wallet/positions/{wallet}"
 description: "Fetch current positions for a Dflow wallet"
 ---
 
@@ -39,9 +39,8 @@ Fetch positions for a wallet on Dflow. Returns cost basis, realized PnL, and fee
   },
   "pagination": {
     "limit": 100,
-    "offset": 0,
-    "total": 1,
-    "has_more": false
+    "has_more": false,
+    "next_pagination_key": null
   }
 }
 ```

@@ -1,0 +1,30 @@
+---
+title: "Volume Chart"
+openapi: "GET /v1/polymarket/volume-chart/{condition_id}"
+description: "Fetch volume chart data for a market"
+---
+
+Returns per-period total, YES, and NO volume aggregated from trade events, broken down by side.
+
+<ResponseExample>
+```json 200
+{
+  "condition_id": "0x1a2b3c4d...",
+  "granularity": "hour",
+  "data": [
+    {
+      "timestamp": 1704067200,
+      "total_volume": 12500.00,
+      "yes_volume": 8200.00,
+      "no_volume": 4300.00
+    },
+    {
+      "timestamp": 1704070800,
+      "total_volume": 9800.00,
+      "yes_volume": 5100.00,
+      "no_volume": 4700.00
+    }
+  ]
+}
+```
+</ResponseExample>

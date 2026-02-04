@@ -32,22 +32,45 @@
             "group": "Cross-Platform Matching",
             "pages": [
               "api-reference/matching/find-matches",
-              "api-reference/matching/matched-pairs"
+              "api-reference/matching/matched-pairs",
+              "api-reference/matching/batch-matches"
             ]
           },
           {
             "group": "Polymarket",
             "pages": [
               "api-reference/markets/list-markets",
+              "api-reference/markets/events",
+              "api-reference/markets/crypto-updown",
               "api-reference/markets/candlesticks",
               "api-reference/markets/market-price",
               "api-reference/markets/volume",
+              "api-reference/markets/volume-chart",
               "api-reference/markets/open-interest",
               "api-reference/markets/orderbooks",
               "api-reference/trading/trades",
-              "api-reference/trading/activity",
+              "api-reference/trading/activity"
+            ]
+          },
+          {
+            "group": "Polymarket Wallets",
+            "pages": [
+              "api-reference/wallet/wallet-profile",
               "api-reference/wallet/positions",
-              "api-reference/wallet/pnl"
+              "api-reference/wallet/pnl",
+              "api-reference/wallet/wallet-markets",
+              "api-reference/wallet/similar-wallets"
+            ]
+          },
+          {
+            "group": "Smart Money & Analytics",
+            "pages": [
+              "api-reference/smart-money/smart-activity",
+              "api-reference/smart-money/smart-money-market",
+              "api-reference/analytics/leaderboard",
+              "api-reference/analytics/market-leaderboard",
+              "api-reference/analytics/cohort-stats",
+              "api-reference/analytics/filter-wallets"
             ]
           },
           {
@@ -64,6 +87,13 @@
               "api-reference/dflow/trades",
               "api-reference/dflow/positions",
               "api-reference/dflow/pnl"
+            ]
+          },
+          {
+            "group": "Binance",
+            "pages": [
+              "api-reference/binance/ticks",
+              "api-reference/binance/candles"
             ]
           }
         ]
@@ -133,7 +163,9 @@
           {
             "group": "Channels",
             "pages": [
-              "websocket/trades"
+              "websocket/trades",
+              "websocket/activity",
+              "websocket/lifecycle"
             ]
           }
         ]

@@ -1,0 +1,29 @@
+---
+title: "Smart Money Positioning"
+openapi: "GET /v1/polymarket/market/{condition_id}/smart-money"
+description: "Smart money positioning for a specific market"
+---
+
+See what profitable traders are doing on a specific market. Returns how many smart wallets are net buyers vs net sellers, average entry prices, and total volume and PnL from smart wallets.
+
+<ResponseExample>
+```json 200
+{
+  "condition_id": "0x1a2b3c4d...",
+  "title": "Will Donald Trump win the 2024 Presidential Election?",
+  "smart_wallets": {
+    "total": 42,
+    "net_buyers": 28,
+    "net_sellers": 14,
+    "avg_buy_price": 0.45,
+    "avg_sell_price": 0.58,
+    "total_volume": 850000.00,
+    "total_pnl": 125000.00
+  },
+  "filters_applied": {
+    "min_pnl": 10000,
+    "window": "all_time"
+  }
+}
+```
+</ResponseExample>

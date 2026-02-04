@@ -1,0 +1,116 @@
+---
+title: "Activity Events"
+description: "Real-time split, merge, and redemption events"
+---
+
+## Message Format
+
+When a split, merge, or redemption matches your subscription, you receive a message with `type: "event"`:
+
+```json
+{
+  "type": "event",
+  "subscription_id": "sub_...",
+  "data": {
+    "event_type": "split|merge|redeem",
+    "user": "0x...",
+    "condition_id": "0x...",
+    "collateral_token": "0x...",
+    "amount": 0,
+    "amount_normalized": 0,
+    "payout": 5000000,
+    "payout_normalized": 5,
+    "tx_hash": "0x...",
+    "log_index": "0x269",
+    "block_number": "0x4eab535",
+    "timestamp": 1770101360,
+    "title": "Spread: Trail Blazers (-3.5)",
+    "market_slug": "nba-mia-por-...",
+    "market_id": "1245288",
+    "image": "https://...",
+    "tokens": [
+      {"token_id": "...", "label": "Trail Blazers"},
+      {"token_id": "...", "label": "Heat"}
+    ]
+  }
+}
+```
+
+## Event Types
+
+| `event_type` | Description |
+|--------------|-------------|
+| `split` | User split collateral into outcome tokens |
+| `merge` | User merged outcome tokens back into collateral |
+| `redeem` | User redeemed winning outcome tokens for payout |
+
+## Field Reference
+
+### Core Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_type` | string | `"split"`, `"merge"`, or `"redeem"` |
+| `user` | string | Wallet address that performed the action |
+| `condition_id` | string | Market condition ID |
+| `collateral_token` | string | Collateral token contract address |
+
+### Amounts
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | number | Raw amount (on-chain precision) |
+| `amount_normalized` | number | Amount normalized for display |
+| `payout` | number | Raw payout amount (redemptions) |
+| `payout_normalized` | number | Payout normalized for display |
+
+### Transaction Details
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tx_hash` | string | Transaction hash |
+| `log_index` | string | Log index within the transaction |
+| `block_number` | string | Block number (hex) |
+| `timestamp` | number | Unix timestamp |
+
+### Market Metadata
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string \| null | Market question/title |
+| `market_slug` | string \| null | URL-friendly market identifier |
+| `market_id` | string \| null | Numeric market ID |
+| `image` | string \| null | Market image URL |
+| `tokens` | array | Outcome tokens with `token_id` and `label` |
+
+## Subscribe to Activity
+
+```json
+{
+  "action": "subscribe",
+  "platform": "polymarket",
+  "version": 1,
+  "type": "activity",
+  "filters": {
+    "users": ["0x1234..."]
+  }
+}
+```
+
+## Example: Tracking Redemptions
+
+```javascript
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+
+  if (msg.type === 'event') {
+    const data = msg.data;
+
+    if (data.event_type === 'redeem') {
+      console.log(`Redemption: $${data.payout_normalized}`);
+      console.log(`Market: ${data.title}`);
+      console.log(`Wallet: ${data.user}`);
+    }
+  }
+};
+```
