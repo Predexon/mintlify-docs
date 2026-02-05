@@ -186,8 +186,14 @@ Offset has no upper limit. Individual endpoint limits vary—see each endpoint f
 | Pro | 100 req/sec | 5,000,000 | $2.50 / 100K | $249/month |
 | Enterprise | Custom | Unlimited | — | $499+/month |
 
-<Note>
-Free tier excludes smart wallet and market matching endpoints. See [predexon.com/pricing](https://predexon.com/pricing) for full plan comparison.
-</Note>
+### Gated Endpoints (Dev & Pro only)
+
+The following endpoint categories require a **Dev** or **Pro** tier subscription:
+
+- **Cross-Platform Matching** — `/v2/matching-markets/*`
+- **Smart Money & Analytics** — Leaderboards, cohort stats, wallet profiles, smart activity
+- **Binance Data** — `/v2/binance/*`
+
+Free tier users will receive a 403 error when accessing these endpoints. See [predexon.com/pricing](https://predexon.com/pricing) for full plan comparison.
 
 Implement exponential backoff when you receive 429 responses.
