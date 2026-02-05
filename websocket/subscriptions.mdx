@@ -5,7 +5,7 @@ description: "Create and manage WebSocket subscriptions"
 
 ## Subscribe
 
-Create a subscription to receive trade alerts matching your filters.
+Create a subscription to receive real-time events matching your filters.
 
 ### Request
 
@@ -16,25 +16,42 @@ Create a subscription to receive trade alerts matching your filters.
   "version": 1,
   "type": "orders",
   "filters": {
-    "<filter_type>": ["<value1>", "<value2>", ...]
+    "users": ["0x1234...", "0x5678..."]
   }
 }
 ```
+
+### Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `action` | Yes | `"subscribe"` |
+| `platform` | Yes | `"polymarket"` |
+| `version` | Yes | `1` |
+| `type` | Yes | Channel: `"orders"`, `"activity"`, or `"lifecycle"` |
+| `filters` | Yes | Object with exactly one key: `users`, `condition_ids`, or `market_slugs` |
+
+Set the filter value to `["*"]` to receive all events on that channel (wildcard subscription, Pro plan only).
 
 ### Filter Types
 
 | Filter | Description | Example |
 |--------|-------------|---------|
-| `users` | Wallet addresses (maker) | `["0x123...", "0xabc..."]` |
+| `users` | Wallet addresses | `["0x123...", "0xabc..."]` |
 | `condition_ids` | Market condition IDs | `["0x456...", "0x789..."]` |
 | `market_slugs` | Market URL slugs | `["will-donald-trump-win-the-2024-us-presidential-election"]` |
+
+<Note>
+Not all filters are available on all channels. See the [filter availability table](/websocket/overview#filter-availability-by-channel) for details.
+</Note>
 
 ### Success Response
 
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798",
+  "channel": "trades"
 }
 ```
 
@@ -44,7 +61,7 @@ Save the `subscription_id` to update or unsubscribe later.
 
 ## Examples
 
-### Subscribe to wallets
+### Subscribe to trade alerts for wallets
 
 Track trades from specific wallet addresses:
 
@@ -63,30 +80,32 @@ Track trades from specific wallet addresses:
 }
 ```
 
-### Subscribe to a market by slug
+### Subscribe to activity for a market
 
-Track all trades in a specific market:
+Track splits, merges, and redemptions on a specific market:
 
 ```json
 {
   "action": "subscribe",
   "platform": "polymarket",
   "version": 1,
-  "type": "orders",
+  "type": "activity",
   "filters": {
-    "market_slugs": ["will-donald-trump-win-the-2024-us-presidential-election"]
+    "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
   }
 }
 ```
 
-### Subscribe to a market by condition ID
+### Subscribe to lifecycle events
+
+Track token registrations and market resolutions:
 
 ```json
 {
   "action": "subscribe",
   "platform": "polymarket",
   "version": 1,
-  "type": "orders",
+  "type": "lifecycle",
   "filters": {
     "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
   }
@@ -110,7 +129,7 @@ Subscribe to **all** trades across Polymarket:
 ```
 
 <Warning>
-Wildcard must be the only subscription on the connection and allows only one connection per API key.
+A wildcard connection cannot mix wildcard and regular subscriptions on the same channel. Up to 2 wildcard connections per channel per API key.
 </Warning>
 
 ---
@@ -124,7 +143,7 @@ Remove an existing subscription using its ID.
 ```json
 {
   "action": "unsubscribe",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798"
 }
 ```
 
@@ -133,7 +152,8 @@ Remove an existing subscription using its ID.
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798",
+  "channel": "trades"
 }
 ```
 
@@ -141,16 +161,16 @@ Remove an existing subscription using its ID.
 
 ## Update Subscription
 
-Modify filters on an existing subscription without creating a new one.
+Replace the entire filter set on an existing subscription.
 
 ### Request
 
 ```json
 {
   "action": "update",
-  "subscription_id": "sub_a1b2c3d4",
+  "subscription_id": "sub_2f4b15b33798",
   "filters": {
-    "users": ["0xnewwallet..."]
+    "condition_ids": ["0xabcd..."]
   }
 }
 ```
@@ -160,7 +180,8 @@ Modify filters on an existing subscription without creating a new one.
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798",
+  "channel": "trades"
 }
 ```
 

@@ -3,6 +3,142 @@ title: "Changelog"
 description: "API updates, new features, and breaking changes"
 ---
 
+## February 2026
+
+### February 4, 2026
+
+#### API v2 Launch
+
+We're introducing **API v2** — a major update with 14 new endpoints, improved pagination, and expanded analytics capabilities. v1 remains fully supported; switch between versions using the dropdown in the docs sidebar.
+
+**Base path:** All v2 endpoints live under `/v2/` (e.g., `https://api.predexon.com/v2/polymarket/markets`).
+
+---
+
+##### New Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Binance Data" icon="chart-candlestick">
+    Real-time and historical Binance book ticker data for backtesting crypto up/down markets.
+  </Card>
+  <Card title="Smart Money Analytics" icon="brain">
+    Track where profitable wallets are trading, filter by PnL/win rate, and discover alpha.
+  </Card>
+  <Card title="Wallet Intelligence" icon="wallet">
+    Full wallet profiles, trading style classification, market exposure, and similar wallet discovery.
+  </Card>
+  <Card title="Enhanced Market Data" icon="chart-line">
+    Events grouping, crypto up/down markets, and per-period volume charts.
+  </Card>
+</CardGroup>
+
+| Category | Endpoint | Description |
+|----------|----------|-------------|
+| **Binance** | `GET /v2/binance/ticks/{symbol}` | Raw book ticker data at microsecond granularity |
+| **Binance** | `GET /v2/binance/candles/{symbol}` | OHLCV candles derived from book ticker mid-prices (1s to 1d intervals) |
+| **Smart Money** | `GET /v2/polymarket/markets/smart-activity` | Markets ranked by smart wallet activity |
+| **Smart Money** | `GET /v2/polymarket/market/{condition_id}/smart-money` | Smart money positioning for a specific market |
+| **Analytics** | `GET /v2/polymarket/leaderboard` | Global wallet leaderboard with 22 filter/sort parameters |
+| **Analytics** | `GET /v2/polymarket/leaderboard/market/{condition_id}` | Per-market leaderboard |
+| **Analytics** | `GET /v2/polymarket/cohorts/stats` | Aggregate stats for wallet cohorts |
+| **Analytics** | `GET /v2/polymarket/wallets/filter` | Filter wallets by market participation and performance |
+| **Wallets** | `GET /v2/polymarket/wallet/{wallet}` | Full wallet profile with metrics across all time windows |
+| **Wallets** | `GET /v2/polymarket/wallet/{wallet}/markets` | Markets a wallet has traded |
+| **Wallets** | `GET /v2/polymarket/wallet/{wallet}/similar` | Find wallets with similar trading patterns |
+| **Markets** | `GET /v2/polymarket/events` | List events with grouped markets |
+| **Markets** | `GET /v2/polymarket/crypto-updown` | Crypto up/down prediction markets |
+| **Markets** | `GET /v2/polymarket/volume-chart/{condition_id}` | Per-period volume breakdown for a market |
+
+---
+
+##### WebSocket Updates
+
+<Card title="WebSocket API" icon="bolt">
+  Major improvements to the WebSocket API with new event types, refined plan tiers, and better connection management.
+</Card>
+
+**New: Fee refund events**
+
+The trades channel (`orders`) now delivers two event types: `order_filled` and `fee_refund`. Fee refund events allow precise net fee calculations by tracking Polymarket's maker rebate program. Correlate refunds to trades via `order_hash`.
+
+**Plan tiers restructured (Free/Pro/Desk → Free/Dev/Pro/Enterprise)**
+
+| Limit | Free | Dev | Pro | Enterprise |
+|-------|------|-----|-----|------------|
+| WebSocket access | No | Yes | Yes | Yes |
+| Subscriptions per connection | — | 10 | 100 | Custom |
+| Items per subscription | — | 10 | 500 | Custom |
+| Total items | — | 100 | 50,000 | Custom |
+| Wildcard | — | No | 2 per channel | Yes |
+| Priority routing | — | No | No | Yes |
+
+**Wildcard rules updated**
+- Wildcard connections are now tracked **per-channel** (e.g. a wildcard on `orders` does not count against `activity`)
+- A wildcard connection cannot mix wildcard and regular subscriptions on the same channel
+- Pro plan allows **2 wildcard connections per channel**
+
+**Filter restrictions by channel**
+- `market_slugs` filter is now only available on the trades (`orders`) channel
+- `users` filter is not available on the lifecycle channel
+- All channels support `condition_ids` and wildcard `["*"]`
+
+**New error code:** `RATE_LIMIT` — returned when a client is sending messages too fast
+
+**Keepalive documentation:** Server pings every 30s, 60s pong timeout, 2-minute idle timeout for zero subscriptions, and buffer overflow protections (1 MB drop threshold, 4 MB disconnect)
+
+---
+
+##### Breaking Changes (v1 → v2)
+
+<Warning>
+These changes only affect v2 endpoints. v1 endpoints remain unchanged.
+</Warning>
+
+**Path parameter renamed:** `{wallet_address}` → `{wallet}`
+
+All wallet-related endpoints now use `{wallet}` instead of `{wallet_address}`:
+- `/v2/polymarket/wallet/pnl/{wallet}`
+- `/v2/polymarket/wallet/positions/{wallet}`
+- `/v2/dflow/wallet/pnl/{wallet}`
+- `/v2/dflow/wallet/positions/{wallet}`
+
+**Pagination: offset → cursor-based**
+
+Several endpoints have switched from `offset` pagination to cursor-based `pagination_key` for better performance on large datasets:
+
+| Endpoint | Removed | Added |
+|----------|---------|-------|
+| `/v2/polymarket/trades` | `offset` | `pagination_key` |
+| `/v2/dflow/trades` | `offset` | `pagination_key` |
+| `/v2/kalshi/markets` | `offset` | `pagination_key` |
+| `/v2/kalshi/trades` | `offset` | `pagination_key` |
+
+**Parameter renames:**
+
+| Endpoint | v1 Param | v2 Param |
+|----------|----------|----------|
+| `/v2/polymarket/trades` | `user` | `wallet` |
+| `/v2/polymarket/activity` | `user` | `wallet` |
+
+**Removed parameters:**
+
+| Endpoint | Removed Param | Notes |
+|----------|---------------|-------|
+| `/v2/polymarket/markets` | `token_id` | Use `condition_id` instead |
+| `/v2/matching-markets/pairs` | `match_type` | All pairs are exact matches (similarity ≥ 95) |
+
+---
+
+##### New Filter Parameters
+
+| Endpoint | New Parameters |
+|----------|----------------|
+| `/v2/polymarket/markets` | `min_volume_1d`, `min_volume_7d`, `min_volume_30d`, `min_trades_1d`, `min_trades_7d`, `min_trades_30d` |
+| `/v2/polymarket/trades` | `min_total`, `wallet` |
+| `/v2/polymarket/activity` | `sort_by`, `wallet` |
+
+---
+
 ## January 2026
 
 ### January 19, 2026

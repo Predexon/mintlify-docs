@@ -1,71 +1,127 @@
 ---
-title: "Trade Alerts"
-description: "Real-time trade message format and fields"
+title: "Trade Events"
+description: "Real-time order fills and fee refunds"
 ---
 
-## Message Format
+The trades channel (`"orders"`) delivers two event types: `order_filled` and `fee_refund`.
 
-When a trade matches your subscription, you receive a message with `type: "trade"`:
+## order_filled
+
+Emitted when an order is filled on-chain.
 
 ```json
 {
-  "type": "trade",
-  "subscription_id": "sub_a1b2c3d4",
+  "type": "event",
+  "subscription_id": "sub_2f4b15b33798",
   "data": {
-    "platform": "polymarket",
-    "asset_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
-    "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-    "condition_id": "0x123...",
-    "shares": 100.5,
-    "shares_normalized": 100.5,
-    "price": 0.65,
-    "tx_hash": "0xabc...",
-    "title": "Will Trump win the 2024 election?",
-    "timestamp": 1704067200,
-    "order_hash": "0xdef...",
-    "user": "0x1234...",
-    "taker": "0x5678...",
-    "outcome": "Yes"
+    "event_type": "order_filled",
+    "token_id": "61192765571543561192611717014424488264158138188165135910061125994065469709826",
+    "token_label": "Up",
+    "side": "SELL",
+    "market_slug": "btc-updown-15m-1770244200",
+    "condition_id": "0x04f954e4f30f5f014f592b4d621768b9c625e3cdaac3c72c8e3762522ecafad8",
+    "shares": 2000000,
+    "shares_normalized": 2,
+    "price": 0.04,
+    "tx_hash": "0xf30a29f2497ae5def32105bd6cdac0b6fd9d875cd4107fa02066ebaf42a9f6b6",
+    "log_index": "0x21e",
+    "title": "Bitcoin Up or Down - February 4, 5:30PM-5:45PM ET",
+    "timestamp": 1770244731,
+    "order_hash": "0x8bf54f44e5d77432f1698084ada4ad8564b97df25bd9590575aadb98aec121b5",
+    "user": "0xe9cbb1c9b3f7f411dd4fdf2ea7afa780c8b4d096",
+    "taker": "0x98f36c3d6300b905d00aef4bbae1d5a00874401f",
+    "outcome": "Up",
+    "market_id": "1329542",
+    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png",
+    "fee": 0.008
   }
 }
 ```
 
-## Field Reference
-
-### Identifiers
+### Field Reference
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `subscription_id` | string | Which subscription matched this trade |
-| `asset_id` | string | Token ID for the outcome |
-| `condition_id` | string | Market condition ID |
-| `market_slug` | string | URL-friendly market identifier |
-| `order_hash` | string | Unique order identifier |
-| `tx_hash` | string | Ethereum transaction hash |
-
-### Trade Details
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `shares` | number | Number of shares traded |
-| `shares_normalized` | number | Shares normalized for display |
-| `price` | number | Price per share (0.00 - 1.00) |
-| `outcome` | string | Outcome label (e.g., "Yes", "No") |
-| `timestamp` | number | Unix timestamp in seconds |
-
-### Participants
-
-| Field | Type | Description |
-|-------|------|-------------|
+| `event_type` | `"order_filled"` | |
 | `user` | string | Maker address (order placer) |
 | `taker` | string | Taker address (order filler) |
+| `side` | `"BUY"` \| `"SELL"` | Maker's side of the trade |
+| `price` | number | Execution price in USDC per share |
+| `shares` | number | Raw share amount (6 decimal places) |
+| `shares_normalized` | number | Human-readable share amount |
+| `fee` | number | Fee charged in USDC (see note on fee accuracy below) |
+| `token_id` | string | Outcome token ID |
+| `token_label` | string \| null | Outcome label (e.g. "Yes", "Up") |
+| `outcome` | string \| null | Same as `token_label` |
+| `condition_id` | string \| null | Market condition ID |
+| `market_slug` | string | Market URL slug |
+| `market_id` | string \| null | Internal market ID |
+| `title` | string \| null | Market title |
+| `image` | string \| null | Market image URL |
+| `order_hash` | string \| null | Order hash |
+| `tx_hash` | string | Transaction hash |
+| `log_index` | string | Log index within the transaction (hex) |
+| `timestamp` | number | Unix timestamp in seconds |
 
-### Metadata
+---
+
+## fee_refund
+
+Emitted when a maker fee rebate is processed on-chain.
+
+```json
+{
+  "type": "event",
+  "subscription_id": "sub_2f4b15b33798",
+  "data": {
+    "event_type": "fee_refund",
+    "user": "0x47a51f21d7424d62259479f4abe98f4443946834",
+    "token_id": "53031995840519349287926798501784281703112543680473469697119005679182720764080",
+    "condition_id": "0xdfb2f9d3ed88bbc4bb7c53aeacfa54fca32259ac94dec52d1503182b762ae5f1",
+    "market_slug": "btc-updown-15m-1770242400",
+    "title": "Bitcoin Up or Down - February 4, 5:00PM-5:15PM ET",
+    "order_hash": "0xbda8ab86c90fc5f366531d103f433b2fbf99db523438b8b1ab188d7038b74b69",
+    "tx_hash": "0x97b2ae33188131fceafac5f7f0d36741abc9ccdd07115fe5faa84896e05d9314",
+    "refund": 9.9904,
+    "fee_charged": 0.0096
+  }
+}
+```
+
+### Field Reference
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `platform` | string | Always `"polymarket"` |
-| `title` | string | Market question/title |
+| `event_type` | `"fee_refund"` | |
+| `user` | string | Address that received the refund |
+| `token_id` | string | Outcome token ID |
+| `condition_id` | string \| null | Market condition ID |
+| `market_slug` | string \| null | Market URL slug |
+| `title` | string \| null | Market title |
+| `order_hash` | string | The order hash this refund applies to |
+| `tx_hash` | string | Transaction hash |
+| `refund` | number | USDC amount refunded to the maker |
+| `fee_charged` | number | Final net fee in USDC after the refund |
+
+---
+
+## Understanding Fee Refunds
+
+Polymarket implements a maker fee rebate program. When a trade executes on-chain, the `OrderFilled` event reports the full gross fee. Immediately after, the exchange's Fee Module processes a rebate for the maker — this is the `FeeRefunded` event.
+
+In practice:
+
+1. An `order_filled` event arrives with a `fee` field representing the gross fee initially charged.
+2. A `fee_refund` event for the same `order_hash` arrives 2-5ms later (within the same block, typically in the same transaction). In rare cases it may be up to 50ms later, but never more.
+3. The maker's actual net fee is: `fee_refund.fee_charged` (or equivalently, `order_filled.fee - fee_refund.refund`).
+
+<Note>
+If you do not need exact fee accounting, you can safely ignore `fee_refund` events. The `fee` field on `order_filled` is still directionally correct and useful for most purposes. Fee refund events are only necessary if your application requires precise net fee calculations (e.g. PnL tracking, cost basis accounting).
+</Note>
+
+Fee refund events are delivered on the same trades channel and respect the same subscription filters (`users`, `condition_ids`, `market_slugs`, wildcard). You can correlate them to their corresponding trade via the `order_hash` and `tx_hash` fields.
+
+---
 
 ## Example: Processing Trades
 
@@ -73,35 +129,22 @@ When a trade matches your subscription, you receive a message with `type: "trade
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
 
-  if (msg.type === 'trade') {
-    const trade = msg.data;
-    const value = trade.shares * trade.price;
+  if (msg.type === 'event') {
+    const data = msg.data;
 
-    console.log(`${trade.outcome} ${trade.shares} @ ${trade.price}`);
-    console.log(`Market: ${trade.title}`);
-    console.log(`Value: $${value.toFixed(2)}`);
-    console.log(`Maker: ${trade.user}`);
-    console.log(`Taker: ${trade.taker}`);
-  }
-};
-```
+    if (data.event_type === 'order_filled') {
+      const value = data.shares_normalized * data.price;
+      console.log(`${data.side} ${data.outcome} ${data.shares_normalized} @ ${data.price}`);
+      console.log(`Market: ${data.title}`);
+      console.log(`Value: $${value.toFixed(2)}`);
+      console.log(`Maker: ${data.user}`);
+      console.log(`Taker: ${data.taker}`);
+    }
 
-## Filtering by Subscription
-
-If you have multiple subscriptions, use `subscription_id` to determine which filter matched:
-
-```javascript
-const subscriptions = {
-  'sub_abc123': 'whale-tracker',
-  'sub_def456': 'btc-markets'
-};
-
-ws.onmessage = (event) => {
-  const msg = JSON.parse(event.data);
-
-  if (msg.type === 'trade') {
-    const source = subscriptions[msg.subscription_id];
-    console.log(`[${source}]`, msg.data.title, msg.data.price);
+    if (data.event_type === 'fee_refund') {
+      console.log(`Fee refund: $${data.refund} for order ${data.order_hash}`);
+      console.log(`Net fee: $${data.fee_charged}`);
+    }
   }
 };
 ```

@@ -1,41 +1,9 @@
 ---
 title: "Orderbook History"
-openapi: "GET /v1/kalshi/orderbooks"
+openapi: "GET /v2/kalshi/orderbooks"
 description: "Fetch historical orderbook snapshots for a Kalshi market"
 ---
 
 Fetch historical orderbook snapshots for a Kalshi market. Data starts from **January 7th, 2026**.
 
 <Warning>Timestamps are in **milliseconds**. Prices are in **cents** (1-99).</Warning>
-
-<ResponseExample>
-```json 200
-{
-  "snapshots": [
-    {
-      "ticker": "KXBTC-25JAN31-B100000",
-      "timestamp": 1706745600000,
-      "yes_bids": [
-        {"price": 52, "size": 1500},
-        {"price": 51, "size": 2300}
-      ],
-      "yes_asks": [
-        {"price": 54, "size": 1200},
-        {"price": 55, "size": 2100}
-      ],
-      "best_bid": 52,
-      "best_ask": 54,
-      "bid_depth": 5600,
-      "ask_depth": 4200,
-      "sequence": 12345678
-    }
-  ],
-  "pagination": {
-    "limit": 100,
-    "count": 50,
-    "pagination_key": "eyJ0aW1lc3RhbXAi...",
-    "has_more": true
-  }
-}
-```
-</ResponseExample>

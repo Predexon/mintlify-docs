@@ -1,48 +1,7 @@
 ---
 title: "List Markets"
-openapi: "GET /v1/kalshi/markets"
+openapi: "GET /v2/kalshi/markets"
 description: "Query Kalshi markets with filtering, sorting, and pagination"
 ---
 
 Fetch Kalshi prediction markets with filtering, sorting, and pagination. Does not include Multi Variate Event (MVE) markets like parlays. Prices returned as decimals (0-1).
-
-<ResponseExample>
-```json 200
-{
-  "markets": [
-    {
-      "ticker": "KXBTC-25JAN10-B100000",
-      "event_ticker": "KXBTC-25JAN10",
-      "market_id": "abc123",
-      "title": "Bitcoin above $100,000?",
-      "yes_subtitle": "Bitcoin above $100,000",
-      "no_subtitle": "Bitcoin at or below $100,000",
-      "status": "open",
-      "result": null,
-      "open_time": "2025-01-01T00:00:00Z",
-      "close_time": "2025-01-10T23:59:59Z",
-      "outcomes": [
-        {"label": "Yes", "bid": 0.52, "ask": 0.54},
-        {"label": "No", "bid": 0.46, "ask": 0.48}
-      ],
-      "last_price": 0.53,
-      "volume": 150000,
-      "open_interest": 25000,
-      "dollar_volume": 75000,
-      "dollar_open_interest": 12500,
-      "event": {
-        "event_ticker": "KXBTC-25JAN10",
-        "series_ticker": "KXBTC",
-        "title": "Bitcoin Price on Jan 10"
-      }
-    }
-  ],
-  "pagination": {
-    "limit": 10,
-    "offset": 0,
-    "total": 5432,
-    "has_more": true
-  }
-}
-```
-</ResponseExample>

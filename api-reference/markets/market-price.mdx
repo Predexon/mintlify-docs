@@ -1,16 +1,7 @@
 ---
 title: "Market Price"
-openapi: "GET /v1/polymarket/market-price/{token_id}"
+openapi: "GET /v2/polymarket/market-price/{token_id}"
 description: "Get the current or historical price for a specific token"
 ---
 
 Fetch current or historical price for a token. Uses weighted average of recent trades when stable, or last trade price when volatile.
-
-<ResponseExample>
-```json 200
-{
-  "price": 0.6234,
-  "at_time": 1704153600
-}
-```
-</ResponseExample>

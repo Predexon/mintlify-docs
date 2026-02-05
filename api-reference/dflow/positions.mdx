@@ -1,48 +1,7 @@
 ---
 title: "Wallet Positions"
-openapi: "GET /v1/dflow/wallet/positions/{wallet_address}"
+openapi: "GET /v2/dflow/wallet/positions/{wallet}"
 description: "Fetch current positions for a Dflow wallet"
 ---
 
 Fetch positions for a wallet on Dflow. Returns cost basis, realized PnL, and fees. Open positions have `total_qty_bought > total_qty_sold`.
-
-<ResponseExample>
-```json 200
-{
-  "wallet": "7vfCXTUXx...",
-  "positions": [
-    {
-      "outcome_mint": "8xPqM3...",
-      "market_ticker": "BTCPRICE-26JAN",
-      "market_title": "Bitcoin above $100k by Jan 2026?",
-      "yes_subtitle": "Yes, Bitcoin will be above $100k",
-      "no_subtitle": "No, Bitcoin will be at or below $100k",
-      "outcome": "yes",
-      "status": "open",
-      "total_cost_basis": 97.50,
-      "avg_entry_price": 0.65,
-      "realized_pnl": 0,
-      "fees_paid": 1.95,
-      "total_qty_bought": 150,
-      "total_qty_sold": 0,
-      "first_trade_at": 1705420800,
-      "last_trade_at": 1705420800
-    }
-  ],
-  "summary": {
-    "total_positions": 1,
-    "open_positions": 1,
-    "closed_positions": 0,
-    "total_cost_basis": 97.50,
-    "total_realized_pnl": 0,
-    "total_fees_paid": 1.95
-  },
-  "pagination": {
-    "limit": 100,
-    "offset": 0,
-    "total": 1,
-    "has_more": false
-  }
-}
-```
-</ResponseExample>

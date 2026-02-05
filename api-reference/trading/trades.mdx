@@ -1,43 +1,7 @@
 ---
 title: "Trades History"
-openapi: "GET /v1/polymarket/trades"
+openapi: "GET /v2/polymarket/trades"
 description: "Fetch historical trade data"
 ---
 
-Query historical trade data with flexible filtering by market, token, user, and time range. At least one of `market_slug`, `condition_id`, `token_id`, or `user` is required.
-
-<ResponseExample>
-```json 200
-{
-  "orders": [
-    {
-      "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455",
-      "side": "BUY",
-      "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-      "condition_id": "0x1a2b3c4d...",
-      "shares": 500.0,
-      "shares_normalized": 500.0,
-      "price": 0.62,
-      "tx_hash": "0xabc123...",
-      "title": "Will Donald Trump win the 2024 Presidential Election?",
-      "timestamp": 1704153600,
-      "order_hash": "0xdef456...",
-      "user": "0x9876543210..."
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 12345,
-    "has_more": true
-  }
-}
-```
-
-```json 400
-{
-  "error": "Invalid filter combination",
-  "message": "Only one of market_slug, token_id, or condition_id can be provided"
-}
-```
-</ResponseExample>
+Query historical trade data with flexible filtering by market, token, wallet, and time range. At least one of `market_slug`, `condition_id`, `token_id`, or `wallet` is required.

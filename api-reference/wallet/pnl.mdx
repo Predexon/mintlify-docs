@@ -1,24 +1,21 @@
 ---
 title: "Wallet P&L"
-openapi: "GET /v1/polymarket/wallet/pnl/{wallet_address}"
-description: "Get realized P&L time series for a wallet"
+openapi: "GET /v2/polymarket/wallet/pnl/{wallet}"
+description: "Get P&L summary and realized P&L time series for a wallet"
 ---
 
-Fetch cumulative realized P&L over time for a wallet. For unrealized P&L, use the [Positions endpoint](/api-reference/wallet/positions).
+Returns both a **summary** (realized, unrealized, fees) and a **time series** of cumulative realized P&L.
 
-<ResponseExample>
-```json 200
-{
-  "wallet_address": "0x1234...",
-  "granularity": "week",
-  "start_time": 1704067200,
-  "end_time": 1735689600,
-  "pnl_over_time": [
-    {"timestamp": 1704067200, "pnl_to_date": 0.0},
-    {"timestamp": 1704672000, "pnl_to_date": 250.50},
-    {"timestamp": 1705276800, "pnl_to_date": 180.25},
-    {"timestamp": 1705881600, "pnl_to_date": 425.75}
-  ]
-}
-```
-</ResponseExample>
+**Summary fields** (current snapshot):
+- `realized_pnl` — Total realized P&L from sells and redemptions
+- `unrealized_pnl` — Unrealized P&L computed live from open positions
+- `total_pnl` — `realized_pnl + unrealized_pnl`
+- `fees_paid` / `fees_refunded` — Taker fees paid and maker rebates received
+
+**Time series** (`pnl_over_time`):
+- Shows **realized P&L only** — does not include unrealized gains/losses
+- Each data point is cumulative realized P&L at that timestamp
+
+<Note>
+Use `condition_id` query param to filter to a specific market. This correctly handles split/merge operations by aggregating both sides.
+</Note>
