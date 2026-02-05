@@ -1,0 +1,13 @@
+---
+title: "Market Top Holders"
+openapi: "GET /v2/polymarket/market/{condition_id}/top-holders"
+description: "Top holders for a specific market ranked by position size"
+---
+
+Get the largest position holders in any market. Use the `side` parameter to filter by Yes or No holders and see their position value, entry price, and PnL.
+
+<Note>**Requires Dev or Pro tier.** This endpoint is not available on the Free tier.</Note>
+
+| Constraint | Value |
+|------------|-------|
+| `limit` | 1–100 (default 100) |

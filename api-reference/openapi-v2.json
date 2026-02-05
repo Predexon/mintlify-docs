@@ -5,16 +5,6 @@
     "description": "Prediction market data aggregation and matching API",
     "version": "2.0.0"
   },
-  "servers": [
-    {
-      "url": "https://api.predexon.com"
-    }
-  ],
-  "security": [
-    {
-      "apiKey": []
-    }
-  ],
   "paths": {
     "/v2/matching-markets": {
       "get": {
@@ -230,7 +220,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 1000,
+              "maximum": 200,
               "minimum": 1,
               "description": "Maximum number of pairs to return",
               "default": 100,
@@ -307,7 +297,7 @@
           "polymarket"
         ],
         "summary": "Get Wallet Pnl",
-        "description": "Fetch realized profit and loss (PnL) for a specific wallet address.\n\nReturns realized gains only - from confirmed sells or redeems.\nUses user_pnl_daily for historical data and user_pnl_summary for live data.\n\nWhen condition_id is provided, returns realized PnL for that specific market only.\nThis handles split/merge operations correctly by aggregating both sides.",
+        "description": "Fetch realized profit and loss (PnL) for a specific wallet address.\n\nReturns realized gains only - from confirmed sells or redeems.\n\nWhen condition_id is provided, returns realized PnL for that specific market only.\nThis handles split/merge operations correctly by aggregating both sides.",
         "operationId": "get_wallet_pnl_v2_polymarket_wallet_pnl__wallet__get",
         "parameters": [
           {
@@ -436,7 +426,7 @@
           "polymarket"
         ],
         "summary": "Get Wallet Positions",
-        "description": "Fetch current positions for a wallet address.\n\nReturns all open positions with cost basis, current market prices, and P&L calculations.\nUses real-time PostgreSQL data for positions.\nSupports filtering by market_slug or condition_id.",
+        "description": "Fetch current positions for a wallet address.\n\nReturns all open positions with cost basis, current market prices, and P&L calculations.\nSupports filtering by market_slug or condition_id.",
         "operationId": "get_wallet_positions_v2_polymarket_wallet_positions__wallet__get",
         "parameters": [
           {
@@ -815,7 +805,7 @@
           "polymarket"
         ],
         "summary": "Get Activity",
-        "description": "Fetch activity data for a specific user.\n\nUses the MV-populated activity_unified_table for optimal single-table query performance.",
+        "description": "Fetch activity data for a specific user.\n\nReturns trades, redemptions, and other wallet activity.",
         "operationId": "get_activity_v2_polymarket_activity_get",
         "parameters": [
           {
@@ -918,13 +908,13 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 200,
+              "maximum": 500,
               "minimum": 1,
-              "description": "Number of activities to return (1-200)",
+              "description": "Number of activities to return (1-500)",
               "default": 100,
               "title": "Limit"
             },
-            "description": "Number of activities to return (1-200)"
+            "description": "Number of activities to return (1-500)"
           },
           {
             "name": "order",
@@ -1006,7 +996,7 @@
           "polymarket"
         ],
         "summary": "Get Markets",
-        "description": "List markets with filtering and sorting from PostgreSQL database.\n\nConsolidates active and closed markets into a single endpoint.\nUse status=open for active markets only.\n\nRolling metrics (volume_1d/7d/30d, trades, OI) are sourced from\nthe market_metrics_summary table, refreshed hourly by the indexer cron.",
+        "description": "List markets with filtering and sorting.\n\nConsolidates active and closed markets into a single endpoint.\nUse status=open for active markets only.\n\nRolling metrics (volume_1d/7d/30d, trades, OI) are refreshed hourly.",
         "operationId": "get_markets_v2_polymarket_markets_get",
         "parameters": [
           {
@@ -1288,7 +1278,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 10000,
               "minimum": 0,
               "description": "Number of markets to skip",
               "default": 0,
@@ -1788,7 +1777,7 @@
           "polymarket"
         ],
         "summary": "Get Trades",
-        "description": "Fetch historical trade data.\n\nReturns trades from Polymarket with support for:\n- Filtering by market_slug, condition_id, token_id, or user\n- Time range filtering\n- Cursor-based pagination\n\nAt least one of market_slug, condition_id, token_id, or user must be provided.",
+        "description": "Fetch historical trade data.\n\nReturns trades from Polymarket with support for:\n- Filtering by market_slug, condition_id, token_id, or wallet\n- Time range filtering\n- Minimum trade amount filtering (min_total)\n- Cursor-based pagination\n\n**Required:** At least one of market_slug, condition_id, token_id, or wallet must be provided.\nmin_total can be used as an additional filter but not alone.",
         "operationId": "get_trades_v2_polymarket_trades_get",
         "parameters": [
           {
@@ -1906,7 +1895,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 200,
+              "maximum": 500,
               "minimum": 1,
               "description": "Number of trades to return",
               "default": 100,
@@ -2113,7 +2102,7 @@
           "smart-wallet"
         ],
         "summary": "Get Wallet Profile",
-        "description": "Get complete smart wallet profile.\n\nReturns all metrics across all time windows and style classifications.\nUses PostgreSQL for all_time (real-time) and ClickHouse for rolling windows.",
+        "description": "Get complete smart wallet profile.\n\nReturns all metrics across all time windows and style classifications.",
         "operationId": "get_wallet_profile_v2_polymarket_wallet__wallet__get",
         "parameters": [
           {
@@ -2179,7 +2168,7 @@
           "smart-wallet"
         ],
         "summary": "Get Leaderboard",
-        "description": "Get global leaderboard of smart wallets.\n\nSupports filtering by trading styles and numeric thresholds.\nUses ClickHouse rolling tables for all time windows.",
+        "description": "Get global leaderboard of smart wallets.\n\nSupports filtering by trading styles and numeric thresholds.",
         "operationId": "get_leaderboard_v2_polymarket_leaderboard_get",
         "parameters": [
           {
@@ -2624,7 +2613,7 @@
           "smart-wallet"
         ],
         "summary": "Get Market Leaderboard",
-        "description": "Get leaderboard for a specific market.\n\nShows wallet rankings for trading performance within a single market.\nUses ClickHouse user_market_metrics_rolling for all time windows.",
+        "description": "Get leaderboard for a specific market.\n\nShows wallet rankings for trading performance within a single market.",
         "operationId": "get_market_leaderboard_v2_polymarket_leaderboard_market__condition_id__get",
         "parameters": [
           {
@@ -2916,6 +2905,147 @@
         }
       }
     },
+    "/v2/polymarket/market/{condition_id}/top-holders": {
+      "get": {
+        "tags": [
+          "polymarket",
+          "smart-wallet"
+        ],
+        "summary": "Get Market Top Holders",
+        "description": "Get top holders for a specific market, ranked by position size.\n\nUse the 'side' parameter to filter by Yes or No holders:\n- side=yes: Top holders betting on Yes outcome\n- side=no: Top holders betting on No outcome\n\nReturns wallets with the largest positions in this market, including\ntheir position value, entry price, and realized/unrealized PnL.",
+        "operationId": "get_market_top_holders_v2_polymarket_market__condition_id__top_holders_get",
+        "parameters": [
+          {
+            "name": "condition_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Market condition ID",
+              "title": "Condition Id"
+            },
+            "description": "Market condition ID"
+          },
+          {
+            "name": "side",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(yes|no)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by position side: 'yes' or 'no'",
+              "title": "Side"
+            },
+            "description": "Filter by position side: 'yes' or 'no'"
+          },
+          {
+            "name": "min_shares",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0.0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum shares held (normalized)",
+              "title": "Min Shares"
+            },
+            "description": "Minimum shares held (normalized)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Results per page",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Results per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Offset for pagination",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Offset for pagination"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopHoldersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/polymarket/wallet/{wallet}/markets": {
       "get": {
         "tags": [
@@ -2923,7 +3053,7 @@
           "smart-wallet"
         ],
         "summary": "Get Wallet Markets",
-        "description": "Get per-market breakdown for a wallet.\n\nShows performance metrics for each market the wallet has traded in.\nUses ClickHouse rolling tables for all time windows.",
+        "description": "Get per-market breakdown for a wallet.\n\nShows performance metrics for each market the wallet has traded in.",
         "operationId": "get_wallet_markets_v2_polymarket_wallet__wallet__markets_get",
         "parameters": [
           {
@@ -3469,7 +3599,7 @@
           "smart-wallet"
         ],
         "summary": "Get Smart Activity Markets",
-        "description": "Discover markets where high-performing wallets are active.\n\n**Use Case:** Find alpha by seeing where profitable traders are putting their money.\n\n**How it works:**\n1. Define \"smart wallets\" using the filter criteria (min_realized_pnl, min_roi, etc.)\n2. Find all markets these wallets have traded\n3. Rank markets by smart wallet activity (volume, count, realized PnL)\n\nReturns markets sorted by smart wallet activity metrics.",
+        "description": "Discover markets where high-performing wallets are active.\n\n**Use Case:** Find alpha by seeing where profitable traders are putting their money.\n\n**How it works:**\n1. Define \"smart wallets\" using the filter criteria (min_realized_pnl, min_roi, etc.)\n2. Find all markets these wallets have traded\n3. Rank markets by smart wallet activity (volume, count, realized PnL)\n\n**Filter Requirements:**\n\nAt least one \"strong\" filter must meet these minimum thresholds:\n- `min_realized_pnl >= 1000` ($1,000+ PnL)\n- `min_roi >= 0.15` (15%+ ROI)\n- `min_trades >= 100` (100+ trades)\n- `min_volume >= 10000` ($10,000+ volume)\n\nIf using `min_win_rate` or `min_profit_factor` without a strong filter,\nyou must also specify `min_trades >= 50`.\n\nThese requirements ensure meaningful wallet filtering and fast query performance.\n\nReturns markets sorted by smart wallet activity metrics.",
         "operationId": "get_smart_activity_markets_v2_polymarket_markets_smart_activity_get",
         "parameters": [
           {
@@ -3702,7 +3832,7 @@
           "smart-wallet"
         ],
         "summary": "Get Smart Money Positioning",
-        "description": "Get smart money positioning for a specific market.\n\n**Use Case:** See what profitable traders are doing on a specific market.\n\n**Returns:**\n- How many smart wallets are net buyers vs net sellers\n- Average entry prices for smart wallets\n- Total volume and realized PnL from smart wallets",
+        "description": "Get smart money positioning for a specific market.\n\n**Use Case:** See what profitable traders are doing on a specific market.\n\n**Filter Requirements:**\n\nAt least one \"strong\" filter must meet these minimum thresholds:\n- `min_realized_pnl >= 1000` ($1,000+ PnL)\n- `min_roi >= 0.15` (15%+ ROI)\n- `min_trades >= 100` (100+ trades)\n- `min_volume >= 10000` ($10,000+ volume)\n\nIf using `min_win_rate` or `min_profit_factor` without a strong filter,\nyou must also specify `min_trades >= 50`.\n\n**Returns:**\n- How many smart wallets are net buyers vs net sellers\n- Average entry prices for smart wallets\n- Total volume and realized PnL from smart wallets",
         "operationId": "get_smart_money_positioning_v2_polymarket_market__condition_id__smart_money_get",
         "parameters": [
           {
@@ -4261,7 +4391,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 10000,
               "minimum": 0,
               "description": "Offset for pagination",
               "default": 0,
@@ -4300,7 +4429,7 @@
           "polymarket"
         ],
         "summary": "Get Events",
-        "description": "List events with filtering and sorting from PostgreSQL database.\n\nEvents are top-level groupings that contain one or more markets.\nUse status=open for active events only.",
+        "description": "List events with filtering and sorting.\n\nEvents are top-level groupings that contain one or more markets.\nUse status=open for active events only.",
         "operationId": "get_events_v2_polymarket_events_get",
         "parameters": [
           {
@@ -4456,7 +4585,6 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 10000,
               "minimum": 0,
               "description": "Number of events to skip",
               "default": 0,
@@ -4872,7 +5000,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 200,
+              "maximum": 500,
               "minimum": 1,
               "description": "Number of trades to return",
               "default": 100,
@@ -5190,7 +5318,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 200,
+              "maximum": 500,
               "minimum": 1,
               "description": "Number of trades to return",
               "default": 100,
@@ -5391,7 +5519,7 @@
           "dflow"
         ],
         "summary": "Get Dflow Wallet Positions",
-        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with total cost basis, realized PnL, and fees paid.\n\n- **Open positions**: Currently holding tokens (total_qty_bought > total_qty_sold)\n- **Closed positions**: No longer holding but has trading history\n\nEnriched with market metadata (title, subtitles) from PostgreSQL.\nUses cursor-based pagination for efficient deep pagination.",
+        "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with total cost basis, realized PnL, and fees paid.\n\n- **Open positions**: Currently holding tokens (total_qty_bought > total_qty_sold)\n- **Closed positions**: No longer holding but has trading history\n\nUses cursor-based pagination for efficient deep pagination.",
         "operationId": "get_dflow_wallet_positions_v2_dflow_wallet_positions__wallet__get",
         "parameters": [
           {
@@ -5487,13 +5615,13 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 200,
+              "maximum": 500,
               "minimum": 1,
-              "description": "Maximum number of positions to return (1-200)",
+              "description": "Maximum number of positions to return (1-500)",
               "default": 100,
               "title": "Limit"
             },
-            "description": "Maximum number of positions to return (1-200)"
+            "description": "Maximum number of positions to return (1-500)"
           },
           {
             "name": "pagination_key",
@@ -5684,7 +5812,7 @@
           "binance"
         ],
         "summary": "Get Binance Candles",
-        "description": "Fetch OHLCV candlestick data for a Binance trading pair.\n\nCandle prices are derived from book ticker mid-prices (not trade prices).\nIntervals 1s and 1m read from pre-aggregated materialized views.\nLarger intervals (5m, 15m, 1h, 4h, 1d) are aggregated on-the-fly from 1m candles.\n\n**Backtesting crypto up/down markets:**\n- Use `interval=15m` for 15-minute prediction markets\n- Use `interval=1h` for 1-hour prediction markets\n- Use `interval=4h` and `interval=1d` for longer timeframes",
+        "description": "Fetch OHLCV candlestick data for a Binance trading pair.\n\nCandle prices are derived from book ticker mid-prices (not trade prices).\n\n**Backtesting crypto up/down markets:**\n- Use `interval=15m` for 15-minute prediction markets\n- Use `interval=1h` for 1-hour prediction markets\n- Use `interval=4h` and `interval=1d` for longer timeframes",
         "operationId": "get_binance_candles_v2_binance_candles__symbol__get",
         "parameters": [
           {
@@ -9887,6 +10015,158 @@
         "title": "TimeWindow",
         "description": "Time window for rolling metrics."
       },
+      "TopHolderEntry": {
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "title": "Rank",
+            "description": "Position in list (1-indexed)"
+          },
+          "user": {
+            "type": "string",
+            "title": "User",
+            "description": "Wallet address"
+          },
+          "position_shares": {
+            "type": "number",
+            "title": "Position Shares",
+            "description": "Total shares held (normalized)"
+          },
+          "position_value_usd": {
+            "type": "number",
+            "title": "Position Value Usd",
+            "description": "Estimated position value in USD"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side",
+            "description": "Position side (Yes/No or custom label)"
+          },
+          "avg_price": {
+            "type": "number",
+            "title": "Avg Price",
+            "description": "Average entry price (0-1)"
+          },
+          "realized_pnl": {
+            "type": "number",
+            "title": "Realized Pnl",
+            "description": "Realized PnL in USD"
+          },
+          "unrealized_pnl": {
+            "type": "number",
+            "title": "Unrealized Pnl",
+            "description": "Unrealized PnL in USD"
+          },
+          "trade_count": {
+            "type": "integer",
+            "title": "Trade Count",
+            "description": "Number of trades"
+          },
+          "first_trade_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Trade At",
+            "description": "Unix timestamp of first trade"
+          },
+          "last_trade_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Trade At",
+            "description": "Unix timestamp of last trade"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rank",
+          "user",
+          "position_shares",
+          "position_value_usd",
+          "side",
+          "avg_price",
+          "realized_pnl",
+          "unrealized_pnl",
+          "trade_count"
+        ],
+        "title": "TopHolderEntry",
+        "description": "Single entry in the top holders list."
+      },
+      "TopHoldersResponse": {
+        "properties": {
+          "condition_id": {
+            "type": "string",
+            "title": "Condition Id",
+            "description": "Market condition ID"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Market title"
+          },
+          "market_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Slug",
+            "description": "Market slug"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Side",
+            "description": "Position side filter applied ('yes', 'no', or null for all)"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/TopHolderEntry"
+            },
+            "type": "array",
+            "title": "Entries",
+            "description": "Top holder entries"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/CursorPagination",
+            "description": "Pagination info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "condition_id",
+          "entries",
+          "pagination"
+        ],
+        "title": "TopHoldersResponse",
+        "description": "Response for market top holders endpoint."
+      },
       "Trade": {
         "properties": {
           "token_id": {
@@ -10846,5 +11126,15 @@
         "name": "x-api-key"
       }
     }
-  }
+  },
+  "servers": [
+    {
+      "url": "https://api.predexon.com"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ]
 }

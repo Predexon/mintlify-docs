@@ -72,7 +72,8 @@
                   "api-reference/analytics/leaderboard",
                   "api-reference/analytics/market-leaderboard",
                   "api-reference/analytics/cohort-stats",
-                  "api-reference/analytics/filter-wallets"
+                  "api-reference/analytics/filter-wallets",
+                  "api-reference/analytics/top-holders"
                 ]
               },
               {
