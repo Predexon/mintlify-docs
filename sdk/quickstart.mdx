@@ -8,11 +8,15 @@ description: "Get up and trading in minutes"
 <Steps>
   <Step title="Create the SDK instance">
     ```typescript
-    import { PredexonSDK, createEvmAdapter } from '@predexon/trade-sdk';
+    import { PredexonSDK, createViemAdapter } from '@predexon/trade-sdk';
+
+    // walletClient is a viem WalletClient — see Wallet Adapters for full setup
+    const wallet = createViemAdapter(walletClient);
+    const walletAddress = await wallet.account.getAddress();
 
     const sdk = new PredexonSDK({
-      apiKey: 'your-api-key',
-      wallet: createEvmAdapter(yourWalletClient),
+      apiKey: process.env.PREDEXON_API_KEY!,
+      wallet,
     });
     ```
   </Step>
@@ -20,9 +24,13 @@ description: "Get up and trading in minutes"
     ```typescript
     await sdk.enableTrading({
       core: { venue: 'polymarket', wallet: walletAddress },
-      approvals: 'auto',
+      approvals: 'broadcast', // or 'sign' if wallet supports signTransaction
     });
     ```
+
+    <Info>
+    If you omit `approvals`, the SDK auto-selects based on your wallet's capabilities. See [Wallet Adapters](/sdk/wallet-adapters) for details.
+    </Info>
   </Step>
   <Step title="Place a market order">
     ```typescript
@@ -39,34 +47,37 @@ description: "Get up and trading in minutes"
 
     console.log('Order placed:', result.orderId, result.status);
     ```
+
+    <Info>
+    Get `tokenId` from the [markets list endpoint](/api-reference/markets/list-markets). Each market has two tokenIds (Yes/No outcomes).
+    </Info>
   </Step>
 </Steps>
 
 ## Kalshi (Solana)
 
 <Steps>
-  <Step title="Create the SDK with Solana signing">
+  <Step title="Create the SDK with Solana adapter">
     ```typescript
-    import { PredexonSDK, createEvmAdapter } from '@predexon/trade-sdk';
+    import { PredexonSDK, createSolanaAdapter } from '@predexon/trade-sdk';
+
+    // See Wallet Adapters for full Solana signing setup
+    const solanaSigner = createSolanaAdapter({
+      signSolanaTransaction: async (base64Tx) => { /* sign and return base64 */ },
+      signSolanaMessage: async (message) => { /* sign and return base64 */ },
+    });
+    const walletAddress = 'your-solana-wallet-address';
 
     const sdk = new PredexonSDK({
-      apiKey: 'your-api-key',
-      wallet: {
-        ...createEvmAdapter(evmWallet),
-        signSolanaTransaction: async (base64Tx) => {
-          // Sign and return base64
-        },
-        signSolanaMessage: async (message) => {
-          // Sign and return signature
-        },
-      },
+      apiKey: process.env.PREDEXON_API_KEY!,
+      solanaSigner,
     });
     ```
   </Step>
   <Step title="Enable trading (wallet registration)">
     ```typescript
     await sdk.enableTrading({
-      core: { venue: 'kalshi', wallet: solanaWalletAddress },
+      core: { venue: 'kalshi', wallet: walletAddress },
     });
     ```
   </Step>
@@ -75,7 +86,7 @@ description: "Get up and trading in minutes"
     const result = await sdk.placeOrder({
       core: {
         venue: 'kalshi',
-        wallet: solanaWalletAddress,
+        wallet: walletAddress,
         side: 'buy',
         amount: '10', // $10 USDC
         type: 'market',
@@ -85,22 +96,23 @@ description: "Get up and trading in minutes"
 
     console.log('Order placed:', result.orderId, result.status);
     ```
+
+    <Info>
+    Get `ticker` from the [Kalshi markets endpoint](/api-reference/kalshi/list-markets).
+    </Info>
   </Step>
 </Steps>
 
 ## Next Steps
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Configuration" icon="gear" href="/sdk/configuration">
-    Learn about SDK options
+    API keys and wallet setup
   </Card>
   <Card title="Core Methods" icon="code" href="/sdk/core-methods">
-    Explore all SDK methods
+    All SDK methods
   </Card>
-  <Card title="Order Semantics" icon="list-check" href="/sdk/order-semantics">
-    Understand order parameters
-  </Card>
-  <Card title="Examples" icon="file-code" href="/sdk/examples">
-    See complete trading flows
+  <Card title="Wallet Adapters" icon="wallet" href="/sdk/wallet-adapters">
+    Turnkey, Privy, and more
   </Card>
 </CardGroup>

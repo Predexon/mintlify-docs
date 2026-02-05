@@ -3,74 +3,73 @@ title: "Configuration"
 description: "SDK constructor options and configuration"
 ---
 
-## Constructor Options
+## Basic Setup
 
 ```typescript
-interface PredexonSdkConfig {
-  apiKey: string;                    // Required: Your Predexon API key
-  wallet?: EvmSigner & SolanaSigner; // Optional: Wallet for signing
-  timeouts?: {
-    requestMs?: number;              // Request timeout (default: 30000ms)
-  };
-}
+import { PredexonSDK, createViemAdapter } from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  wallet: createViemAdapter(walletClient),
+});
 ```
 
-## Configuration Parameters
+For Kalshi (Solana), use `solanaSigner` instead of `wallet`:
+
+```typescript
+import { PredexonSDK, createSolanaAdapter } from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  solanaSigner: createSolanaAdapter({
+    signSolanaTransaction: async (base64Tx) => signedBase64,
+    signSolanaMessage: async (message) => signatureBase64,
+  }),
+});
+```
+
+---
+
+## Configuration Reference
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `apiKey` | `string` | Yes | - | Your Predexon API key |
-| `wallet` | `EvmSigner & SolanaSigner` | No | - | Wallet adapter for signing |
-| `timeouts.requestMs` | `number` | No | `30000` | Request timeout in milliseconds |
+| `wallet` | `EvmWallet` | No | - | EVM wallet for Polymarket |
+| `solanaSigner` | `SolanaSigner` | No | - | Solana signer for Kalshi |
 
-## Basic Configuration
+---
+
+## Advanced Options
+
+These options are rarely needed:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `evmSignerOptions.chainId` | `number` | `137` | EVM chain ID (Polygon) |
+| `evmSignerOptions.enableRawAccess` | `boolean` | `false` | Enable raw signer access |
+| `timeouts.requestMs` | `number` | `30000` | Request timeout in milliseconds |
 
 ```typescript
-import { PredexonSDK, createEvmAdapter } from '@predexon/trade-sdk';
-
 const sdk = new PredexonSDK({
-  apiKey: 'pk_live_xxxxx',
-  wallet: createEvmAdapter(walletClient),
-});
-```
-
-## Custom Timeout
-
-```typescript
-const sdk = new PredexonSDK({
-  apiKey: 'pk_live_xxxxx',
-  wallet: createEvmAdapter(walletClient),
+  apiKey: process.env.PREDEXON_API_KEY!,
+  wallet: createViemAdapter(walletClient),
   timeouts: {
-    requestMs: 60000, // 60 second timeout
+    requestMs: 60000,
   },
 });
 ```
 
-## Read-Only Configuration
+---
 
-Some operations don't require a wallet. You can create a read-only SDK instance:
+## Security
 
-```typescript
-const sdk = new PredexonSDK({
-  apiKey: 'pk_live_xxxxx',
-});
-
-// These work without a wallet
-const positions = await sdk.getPositions({
-  core: { venue: 'polymarket', wallet: '0x...' },
-});
-
-const balance = await sdk.getBalance({
-  core: { venue: 'polymarket', wallet: '0x...' },
-});
-
-const orders = await sdk.getOpenOrders({
-  core: { venue: 'polymarket', wallet: '0x...' },
-});
-```
+<Info>
+**API key required for all SDK calls.** The API key is sent via the `x-api-key` header on every request.
+</Info>
 
 <Warning>
-Placing orders, enabling trading, and redemption require a wallet to be configured.
+**Base URL is hard-locked** to `https://trade.predexon.com` for security. This cannot be overridden. See the [Security](/sdk/security) page for details.
 </Warning>
 
 ## Next Steps

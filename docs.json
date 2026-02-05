@@ -142,8 +142,6 @@
             "group": "Core API",
             "pages": [
               "sdk/core-methods",
-              "sdk/order-semantics",
-              "sdk/idempotency",
               "sdk/errors"
             ]
           },
@@ -151,30 +149,6 @@
             "group": "Security",
             "pages": [
               "sdk/security"
-            ]
-          },
-          {
-            "group": "TypeScript",
-            "pages": [
-              "sdk/typescript"
-            ]
-          },
-          {
-            "group": "Examples",
-            "pages": [
-              "sdk/examples"
-            ]
-          },
-          {
-            "group": "FAQ",
-            "pages": [
-              "sdk/faq"
-            ]
-          },
-          {
-            "group": "Changelog",
-            "pages": [
-              "sdk/changelog"
             ]
           }
         ]

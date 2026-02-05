@@ -1,201 +1,75 @@
 ---
 title: "Errors"
-description: "Typed error classes and error handling patterns"
+description: "Error types and handling"
 ---
 
-The SDK throws typed errors for different failure scenarios, allowing you to handle each case appropriately.
+The SDK throws typed errors you can catch and handle specifically.
 
-## Error Types
-
-| Error Class | Code | Description |
-|-------------|------|-------------|
-| `SdkError` | `SDK_ERROR` | Base error class for all SDK errors |
-| `NetworkError` | `NETWORK_ERROR` | HTTP/network failures, timeouts |
-| `AuthError` | `AUTH_ERROR` | API key invalid or wallet authentication issues |
-| `ValidationError` | `VALIDATION_ERROR` | Invalid input parameters |
-| `SigningError` | `SIGNING_ERROR` | Wallet signing failures |
-| `OrderRejectedError` | `ORDER_REJECTED` | Order rejected by venue (insufficient balance, liquidity, etc.) |
-| `NotSupportedError` | `NOT_SUPPORTED` | Unsupported operation (e.g., limit orders on Kalshi) |
-
-## Importing Errors
+## Error Classes
 
 ```typescript
 import {
-  SdkError,
-  NetworkError,
-  AuthError,
-  ValidationError,
-  SigningError,
-  OrderRejectedError,
-  NotSupportedError,
+  SdkError,          // Base class
+  ValidationError,   // Invalid input parameters
+  AuthError,         // Missing API key or wallet/signer
+  NetworkError,      // HTTP failures, timeouts, server errors
+  SigningError,      // Wallet signing failed or rejected
+  NotSupportedError, // Operation not supported (e.g., Kalshi limit orders)
 } from '@predexon/trade-sdk';
 ```
 
-## Basic Error Handling
+All errors have a `code` property:
+
+| Error | Code | When |
+|-------|------|------|
+| `ValidationError` | `VALIDATION_ERROR` | Invalid params, wrong amount/size combo, price out of range |
+| `AuthError` | `AUTH_ERROR` | Missing API key, missing wallet/signer in SDK config |
+| `NetworkError` | `NETWORK_ERROR` | HTTP errors, timeouts, server errors, 409 conflicts |
+| `SigningError` | `SIGNING_ERROR` | Wallet rejected signature, missing signing method |
+| `NotSupportedError` | `NOT_SUPPORTED` | Operation unavailable for venue (e.g., Kalshi limit orders) |
+
+## Handling Errors
 
 ```typescript
 try {
   await sdk.placeOrder({
-    core: {
-      venue: 'polymarket',
-      wallet: '0x...',
-      side: 'buy',
-      amount: '10',
-      type: 'market',
-    },
+    core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '10', type: 'market' },
     flags: { tokenId: '12345...' },
   });
 } catch (error) {
   if (error instanceof ValidationError) {
-    console.log('Invalid input:', error.message);
-    console.log('Error code:', error.code); // 'VALIDATION_ERROR'
-  } else if (error instanceof AuthError) {
-    console.log('Authentication failed:', error.message);
-  } else if (error instanceof NetworkError) {
-    console.log('Network issue:', error.message);
+    // Fix input and retry
   } else if (error instanceof SigningError) {
-    console.log('Wallet signing failed:', error.message);
-  } else if (error instanceof OrderRejectedError) {
-    console.log('Order rejected:', error.message);
+    // User rejected or wallet missing method
+  } else if (error instanceof AuthError) {
+    // Missing API key or wallet config
+  } else if (error instanceof NetworkError) {
+    // Safe to retry (use idempotency key)
   } else if (error instanceof NotSupportedError) {
-    console.log('Not supported:', error.message);
+    // Operation not available for this venue/wallet
   }
 }
 ```
 
-## Error Handling by Scenario
+## Retryable vs Non-Retryable
 
-### Validation Errors
+| Error | Retryable? | Action |
+|-------|------------|--------|
+| `NetworkError` | Yes | Retry with same idempotency key |
+| `ValidationError` | No | Fix input parameters |
+| `AuthError` | No | Fix API key or wallet setup |
+| `SigningError` | No | User must approve signature |
+| `NotSupportedError` | No | Operation not available |
 
-Thrown when input parameters are invalid. Fix the request before retrying.
+## Error Cause
 
-```typescript
-try {
-  await sdk.placeOrder({
-    core: { venue: 'polymarket', wallet: '0x...', side: 'buy', type: 'market' },
-    flags: { tokenId: '' }, // Invalid: empty tokenId
-  });
-} catch (error) {
-  if (error instanceof ValidationError) {
-    // Fix the input and retry
-    console.log('Validation failed:', error.message);
-  }
-}
-```
-
-### Network Errors
-
-Thrown for HTTP failures, timeouts, or connectivity issues. Safe to retry.
+Errors preserve the original cause for debugging:
 
 ```typescript
-try {
-  await sdk.placeOrder({
-    core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '10', type: 'market' },
-    flags: { tokenId: '12345...' },
-  });
-} catch (error) {
-  if (error instanceof NetworkError) {
-    // Safe to retry with same idempotency key
-    console.log('Network error, retrying...');
-  }
-}
-```
-
-### Auth Errors
-
-Thrown when API key is invalid or wallet authentication fails.
-
-```typescript
-try {
-  await sdk.enableTrading({ core: { venue: 'polymarket', wallet: '0x...' } });
-} catch (error) {
-  if (error instanceof AuthError) {
-    // Check API key or wallet connection
-    console.log('Auth failed:', error.message);
-  }
-}
-```
-
-### Signing Errors
-
-Thrown when the wallet fails to sign a transaction or typed data.
-
-```typescript
-try {
-  await sdk.placeOrder({
-    core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '10', type: 'market' },
-    flags: { tokenId: '12345...' },
-  });
-} catch (error) {
+catch (error) {
   if (error instanceof SigningError) {
-    // User may have rejected the signature request
-    console.log('Signing failed:', error.message);
-  }
-}
-```
-
-### Order Rejected Errors
-
-Thrown when the venue rejects the order (e.g., insufficient balance, no liquidity).
-
-```typescript
-try {
-  await sdk.placeOrder({
-    core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '10', type: 'market' },
-    flags: { tokenId: '12345...' },
-  });
-} catch (error) {
-  if (error instanceof OrderRejectedError) {
-    // Check balance, liquidity, or order parameters
-    console.log('Order rejected:', error.message);
-  }
-}
-```
-
-## Complete Error Handler
-
-```typescript
-import {
-  PredexonSDK,
-  ValidationError,
-  AuthError,
-  NetworkError,
-  SigningError,
-  OrderRejectedError,
-  NotSupportedError,
-  PlaceOrderRequest,
-} from '@predexon/trade-sdk';
-
-async function placeOrderSafely(sdk: PredexonSDK, request: PlaceOrderRequest) {
-  try {
-    const result = await sdk.placeOrder(request);
-    return { success: true, order: result };
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      // Invalid input - fix the request
-      return { success: false, error: 'validation', message: error.message };
-    }
-    if (error instanceof AuthError) {
-      // Auth issue - check API key or wallet
-      return { success: false, error: 'auth', message: error.message };
-    }
-    if (error instanceof NetworkError) {
-      // Network issue - retry later
-      return { success: false, error: 'network', message: error.message };
-    }
-    if (error instanceof SigningError) {
-      // Signing failed - user may have rejected
-      return { success: false, error: 'signing', message: error.message };
-    }
-    if (error instanceof OrderRejectedError) {
-      // Order rejected - check liquidity/balance
-      return { success: false, error: 'rejected', message: error.message };
-    }
-    if (error instanceof NotSupportedError) {
-      // Operation not supported
-      return { success: false, error: 'not_supported', message: error.message };
-    }
-    throw error; // Unknown error
+    console.log(error.message);  // "Wallet signing failed"
+    console.log(error.cause);    // Original error from wallet
   }
 }
 ```
@@ -203,10 +77,10 @@ async function placeOrderSafely(sdk: PredexonSDK, request: PlaceOrderRequest) {
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Idempotency" icon="rotate" href="/sdk/idempotency">
-    Retry-safe order placement
-  </Card>
   <Card title="Security" icon="shield" href="/sdk/security">
     Security architecture
+  </Card>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Full API reference
   </Card>
 </CardGroup>

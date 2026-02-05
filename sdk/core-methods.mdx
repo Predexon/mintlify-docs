@@ -1,64 +1,51 @@
 ---
 title: "Core Methods"
-description: "Primary SDK APIs for trading, orders, and portfolio management"
+description: "SDK method reference"
 ---
 
 ## enableTrading
 
-Enable trading for a venue. Must be called once before placing orders.
-
-```typescript
-async enableTrading(request: EnableTradingRequest): Promise<EnableTradingResponse>
-```
-
-### Polymarket
-
-Handles CLOB credential registration and contract approvals.
+Enable trading for a venue. Call once per wallet before placing orders.
 
 ```typescript
 await sdk.enableTrading({
   core: { venue: 'polymarket', wallet: '0x...' },
-  approvals: 'auto', // 'auto' | 'manual' | 'skip'
+  approvals: 'sign', // optional: 'sign' | 'broadcast' | 'skip'
 });
 ```
 
-**Approval modes:**
+### Polymarket
 
-| Mode | Behavior |
-|------|----------|
-| `'auto'` | SDK signs and broadcasts approval transactions automatically |
-| `'manual'` | Returns unsigned approval transactions for you to broadcast |
-| `'skip'` | Skip approval check (use if already approved) |
+Registers CLOB credentials and approves trading contracts.
 
-**Response:**
-
-```typescript
-interface EnableTradingResponse {
-  venue: 'polymarket';
-  tradingEnabled: boolean;
-  approvalsComplete: boolean;
-  clobRegistered: boolean;
-  approvalTransactions?: ApprovalTransaction[]; // Only for 'manual' mode
-}
-```
+| Approval Mode | Wallet Requirement | Behavior |
+|---------------|-------------------|----------|
+| `'sign'` | `signTransaction` | Wallet signs, server broadcasts |
+| `'broadcast'` | `sendTransaction` | Wallet signs and broadcasts |
+| `'skip'` | None | Skip approvals (use if already approved) |
 
 ### Kalshi
 
-Registers your Solana wallet with Predexon.
+Registers your Solana wallet via message signing.
 
 ```typescript
 await sdk.enableTrading({
-  core: { venue: 'kalshi', wallet: 'SolanaPublicKey...' },
+  core: { venue: 'kalshi', wallet: '7xKX...' },
 });
 ```
 
-**Response:**
+### Response
 
 ```typescript
 interface EnableTradingResponse {
-  venue: 'kalshi';
+  venue: 'polymarket' | 'kalshi';
   tradingEnabled: boolean;
-  ownershipVerified: boolean;
+  // Polymarket only:
+  approvalsComplete?: boolean;
+  clobRegistered?: boolean;
+  approvalTxHashes?: string[];
+  // Kalshi only:
+  ownershipVerified?: boolean;
 }
 ```
 
@@ -66,127 +53,64 @@ interface EnableTradingResponse {
 
 ## placeOrder
 
-Build, sign, and submit an order in one call. This is the primary API for trading.
+Place an order. This is the primary trading method.
 
 ```typescript
-async placeOrder(request: PlaceOrderRequest): Promise<PlaceOrderResponse>
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    amount: '100',    // $100 USDC
+    type: 'market',
+  },
+  flags: { tokenId: '...' },
+});
 ```
 
-### Polymarket Orders
+### Polymarket Examples
 
-<Tabs>
-  <Tab title="Market BUY (by USDC)">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'polymarket',
-        wallet: '0x...',
-        side: 'buy',
-        amount: '100', // Spend $100 USDC
-        type: 'market',
-      },
-      flags: { tokenId: '12345...' },
-    });
-    ```
-  </Tab>
-  <Tab title="Market BUY (by shares)">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'polymarket',
-        wallet: '0x...',
-        side: 'buy',
-        size: '50', // Buy 50 shares
-        type: 'market',
-      },
-      flags: { tokenId: '12345...' },
-    });
-    ```
-  </Tab>
-  <Tab title="Market SELL">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'polymarket',
-        wallet: '0x...',
-        side: 'sell',
-        size: '50', // Sell 50 shares
-        type: 'market',
-      },
-      flags: { tokenId: '12345...' },
-    });
-    ```
-  </Tab>
-  <Tab title="Limit BUY">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'polymarket',
-        wallet: '0x...',
-        side: 'buy',
-        size: '100', // Buy 100 shares
-        price: '0.65', // At $0.65 per share
-        type: 'limit',
-      },
-      flags: { tokenId: '12345...' },
-    });
-    ```
-  </Tab>
-  <Tab title="Limit SELL">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'polymarket',
-        wallet: '0x...',
-        side: 'sell',
-        size: '100',
-        price: '0.70',
-        type: 'limit',
-      },
-      flags: { tokenId: '12345...' },
-    });
-    ```
-  </Tab>
-</Tabs>
+**Market order — buy $100 worth:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '100', type: 'market' },
+  flags: { tokenId: '...' },
+});
+```
 
-### Kalshi Orders
+**Limit order — buy 100 shares at $0.65:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', size: '100', price: '0.65', type: 'limit' },
+  flags: { tokenId: '...' },
+});
+```
 
-<Tabs>
-  <Tab title="Market BUY">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'kalshi',
-        wallet: 'SolanaPublicKey...',
-        side: 'buy',
-        amount: '50', // Spend $50 USDC
-        type: 'market',
-      },
-      flags: {
-        ticker: 'PRES-2024-DEM',
-        outcome: 'Yes', // or 'No'
-      },
-    });
-    ```
-  </Tab>
-  <Tab title="Market SELL">
-    ```typescript
-    const result = await sdk.placeOrder({
-      core: {
-        venue: 'kalshi',
-        wallet: 'SolanaPublicKey...',
-        side: 'sell',
-        size: '25', // Sell 25 tokens
-        type: 'market',
-      },
-      flags: {
-        ticker: 'PRES-2024-DEM',
-        outcome: 'Yes',
-      },
-    });
-    ```
-  </Tab>
-</Tabs>
+**Sell order — sell 50 shares:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'sell', size: '50', type: 'market' },
+  flags: { tokenId: '...' },
+});
+```
+
+### Kalshi Examples
+
+**Market buy — spend $50 USDC:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'kalshi', wallet: '7xKX...', side: 'buy', amount: '50', type: 'market' },
+  flags: { ticker: 'PRES-2024-DEM', outcome: 'Yes' },
+});
+```
+
+**Market sell — sell 25 tokens:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'kalshi', wallet: '7xKX...', side: 'sell', size: '25', type: 'market' },
+  flags: { ticker: 'PRES-2024-DEM', outcome: 'Yes' },
+});
+```
 
 ### Response
 
@@ -196,85 +120,126 @@ interface PlaceOrderResponse {
   venue: 'polymarket' | 'kalshi';
   status: 'filled' | 'pending' | 'canceled' | 'failed' | 'reverted';
   price: string | null;
-  amount?: string;      // USDC amount
-  size?: string;        // Share/token size
+  amount?: string;
+  size?: string;
   filledAmount?: string;
   createdAt: string;
   message?: string;
 }
 ```
 
----
+| Status | Description |
+|--------|-------------|
+| `filled` | Fully executed |
+| `pending` | Processing or resting on book |
+| `canceled` | User canceled |
+| `failed` | Rejected (invalid params, insufficient balance) |
+| `reverted` | On-chain revert (Kalshi only) |
 
-## prepareOrder
+<Accordion title="Order Parameters Reference">
 
-Build and sign an order without submitting. For advanced use cases.
+### Units
 
+All numeric inputs are human-readable strings:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `amount` | USDC to spend | `'100'` = $100 |
+| `size` | Number of shares/tokens | `'50'` = 50 shares |
+| `price` | Price per share (0-1) | `'0.65'` = $0.65 |
+
+### Required Fields by Order Type
+
+**Polymarket:**
+
+| Order Type | Side | Required Fields |
+|------------|------|-----------------|
+| Market | BUY | `amount` OR `size` |
+| Market | SELL | `size` |
+| Limit | BUY/SELL | `size` + `price` |
+
+**Kalshi** (market orders only):
+
+| Side | Required Fields |
+|------|-----------------|
+| BUY | `amount` |
+| SELL | `size` |
+
+### Flags
+
+**Polymarket:**
 ```typescript
-async prepareOrder(request: PrepareOrderRequest): Promise<UnifiedPrepareOrderResponse>
-```
-
-### Polymarket Response
-
-```typescript
-interface PrepareOrderResponse {
-  order: PolymarketOrder;
-  signature: string;
+flags: {
+  tokenId: string,        // Required
+  feeRateBps?: string,    // Optional (omit to let CLOB resolve)
+  expiration?: string,    // Optional (Unix timestamp, '0' = no expiration)
 }
 ```
 
-### Kalshi Response
+<Warning>
+Do not pass `feeRateBps: '0'` on markets that require fees. Omit the field to let the CLOB resolve the correct fee.
+</Warning>
 
+**Kalshi:**
 ```typescript
-interface PrepareKalshiOrderResponse {
-  transaction: string;  // Base64 Solana transaction
-  orderParams: KalshiOrderParams;
-  executionMode?: 'sync' | 'async';
-  sponsorAddress?: string;
+flags: {
+  ticker: string,         // Required (e.g., 'PRES-2024-DEM')
+  outcome: 'Yes' | 'No',  // Required
 }
 ```
 
----
+</Accordion>
 
-## submitOrder
+<Accordion title="Advanced: prepareOrder + submitOrder">
 
-Submit a previously prepared order.
+For custom signing flows (HSM, multisig) or order inspection before submission:
 
+**Polymarket:**
 ```typescript
-async submitOrder(request: UnifiedSubmitOrderRequest): Promise<PlaceOrderResponse>
+// Step 1: Prepare (builds and signs order without submitting)
+const prepared = await sdk.prepareOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '100', type: 'market' },
+  flags: { tokenId: '...' },
+});
+
+// Step 2: Submit
+const result = await sdk.submitOrder({
+  order: prepared.order,
+  signature: prepared.signature,
+  orderType: 'market',
+});
 ```
 
-<Tabs>
-  <Tab title="Polymarket">
-    ```typescript
-    await sdk.submitOrder({
-      order: preparedOrder,
-      signature: signature,
-      orderType: 'market', // or 'limit'
-      idempotencyKey: 'optional-key',
-    });
-    ```
-  </Tab>
-  <Tab title="Kalshi">
-    ```typescript
-    await sdk.submitOrder({
-      walletAddress: 'SolanaPublicKey...',
-      signedTransaction: signedBase64,
-      orderParams: { ticker, outcome, side, amount },
-    });
-    ```
-  </Tab>
-</Tabs>
+**Kalshi:**
+```typescript
+const prepared = await sdk.prepareOrder({
+  core: { venue: 'kalshi', wallet: '7xKX...', side: 'buy', amount: '50', type: 'market' },
+  flags: { ticker: 'TICKER', outcome: 'Yes' },
+});
+
+// Sign the transaction with your Solana wallet
+const signedTx = await solanaSigner.signSolanaTransaction(prepared.transaction);
+
+const result = await sdk.submitOrder({
+  walletAddress: '7xKX...',
+  signedTransaction: signedTx,
+  orderParams: prepared.orderParams,
+});
+```
+
+</Accordion>
 
 ---
 
-## getOpenOrders
+## Order Management
+
+<Warning>
+**Kalshi limitation:** `getOpenOrders`, `cancelOrder`, and `cancelAllOrders` are not supported on Kalshi. Kalshi uses atomic swaps with no resting orders.
+</Warning>
+
+### getOpenOrders
 
 List open orders for a wallet.
-
-```typescript
-async getOpenOrders(params): Promise<OpenOrder[]>
-```
 
 ```typescript
 const orders = await sdk.getOpenOrders({
@@ -282,33 +247,21 @@ const orders = await sdk.getOpenOrders({
 });
 ```
 
-**Response:**
-
 ```typescript
 interface OpenOrder {
   orderId: string;
-  venue: 'polymarket' | 'kalshi';
-  tokenId?: string;   // Polymarket
-  ticker?: string;    // Kalshi
+  tokenId: string;
   side: string;
-  outcome?: string;
   amount: string;
-  amountMatched?: string;
   price: string;
   status: string;
   createdAt: string;
 }
 ```
 
----
+### cancelOrder
 
-## cancelOrder
-
-Cancel a specific open order.
-
-```typescript
-async cancelOrder(params): Promise<void>
-```
+Cancel a specific order.
 
 ```typescript
 await sdk.cancelOrder({
@@ -317,40 +270,30 @@ await sdk.cancelOrder({
 });
 ```
 
----
+### cancelAllOrders
 
-## cancelAllOrders
-
-Cancel all open orders for a wallet.
-
-```typescript
-async cancelAllOrders(params): Promise<{ cancelled: number }>
-```
+Cancel all open orders.
 
 ```typescript
 const result = await sdk.cancelAllOrders({
   core: { venue: 'polymarket', wallet: '0x...' },
 });
-console.log(`Cancelled ${result.cancelled} orders`);
+// result.cancelled = number of orders canceled
 ```
 
 ---
 
-## getPositions
+## Portfolio
 
-Get current positions for a wallet.
+### getPositions
 
-```typescript
-async getPositions(params): Promise<Position[]>
-```
+Get current positions.
 
 ```typescript
 const positions = await sdk.getPositions({
   core: { venue: 'polymarket', wallet: '0x...' },
 });
 ```
-
-**Response:**
 
 ```typescript
 interface Position {
@@ -362,22 +305,15 @@ interface Position {
   size: string;
   status: 'active' | 'resolved' | 'redeemable';
   result?: 'won' | 'lost' | null;
-  averagePrice?: string | null;
   currentPrice?: string | null;
   currentValue?: string | null;
   pnl?: string | null;
 }
 ```
 
----
-
-## getBalance
+### getBalance
 
 Get wallet balance.
-
-```typescript
-async getBalance(params): Promise<Balance[]>
-```
 
 ```typescript
 const balances = await sdk.getBalance({
@@ -385,14 +321,12 @@ const balances = await sdk.getBalance({
 });
 ```
 
-**Response:**
-
 ```typescript
 interface Balance {
   venue: 'polymarket' | 'kalshi';
   available: string;  // Available for trading
-  locked: string;     // Locked in open orders
-  total: string;      // Total balance
+  locked: string;     // In open orders
+  total: string;
 }
 ```
 
@@ -400,32 +334,37 @@ interface Balance {
 
 ## redeem
 
-Redeem resolved positions.
+Redeem resolved positions to claim USDC.
+
+### Polymarket
 
 ```typescript
-async redeem(request: RedeemRequest): Promise<RedeemResponse>
+const result = await sdk.redeem({
+  core: { venue: 'polymarket', wallet: '0x...' },
+  flags: { tokenId: 'resolved-token-id' },
+  redemption: 'sign', // optional: 'sign' | 'broadcast'
+});
 ```
 
-<Tabs>
-  <Tab title="Polymarket">
-    ```typescript
-    const result = await sdk.redeem({
-      core: { venue: 'polymarket', wallet: '0x...' },
-      flags: { tokenId: 'resolved-token-id' },
-    });
-    ```
-  </Tab>
-  <Tab title="Kalshi">
-    ```typescript
-    const result = await sdk.redeem({
-      core: { venue: 'kalshi', wallet: 'SolanaPublicKey...' },
-      flags: { ticker: 'TICKER', outcome: 'Yes' },
-    });
-    ```
-  </Tab>
-</Tabs>
+| Redemption Mode | Wallet Requirement | Behavior |
+|-----------------|-------------------|----------|
+| `'sign'` | `signTransaction` | Wallet signs, server broadcasts |
+| `'broadcast'` | `sendTransaction` | Wallet signs and broadcasts |
 
-**Response:**
+<Info>
+If `redemption` is omitted, the SDK auto-detects based on wallet capabilities.
+</Info>
+
+### Kalshi
+
+```typescript
+const result = await sdk.redeem({
+  core: { venue: 'kalshi', wallet: '7xKX...' },
+  flags: { ticker: 'TICKER', outcome: 'Yes' },
+});
+```
+
+### Response
 
 ```typescript
 interface RedeemResponse {
@@ -438,13 +377,15 @@ interface RedeemResponse {
 }
 ```
 
+---
+
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Order Semantics" icon="list-check" href="/sdk/order-semantics">
-    Understand order parameters
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/errors">
+    Handle errors and retries
   </Card>
-  <Card title="Examples" icon="file-code" href="/sdk/examples">
-    See complete trading flows
+  <Card title="Security" icon="shield" href="/sdk/security">
+    Security architecture
   </Card>
 </CardGroup>

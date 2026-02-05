@@ -9,16 +9,20 @@ description: "Install the Predexon Trade SDK and set up your project"
 npm install @predexon/trade-sdk
 ```
 
+<Info>
+Current version: **0.0.7**
+</Info>
+
 ## Requirements
 
 | Requirement | Version |
 |-------------|---------|
-| Node.js | 18+ (20+ recommended for cleanest install) |
-| TypeScript | 5.0+ (if using TypeScript) |
+| Node.js | 20.18+ |
+| TypeScript | 5+ (if you want types) |
 
 ## Peer Dependencies
 
-The SDK bundles its dependencies internally. No peer dependencies required.
+Core SDK has no peer dependencies. Server adapters require additional packages—see [Wallet Adapters](/sdk/wallet-adapters).
 
 ## Module Formats
 
@@ -40,7 +44,7 @@ const { PredexonSDK } = require('@predexon/trade-sdk');
 import { PredexonSDK } from '@predexon/trade-sdk';
 
 const sdk = new PredexonSDK({
-  apiKey: 'your-api-key',
+  apiKey: process.env.PREDEXON_API_KEY!,
 });
 
 console.log('SDK initialized successfully');
