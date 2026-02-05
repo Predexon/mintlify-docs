@@ -4,7 +4,7 @@ description: "How to authenticate with the Predexon API"
 ---
 
 <Info>
-**Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com). Upgrade to Pro or Desk for higher rate limits and unlimited requests.
+**Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com). Upgrade to Dev, Pro, or Enterprise for higher rate limits and more requests.
 </Info>
 
 ## Getting Started
@@ -18,11 +18,16 @@ curl -H "x-api-key: YOUR_API_KEY" \
 
 ## Rate Limits
 
-| Tier | Rate Limit | Monthly Requests | WebSocket Subs | Price |
-|------|------------|------------------|----------------|-------|
-| Free | 1 req/sec | 25,000 | 5 | $0/month |
-| Pro | 20 req/sec (40 burst) | Unlimited | 100 | $129/month |
-| Desk | 100 req/sec (200 burst) | Unlimited | 1,000 | $499/month |
+| Tier | Rate Limit | Monthly Requests | WebSocket | Price |
+|------|------------|------------------|-----------|-------|
+| Free | 1 req/sec | 1,000 | — | $0/month |
+| Dev | 20 req/sec | 1,000,000 | 10 subs × 10 items | $49/month |
+| Pro | 100 req/sec | 5,000,000 | 100 subs × 500 items + 2 wildcards/channel | $249/month |
+| Enterprise | Custom | Unlimited | Custom | $499+/month |
+
+<Note>
+Free tier excludes smart wallet, market matching endpoints, and WebSocket access. Dev and Pro tiers include overage pricing ($5/100K and $2.50/100K respectively).
+</Note>
 
 See full plan comparison at [predexon.com/pricing](https://predexon.com/pricing).
 

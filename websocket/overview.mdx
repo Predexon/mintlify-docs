@@ -71,7 +71,7 @@ On successful connection, the server sends:
 | HTTP Status | Reason |
 |-------------|--------|
 | 401 | Missing or invalid API key |
-| 403 | Free tier — WebSocket access requires a paid plan |
+| 403 | WebSocket access requires Dev plan or higher |
 | 429 | Connection limit exceeded for your plan |
 | 503 | Server at capacity |
 
@@ -94,13 +94,17 @@ On successful connection, the server sends:
 
 ## Plan Limits
 
-| Limit | Dev | Pro |
-|-------|-----|-----|
-| Subscriptions per connection | 10 | 100 |
-| Items per subscription | 10 | 500 |
-| Total items across all subscriptions | 100 | 50,000 |
-| Wildcard subscriptions | Not allowed | Allowed |
-| Wildcard connections per API key | 0 | 2 per channel |
+| Limit | Dev | Pro | Enterprise |
+|-------|-----|-----|------------|
+| Subscriptions per connection | 10 | 100 | Custom |
+| Items per subscription | 10 | 500 | Custom |
+| Total items across all subscriptions | 100 | 50,000 | Custom |
+| Wildcard subscriptions | Not allowed | 2 per channel | Allowed |
+| Priority routing (dedicated node) | No | No | Yes |
+
+<Note>
+**Free tier does not include WebSocket access.** Upgrade to Dev ($49/mo) or higher to use WebSocket streaming.
+</Note>
 
 Subscription and item limits are global across all channels — not per-channel. Wildcard connections are tracked per-channel (e.g. a wildcard on `orders` does not count against your `activity` wildcard limit).
 
