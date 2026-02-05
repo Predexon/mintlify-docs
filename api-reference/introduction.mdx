@@ -164,6 +164,19 @@ The complete OpenAPI 3.0 specification is available for generating client SDKs:
   Download the OpenAPI JSON specification
 </Card>
 
+## Global Constraints
+
+The following constraints apply across all v2 endpoints:
+
+| Constraint | Value |
+|------------|-------|
+| Max search length | 100 characters (minimum 3) |
+| Max array filter items | 50 items |
+
+<Note>
+Offset has no upper limit. Individual endpoint limits vary—see each endpoint for specific `limit` ranges.
+</Note>
+
 ## Rate Limits
 
 | Tier | Rate Limit | Monthly Requests | Overage | Price |

@@ -6,4 +6,9 @@ description: "Get raw book ticker data at microsecond granularity"
 
 Fetch raw book ticker data for a Binance trading pair. Returns bid/ask/mid/spread for each tick with microsecond precision.
 
+| Constraint | Value |
+|------------|-------|
+| `limit` | 1–10,000 (default 10,000) |
+| Time range | No limit |
+
 Use cursor-based pagination to iterate through large time ranges (e.g. a 15-minute window is ~63K ticks).

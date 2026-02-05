@@ -6,6 +6,22 @@ description: "Get OHLCV candlestick data for a Binance trading pair"
 
 Fetch OHLCV candlestick data derived from Binance book ticker mid-prices. Supported intervals: `1s`, `1m`, `5m`, `15m`, `1h`, `4h`, `1d`.
 
+| Constraint | Value |
+|------------|-------|
+| `limit` | 1–1,500 (default 500) |
+
+### Time Range Limits
+
+| Interval | Max Range |
+|----------|-----------|
+| `1s` | 1 hour |
+| `1m` | 7 days |
+| `5m` | 30 days |
+| `15m` | 90 days |
+| `1h` | 180 days |
+| `4h` | 365 days |
+| `1d` | 730 days |
+
 Useful for backtesting crypto up/down prediction markets:
 - `15m` for 15-minute markets
 - `1h` for 1-hour markets

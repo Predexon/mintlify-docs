@@ -5,3 +5,8 @@ description: "Fetch trading activity (merges, splits, redeems) for a user"
 ---
 
 Query trading activity for a wallet. Includes `SPLIT` (deposit collateral to create YES+NO pairs), `MERGE` (combine pairs back to collateral), and `REDEEM` (redeem winning tokens after resolution).
+
+| Constraint | Value |
+|------------|-------|
+| `limit` | 1–500 (default 100) |
+| `offset` | No limit |

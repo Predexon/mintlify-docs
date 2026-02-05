@@ -8,6 +8,10 @@ description: "Get all active exact-matched market pairs across Polymarket and Ka
 
 Get all active exact-matched market pairs between Polymarket and Kalshi. This endpoint returns pre-computed pairs where both markets are currently active, ordered by similarity score (highest first).
 
+| Constraint | Value |
+|------------|-------|
+| `limit` | 1–200 (default 100) |
+
 <Warning>
 **LLM-Based Matching**: Market matching is powered by large language models (LLMs). There is a small percentage of markets where hallucinations may occur, resulting in invalid or incorrect matches. Always verify matches before making trading decisions.
 </Warning>

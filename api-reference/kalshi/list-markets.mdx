@@ -4,4 +4,10 @@ openapi: "GET /v2/kalshi/markets"
 description: "Query Kalshi markets with filtering, sorting, and pagination"
 ---
 
-Fetch Kalshi prediction markets with filtering, sorting, and pagination. Does not include Multi Variate Event (MVE) markets like parlays. Prices returned as decimals (0-1).
+Fetch Kalshi prediction markets with filtering, sorting, and pagination. Does not include Multi Variate Event (MVE) markets like parlays.
+
+| Constraint | Value |
+|------------|-------|
+| `limit` | 1–100 (default 20) |
+
+<Note>Prices are returned as decimals (0–1), not cents.</Note>
