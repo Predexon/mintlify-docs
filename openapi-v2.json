@@ -10027,6 +10027,11 @@
             "title": "User",
             "description": "Wallet address"
           },
+          "token_id": {
+            "type": "string",
+            "title": "Token Id",
+            "description": "Token ID for this position"
+          },
           "position_shares": {
             "type": "number",
             "title": "Position Shares",
@@ -10091,6 +10096,7 @@
         "required": [
           "rank",
           "user",
+          "token_id",
           "position_shares",
           "position_value_usd",
           "side",
