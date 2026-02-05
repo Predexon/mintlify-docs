@@ -35,8 +35,7 @@
                 "group": "Cross-Platform Matching",
                 "pages": [
                   "api-reference/matching/find-matches",
-                  "api-reference/matching/matched-pairs",
-                  "api-reference/matching/batch-matches"
+                  "api-reference/matching/matched-pairs"
                 ]
               },
               {

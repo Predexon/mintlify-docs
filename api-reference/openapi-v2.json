@@ -183,175 +183,6 @@
         }
       }
     },
-    "/v2/matching-markets/batch": {
-      "get": {
-        "tags": [
-          "matching"
-        ],
-        "summary": "Get Batch Matching Markets",
-        "description": "Find matching markets for multiple market identifiers at once.\n\nProvide exactly ONE of:\n- polymarket_condition_ids\n- polymarket_market_slugs\n- polymarket_market_ids\n- kalshi_market_tickers\n\nReturns a dictionary mapping each input identifier to its matches.",
-        "operationId": "get_batch_matching_markets_v2_matching_markets_batch_get",
-        "parameters": [
-          {
-            "name": "polymarket_condition_ids",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of Polymarket condition IDs",
-              "title": "Polymarket Condition Ids"
-            },
-            "description": "List of Polymarket condition IDs",
-            "example": [
-              "0x6f14e52f6a1502a35406feea3f0e8d42502bbf1199e42c73a743fe1745ccc12c"
-            ]
-          },
-          {
-            "name": "polymarket_market_slugs",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of Polymarket slugs",
-              "title": "Polymarket Market Slugs"
-            },
-            "description": "List of Polymarket slugs",
-            "example": [
-              "will-chappell-roan-perform-at-the-2026-grammy-awards"
-            ]
-          },
-          {
-            "name": "polymarket_market_ids",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of Polymarket market IDs",
-              "title": "Polymarket Market Ids"
-            },
-            "description": "List of Polymarket market IDs",
-            "example": [
-              "1137275"
-            ]
-          },
-          {
-            "name": "kalshi_market_tickers",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of Kalshi market tickers",
-              "title": "Kalshi Market Tickers"
-            },
-            "description": "List of Kalshi market tickers",
-            "example": [
-              "KXPERFORMGRAMMYS-26-CHA"
-            ]
-          },
-          {
-            "name": "match_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/MatchType"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Filter by match type: 'exact', 'related', or 'all' (default: all)",
-              "title": "Match Type"
-            },
-            "description": "Filter by match type: 'exact', 'related', or 'all' (default: all)",
-            "example": "exact"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BatchMatchingResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Internal Server Error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v2/matching-markets/pairs": {
       "get": {
         "tags": [
@@ -6292,20 +6123,6 @@
         "title": "AllTimeMetrics",
         "description": "Extended metrics available only for all-time window."
       },
-      "BatchMatchingResponse": {
-        "properties": {
-          "markets": {
-            "type": "object",
-            "title": "Markets"
-          }
-        },
-        "type": "object",
-        "required": [
-          "markets"
-        ],
-        "title": "BatchMatchingResponse",
-        "description": "Response for batch market matching endpoint.\n\nKeys are the input identifiers (condition IDs, slugs, market IDs, or tickers).\nValues are match results (PolymarketMatchResponse or KalshiMatchResponse shape)\nor error dicts when an individual lookup fails."
-      },
       "BinanceCandleData": {
         "properties": {
           "timestamp": {
@@ -11020,6 +10837,13 @@
           "oi_change_30d"
         ],
         "title": "SortOption"
+      }
+    },
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
       }
     }
   }
