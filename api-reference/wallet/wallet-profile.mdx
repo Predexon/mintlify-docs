@@ -1,35 +1,7 @@
 ---
 title: "Wallet Profile"
-openapi: "GET /v1/polymarket/wallet/{wallet}"
+openapi: "GET /v2/polymarket/wallet/{wallet}"
 description: "Get a complete smart wallet profile"
 ---
 
 Returns all metrics across all time windows and style classifications for a wallet. Uses PostgreSQL for all-time (real-time) and ClickHouse for rolling windows.
-
-<ResponseExample>
-```json 200
-{
-  "wallet": "0x1234567890abcdef...",
-  "metrics": {
-    "all_time": {
-      "pnl": 12500.00,
-      "volume": 250000.00,
-      "trades": 842,
-      "roi": 0.15,
-      "win_rate": 0.62,
-      "profit_factor": 1.85,
-      "sharpe_ratio": 1.42,
-      "avg_buy_price": 0.45,
-      "avg_sell_price": 0.58
-    },
-    "30d": {
-      "pnl": 3200.00,
-      "volume": 45000.00,
-      "trades": 120
-    }
-  },
-  "styles": ["ACTIVE_TRADER", "HIGH_CONVICTION"],
-  "primary_trading_style": "ACTIVE_TRADER"
-}
-```
-</ResponseExample>

@@ -1,29 +1,9 @@
 ---
 title: "Ticks"
-openapi: "GET /v1/binance/ticks/{symbol}"
+openapi: "GET /v2/binance/ticks/{symbol}"
 description: "Get raw book ticker data at microsecond granularity"
 ---
 
 Fetch raw book ticker data for a Binance trading pair. Returns bid/ask/mid/spread for each tick with microsecond precision.
 
 Use cursor-based pagination to iterate through large time ranges (e.g. a 15-minute window is ~63K ticks).
-
-<ResponseExample>
-```json 200
-{
-  "symbol": "BTCUSDT",
-  "ticks": [
-    {
-      "timestamp": "2026-01-31T12:00:00.123456Z",
-      "bid_price": 103250.12,
-      "ask_price": 103250.22,
-      "mid_price": 103250.17,
-      "spread": 0.1,
-      "bid_qty": 0.523,
-      "ask_qty": 0.412
-    }
-  ],
-  "pagination_key": "MjAyNi0wMS0zMVQxMjowMDowMC4xMjM0NTZa"
-}
-```
-</ResponseExample>

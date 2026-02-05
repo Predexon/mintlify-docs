@@ -1,29 +1,7 @@
 ---
 title: "Candlesticks"
-openapi: "GET /v1/polymarket/candlesticks/{condition_id}"
+openapi: "GET /v2/polymarket/candlesticks/{condition_id}"
 description: "Get historical OHLCV candlestick data for a market"
 ---
 
 Fetch OHLCV candlestick data for charting. Prices normalized to YES side (NO prices converted as 1 - price).
-
-<ResponseExample>
-```json 200
-{
-  "condition_id": "0x1234...",
-  "candlesticks": [
-    {
-      "end_period_ts": 1704070800,
-      "price": {
-        "open": 0.55,
-        "high": 0.565,
-        "low": 0.548,
-        "close": 0.562,
-        "mean": 0.556
-      },
-      "volume": 125000.50,
-      "trades_count": 847
-    }
-  ]
-}
-```
-</ResponseExample>

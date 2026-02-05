@@ -1,53 +1,7 @@
 ---
 title: "Activity"
-openapi: "GET /v1/polymarket/activity"
+openapi: "GET /v2/polymarket/activity"
 description: "Fetch trading activity (merges, splits, redeems) for a user"
 ---
 
 Query trading activity for a wallet. Includes `SPLIT` (deposit collateral to create YES+NO pairs), `MERGE` (combine pairs back to collateral), and `REDEEM` (redeem winning tokens after resolution).
-
-<ResponseExample>
-```json 200
-{
-  "activities": [
-    {
-      "side": "SPLIT",
-      "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-      "condition_id": "0x1a2b3c4d...",
-      "shares": 1000000000,
-      "shares_normalized": 1000.0,
-      "price": 0.62,
-      "tx_hash": "0xabc123...",
-      "title": "Will Donald Trump win the 2024 Presidential Election?",
-      "timestamp": 1704153600,
-      "user": "0x1234567890..."
-    },
-    {
-      "side": "REDEEM",
-      "market_slug": "will-btc-hit-50k-jan",
-      "condition_id": "0x5678efgh...",
-      "shares": 500000000,
-      "shares_normalized": 500.0,
-      "price": 1.0,
-      "tx_hash": "0xdef456...",
-      "title": "Will Bitcoin hit $50k in January 2024?",
-      "timestamp": 1704067200,
-      "user": "0x1234567890..."
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "count": 50,
-    "pagination_key": "eyJ0aW1lc3RhbXAiOjE3MDQwNjcyMDAsInR4X2hhc2giOiIweGRlZjQ1NiJ9",
-    "has_more": true
-  }
-}
-```
-
-```json 400
-{
-  "error": "Invalid filter combination",
-  "message": "Only one of market_slug or condition_id can be provided"
-}
-```
-</ResponseExample>

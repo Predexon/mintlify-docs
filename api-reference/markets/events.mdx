@@ -1,35 +1,7 @@
 ---
 title: "List Events"
-openapi: "GET /v1/polymarket/events"
+openapi: "GET /v2/polymarket/events"
 description: "List events with filtering and sorting"
 ---
 
 Events are top-level groupings that contain one or more markets. Use `status=open` for active events only.
-
-<ResponseExample>
-```json 200
-{
-  "events": [
-    {
-      "id": "12345",
-      "slug": "2024-presidential-election",
-      "title": "2024 Presidential Election",
-      "category": "Politics",
-      "status": "open",
-      "markets_count": 5,
-      "total_volume": 25000000.00,
-      "created_at": 1704067200,
-      "tags": [
-        {"label": "Elections", "slug": "elections"}
-      ]
-    }
-  ],
-  "pagination": {
-    "limit": 20,
-    "offset": 0,
-    "total": 150,
-    "has_more": true
-  }
-}
-```
-</ResponseExample>

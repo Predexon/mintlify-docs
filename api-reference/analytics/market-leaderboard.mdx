@@ -1,36 +1,7 @@
 ---
 title: "Market Leaderboard"
-openapi: "GET /v1/polymarket/leaderboard/market/{condition_id}"
+openapi: "GET /v2/polymarket/leaderboard/market/{condition_id}"
 description: "Leaderboard for a specific market"
 ---
 
 Wallet rankings for trading performance within a single market. Filter by entry/sell prices, edge, and volume to find the best-performing traders on any market.
-
-<ResponseExample>
-```json 200
-{
-  "condition_id": "0x1a2b3c4d...",
-  "title": "Will Donald Trump win the 2024 Presidential Election?",
-  "leaderboard": [
-    {
-      "wallet": "0x1234567890abcdef...",
-      "rank": 1,
-      "pnl": 45000.00,
-      "volume": 120000.00,
-      "trades": 85,
-      "roi": 0.375,
-      "win_rate": 0.74,
-      "avg_buy_price": 0.38,
-      "avg_sell_price": 0.62,
-      "entry_edge": 0.24
-    }
-  ],
-  "window": "all_time",
-  "pagination": {
-    "limit": 100,
-    "has_more": true,
-    "next_pagination_key": "eyJ3YWxsZXQiOiIweDEyMzQifQ=="
-  }
-}
-```
-</ResponseExample>

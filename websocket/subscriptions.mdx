@@ -5,7 +5,7 @@ description: "Create and manage WebSocket subscriptions"
 
 ## Subscribe
 
-Create a subscription to receive real-time alerts matching your filters.
+Create a subscription to receive real-time events matching your filters.
 
 ### Request
 
@@ -14,11 +14,9 @@ Create a subscription to receive real-time alerts matching your filters.
   "action": "subscribe",
   "platform": "polymarket",
   "version": 1,
-  "type": "orders|activity|lifecycle",
+  "type": "orders",
   "filters": {
-    "users": ["0x..."],
-    "condition_ids": ["0x..."],
-    "market_slugs": ["slug"]
+    "users": ["0x1234...", "0x5678..."]
   }
 }
 ```
@@ -31,7 +29,9 @@ Create a subscription to receive real-time alerts matching your filters.
 | `platform` | Yes | `"polymarket"` |
 | `version` | Yes | `1` |
 | `type` | Yes | Channel: `"orders"`, `"activity"`, or `"lifecycle"` |
-| `filters` | Yes | At least one filter type required |
+| `filters` | Yes | Object with exactly one key: `users`, `condition_ids`, or `market_slugs` |
+
+Set the filter value to `["*"]` to receive all events on that channel (wildcard subscription, Pro plan only).
 
 ### Filter Types
 
@@ -41,12 +41,16 @@ Create a subscription to receive real-time alerts matching your filters.
 | `condition_ids` | Market condition IDs | `["0x456...", "0x789..."]` |
 | `market_slugs` | Market URL slugs | `["will-donald-trump-win-the-2024-us-presidential-election"]` |
 
+<Note>
+Not all filters are available on all channels. See the [filter availability table](/websocket/overview#filter-availability-by-channel) for details.
+</Note>
+
 ### Success Response
 
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4",
+  "subscription_id": "sub_2f4b15b33798",
   "channel": "trades"
 }
 ```
@@ -92,7 +96,7 @@ Track splits, merges, and redemptions on a specific market:
 }
 ```
 
-### Subscribe to lifecycle events by slug
+### Subscribe to lifecycle events
 
 Track token registrations and market resolutions:
 
@@ -103,12 +107,12 @@ Track token registrations and market resolutions:
   "version": 1,
   "type": "lifecycle",
   "filters": {
-    "market_slugs": ["will-donald-trump-win-the-2024-us-presidential-election"]
+    "condition_ids": ["0x1234567890abcdef1234567890abcdef12345678901234567890abcdef12345678"]
   }
 }
 ```
 
-### Wildcard subscription (Pro/Desk only)
+### Wildcard subscription (Pro only)
 
 Subscribe to **all** trades across Polymarket:
 
@@ -125,9 +129,7 @@ Subscribe to **all** trades across Polymarket:
 ```
 
 <Warning>
-**Pro:** Wildcard must be the only subscription on the connection. One wildcard connection per API key.
-
-**Desk:** Wildcard can be mixed with other subscriptions. Up to 10 wildcard connections per API key.
+A wildcard connection cannot mix wildcard and regular subscriptions on the same channel. Up to 2 wildcard connections per channel per API key.
 </Warning>
 
 ---
@@ -141,7 +143,7 @@ Remove an existing subscription using its ID.
 ```json
 {
   "action": "unsubscribe",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798"
 }
 ```
 
@@ -150,7 +152,8 @@ Remove an existing subscription using its ID.
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798",
+  "channel": "trades"
 }
 ```
 
@@ -158,16 +161,16 @@ Remove an existing subscription using its ID.
 
 ## Update Subscription
 
-Modify filters on an existing subscription without creating a new one.
+Replace the entire filter set on an existing subscription.
 
 ### Request
 
 ```json
 {
   "action": "update",
-  "subscription_id": "sub_a1b2c3d4",
+  "subscription_id": "sub_2f4b15b33798",
   "filters": {
-    "users": ["0xnewwallet..."]
+    "condition_ids": ["0xabcd..."]
   }
 }
 ```
@@ -177,7 +180,8 @@ Modify filters on an existing subscription without creating a new one.
 ```json
 {
   "type": "ack",
-  "subscription_id": "sub_a1b2c3d4"
+  "subscription_id": "sub_2f4b15b33798",
+  "channel": "trades"
 }
 ```
 

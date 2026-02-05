@@ -3,132 +3,86 @@ title: "Lifecycle Events"
 description: "Real-time token registrations and market resolutions"
 ---
 
-## Event Types
+The lifecycle channel (`"lifecycle"`) delivers two event types: `token_registered` and `condition_resolution`.
 
-The lifecycle channel delivers two event types:
+## token_registered
 
-| `event_type` | Description |
-|--------------|-------------|
-| `condition_resolution` | A market has been resolved - winning/losing outcomes determined |
-| `token_registered` | New outcome tokens have been registered on-chain |
-
----
-
-## Condition Resolution
-
-Fired when an oracle resolves a market. The `tokens` array indicates which outcome won.
+Emitted when a new market's outcome tokens are registered on-chain. This is the earliest signal that a new market exists. Metadata fields (`title`, `market_slug`, etc.) may be null for brand-new markets since off-chain metadata may not yet be available.
 
 ```json
 {
   "type": "event",
-  "subscription_id": "sub_...",
-  "data": {
-    "event_type": "condition_resolution",
-    "condition_id": "0x...",
-    "oracle": "0x...",
-    "question_id": "0x...",
-    "tx_hash": "0x...",
-    "log_index": "0xcd",
-    "block_number": "0x4eb0b92",
-    "timestamp": 1770145578,
-    "title": "Will the highest temperature in Atlanta be between 50-51\u00b0F?",
-    "market_slug": "highest-temperature-...",
-    "market_id": "1312704",
-    "image": "https://...",
-    "tokens": [
-      {"token_id": "...", "label": "Yes", "won": false},
-      {"token_id": "...", "label": "No", "won": true}
-    ],
-    "is_neg_risk": true
-  }
-}
-```
-
-## Token Registered
-
-Fired when new outcome tokens are created on-chain. These often appear before market metadata is available.
-
-```json
-{
-  "type": "event",
-  "subscription_id": "sub_...",
+  "subscription_id": "sub_2f4b15b33798",
   "data": {
     "event_type": "token_registered",
-    "condition_id": "0x...",
+    "condition_id": "0x197047c17a5111889b1090b979105a8822774a8f173085f0703f311eeff91804",
     "oracle": null,
     "question_id": null,
-    "tx_hash": "0x...",
-    "log_index": "0x3c",
-    "block_number": "0x4eb0ba2",
-    "timestamp": 1770145610,
+    "tx_hash": "0xbdb667d47544cd25dfe8a03e53a287cb6cc073ae502887efbd07ac15120aa9f6",
+    "log_index": "0x1b7",
+    "block_number": "0x4ebcd5f",
+    "timestamp": 1770244805,
     "title": null,
     "market_slug": null,
     "market_id": null,
     "image": null,
     "tokens": [
-      {"token_id": "...", "label": "Unknown"},
-      {"token_id": "...", "label": "Unknown"}
+      { "token_id": "2505367458...", "label": "Unknown" },
+      { "token_id": "3237569069...", "label": "Unknown" }
     ],
     "is_neg_risk": false
   }
 }
 ```
 
-<Note>
-`token_registered` events may have `null` metadata fields (`title`, `market_slug`, `market_id`) when the token is registered before the market is created in Polymarket's system.
-</Note>
+## condition_resolution
 
-## Field Reference
-
-### Resolution Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `event_type` | string | `"condition_resolution"` or `"token_registered"` |
-| `condition_id` | string | Market condition ID |
-| `oracle` | string \| null | Oracle contract address |
-| `question_id` | string \| null | Question ID for the oracle |
-| `is_neg_risk` | boolean | Whether the market uses neg-risk framework |
-
-### Token Details
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `tokens[].token_id` | string | Outcome token ID |
-| `tokens[].label` | string | Outcome label (e.g., "Yes", "No", "Unknown") |
-| `tokens[].won` | boolean | Whether this outcome won (resolution only) |
-
-### Transaction Details
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `tx_hash` | string | Transaction hash |
-| `log_index` | string | Log index within the transaction |
-| `block_number` | string | Block number (hex) |
-| `timestamp` | number | Unix timestamp |
-
-### Market Metadata
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string \| null | Market question/title |
-| `market_slug` | string \| null | URL-friendly market identifier |
-| `market_id` | string \| null | Numeric market ID |
-| `image` | string \| null | Market image URL |
-
-## Subscribe to Lifecycle Events
+Emitted when a market resolves. The `tokens` array includes a `won` field indicating which outcome won.
 
 ```json
 {
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "lifecycle",
-  "filters": {
-    "condition_ids": ["0x..."]
+  "type": "event",
+  "subscription_id": "sub_2f4b15b33798",
+  "data": {
+    "event_type": "condition_resolution",
+    "condition_id": "0x6b6de56b0057be1b236ef4e52745ca1160497419789ffe3c6f0f95b12e195762",
+    "oracle": "0x6a9d222616c90fcd177a525e9fa661a564a67b14",
+    "question_id": "0x1234...",
+    "tx_hash": "0x...",
+    "log_index": "0x...",
+    "block_number": "0x...",
+    "timestamp": 1770244800,
+    "title": "Will Sunderland AFC win on 2026-02-02?",
+    "market_slug": "epl-sun-bur-2026-02-02-sun",
+    "market_id": "1225150",
+    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/...",
+    "tokens": [
+      { "token_id": "3331904137...", "label": "Yes", "won": true },
+      { "token_id": "9751235886...", "label": "No", "won": false }
+    ],
+    "is_neg_risk": false
   }
 }
 ```
+
+## Field Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_type` | `"token_registered"` \| `"condition_resolution"` | |
+| `condition_id` | string | Market condition ID |
+| `oracle` | string \| null | Oracle address (resolution only) |
+| `question_id` | string \| null | Question ID (resolution only) |
+| `is_neg_risk` | boolean | Whether this is a neg-risk market |
+| `tokens` | array \| null | Outcome tokens; includes `won` boolean on resolution events |
+| `title` | string \| null | Market title |
+| `market_slug` | string \| null | Market URL slug |
+| `market_id` | string \| null | Internal market ID |
+| `image` | string \| null | Market image URL |
+| `tx_hash` | string | Transaction hash |
+| `log_index` | string | Log index (hex) |
+| `block_number` | string | Block number (hex) |
+| `timestamp` | number | Unix timestamp in seconds |
 
 ## Example: Monitoring Resolutions
 

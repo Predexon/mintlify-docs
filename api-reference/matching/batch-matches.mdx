@@ -1,35 +1,7 @@
 ---
 title: "Batch Matching Markets"
-openapi: "GET /v1/matching-markets/batch"
+openapi: "GET /v2/matching-markets/batch"
 description: "Find matching markets for multiple identifiers at once"
 ---
 
 Batch version of the matching endpoint. Provide exactly one of: `polymarket_condition_ids`, `polymarket_market_slugs`, `polymarket_market_ids`, or `kalshi_market_tickers`. Returns a dictionary mapping each input identifier to its matches.
-
-<ResponseExample>
-```json 200
-{
-  "matches": {
-    "0xabc123...": {
-      "polymarket": {
-        "condition_id": "0xabc123...",
-        "title": "Will Donald Trump win the 2024 Presidential Election?"
-      },
-      "kalshi": {
-        "ticker": "PRES-2024-DJT",
-        "title": "Donald Trump wins the 2024 presidential election?",
-        "match_type": "exact",
-        "similarity_score": 97
-      }
-    },
-    "0xdef456...": {
-      "polymarket": {
-        "condition_id": "0xdef456...",
-        "title": "Will Bitcoin reach $100k by end of 2024?"
-      },
-      "kalshi": null
-    }
-  }
-}
-```
-</ResponseExample>

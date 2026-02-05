@@ -1,13 +1,13 @@
 ---
 title: "Overview"
-description: "Real-time Polymarket trade, activity, and lifecycle alerts via WebSocket"
+description: "Real-time Polymarket trade, activity, and lifecycle events via WebSocket"
 ---
 
 <Info>
-**Get your free API key** at [dashboard.predexon.com](https://dashboard.predexon.com) - required for WebSocket connections.
+**Get your API key** at [dashboard.predexon.com](https://dashboard.predexon.com) — required for WebSocket connections.
 </Info>
 
-Get real-time notifications from Polymarket markets. Subscribe to trades, activity (splits/merges/redemptions), and lifecycle events (token registrations, market resolutions) for specific wallets, markets, or the entire platform with wildcard subscriptions.
+Real-time streaming of Polymarket on-chain events including trades, position activity, and market lifecycle events. Subscribe to specific wallets, markets, or the entire platform with wildcard subscriptions.
 
 ## Use Cases
 
@@ -22,7 +22,7 @@ Get real-time notifications from Polymarket markets. Subscribe to trades, activi
     Monitor your own wallet for trade confirmations, splits, merges, and redemptions.
   </Card>
   <Card title="Analytics & Research" icon="magnifying-glass-chart">
-    Stream all events (Pro/Desk) to build datasets, analyze market dynamics, and identify trends.
+    Stream all events with wildcard subscriptions (Pro) to build datasets, analyze market dynamics, and identify trends.
   </Card>
 </CardGroup>
 
@@ -54,10 +54,10 @@ ws.onmessage = (event) => {
 ### Endpoint
 
 ```
-wss://wss.predexon.com/v1/<API_KEY>
+wss://wss.predexon.com/v1/YOUR_API_KEY
 ```
 
-API key in the URL path. On connect the server sends:
+On successful connection, the server sends:
 
 ```json
 {
@@ -66,52 +66,54 @@ API key in the URL path. On connect the server sends:
 }
 ```
 
-### Idle Timeout
+### Connection Errors
 
-Connections with no active subscriptions are closed after **120 seconds**. Subscribe to at least one filter to keep the connection alive.
+| HTTP Status | Reason |
+|-------------|--------|
+| 401 | Missing or invalid API key |
+| 403 | Free tier — WebSocket access requires a paid plan |
+| 429 | Connection limit exceeded for your plan |
+| 503 | Server at capacity |
 
 ## Channels
 
-| Channel | `type` value | Events |
-|---------|-------------|--------|
-| Trades | `"orders"` | Order fills (BUY/SELL) |
-| Activity | `"activity"` | Splits, merges, redemptions |
-| Lifecycle | `"lifecycle"` | Token registrations, condition resolutions |
+| Channel | `type` value | Description |
+|---------|-------------|-------------|
+| Trades | `"orders"` | Order fills and fee refunds |
+| Activity | `"activity"` | Position splits, merges, and redemptions |
+| Lifecycle | `"lifecycle"` | New market registration and condition resolution |
 
-## Plans & Limits
+### Filter Availability by Channel
 
-| Feature | Free | Pro | Desk |
-|---------|------|-----|------|
-| Subscriptions | 2 | 100 | 1,000 |
-| Items per subscription | 5 | 500 | 500 |
-| Total items | 10 | 50,000 | 500,000 |
-| Wildcard | No | Yes (exclusive) | Yes (can mix) |
-| Wildcard connections | 0 | 1 | 10 |
+| Filter | Trades (`orders`) | Activity (`activity`) | Lifecycle (`lifecycle`) |
+|--------|:-:|:-:|:-:|
+| `users` | Yes | Yes | No |
+| `condition_ids` | Yes | Yes | Yes |
+| `market_slugs` | Yes | No | No |
+| Wildcard `["*"]` | Yes | Yes | Yes |
 
-### Wildcard Subscriptions
+## Plan Limits
 
-Pro and Desk users can subscribe to **all events** across the platform using the wildcard filter `{"users": ["*"]}`.
+| Limit | Dev | Pro |
+|-------|-----|-----|
+| Subscriptions per connection | 10 | 100 |
+| Items per subscription | 10 | 500 |
+| Total items across all subscriptions | 100 | 50,000 |
+| Wildcard subscriptions | Not allowed | Allowed |
+| Wildcard connections per API key | 0 | 2 per channel |
 
-**Pro rules:**
-- Wildcard must be the **only** subscription on the connection (exclusive)
-- Only **1 wildcard connection** per API key
+Subscription and item limits are global across all channels — not per-channel. Wildcard connections are tracked per-channel (e.g. a wildcard on `orders` does not count against your `activity` wildcard limit).
 
-**Desk rules:**
-- Wildcard can be **mixed** with other subscriptions on the same connection
-- Up to **10 wildcard connections** per API key
+<Warning>
+A wildcard connection cannot mix wildcard and regular subscriptions on the same channel.
+</Warning>
 
-**Example wildcard subscription:**
-```json
-{
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "orders",
-  "filters": {
-    "users": ["*"]
-  }
-}
-```
+## Keepalive & Connection Management
+
+- The server sends a WebSocket **ping every 30 seconds**. Your client must respond with a pong (most WebSocket libraries handle this automatically).
+- If no pong is received within **60 seconds**, the connection is closed.
+- If a connection has **zero active subscriptions for 2 minutes**, it is closed with close code `4000`.
+- If the client is consuming events too slowly and the server-side outbound buffer exceeds **1 MB**, new events will be dropped. If it exceeds **4 MB**, the connection is terminated.
 
 ## Error Handling
 
@@ -131,42 +133,14 @@ All errors follow this format:
 |------|-------------|
 | `AUTH_REQUIRED` | No API key provided |
 | `AUTH_FAILED` | API key not found or invalid |
-| `INVALID_FILTERS` | Missing or malformed filters |
+| `CONNECTION_LIMIT` | Server-wide connection cap reached |
+| `WILDCARD_CONNECTION_LIMIT` | Wildcard connection limit for your key exceeded |
 | `SUBSCRIPTION_LIMIT` | Maximum subscriptions reached |
-| `ITEMS_LIMIT` | Maximum total items reached |
 | `ITEMS_PER_SUB_LIMIT` | Too many items in single subscription |
-| `WILDCARD_NOT_ALLOWED` | Wildcard requires Pro or Desk plan |
-| `WILDCARD_CONNECTION_LIMIT` | Maximum wildcard connections reached |
-| `CONNECTION_LIMIT` | Too many connections for this API key |
+| `ITEMS_LIMIT` | Maximum total items reached |
+| `WILDCARD_NOT_ALLOWED` | Your plan does not support wildcard subscriptions |
+| `INVALID_FILTERS` | Missing or invalid filter, or filter not supported on this channel |
 | `SUBSCRIPTION_NOT_FOUND` | Subscription ID doesn't exist |
 | `PARSE_ERROR` | Invalid JSON message |
 | `UNKNOWN_ACTION` | Unrecognized action field |
-| `CAPACITY_EXCEEDED` | Send buffer full (client too slow) |
-
-### Close Codes
-
-| Code | Reason |
-|------|--------|
-| `1000` | Normal closure |
-| `1001` | Server shutting down |
-| `1006` | Abnormal closure (network issue) |
-| `4000` | Idle timeout (no subscriptions for 120s) |
-| `4001` | Authentication failed |
-| `4002` | Limit exceeded |
-
-## Best Practices
-
-<CardGroup cols={2}>
-  <Card title="Reconnect with backoff" icon="rotate">
-    Implement exponential backoff when reconnecting after disconnects
-  </Card>
-  <Card title="Subscribe quickly" icon="clock">
-    Send your first subscription within 120s to avoid idle timeout
-  </Card>
-  <Card title="Batch items" icon="layer-group">
-    Combine multiple items in one subscription when possible
-  </Card>
-  <Card title="Handle errors gracefully" icon="shield">
-    Check error codes and adjust subscriptions accordingly
-  </Card>
-</CardGroup>
+| `RATE_LIMIT` | Client is sending messages too fast |

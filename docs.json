@@ -12,88 +12,157 @@
     "tabs": [
       {
         "tab": "Data API",
-        "groups": [
+        "versions": [
           {
-            "group": "Getting Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "authentication",
-              "mcp-server"
+            "version": "v2",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "index",
+                  "quickstart",
+                  "authentication",
+                  "mcp-server"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              },
+              {
+                "group": "Cross-Platform Matching",
+                "pages": [
+                  "api-reference/matching/find-matches",
+                  "api-reference/matching/matched-pairs",
+                  "api-reference/matching/batch-matches"
+                ]
+              },
+              {
+                "group": "Polymarket",
+                "pages": [
+                  "api-reference/markets/list-markets",
+                  "api-reference/markets/events",
+                  "api-reference/markets/crypto-updown",
+                  "api-reference/markets/candlesticks",
+                  "api-reference/markets/market-price",
+                  "api-reference/markets/volume",
+                  "api-reference/markets/volume-chart",
+                  "api-reference/markets/open-interest",
+                  "api-reference/markets/orderbooks",
+                  "api-reference/trading/trades",
+                  "api-reference/trading/activity"
+                ]
+              },
+              {
+                "group": "Polymarket Wallets",
+                "pages": [
+                  "api-reference/wallet/wallet-profile",
+                  "api-reference/wallet/positions",
+                  "api-reference/wallet/pnl",
+                  "api-reference/wallet/wallet-markets",
+                  "api-reference/wallet/similar-wallets"
+                ]
+              },
+              {
+                "group": "Smart Money & Analytics",
+                "pages": [
+                  "api-reference/smart-money/smart-activity",
+                  "api-reference/smart-money/smart-money-market",
+                  "api-reference/analytics/leaderboard",
+                  "api-reference/analytics/market-leaderboard",
+                  "api-reference/analytics/cohort-stats",
+                  "api-reference/analytics/filter-wallets"
+                ]
+              },
+              {
+                "group": "Kalshi",
+                "pages": [
+                  "api-reference/kalshi/list-markets",
+                  "api-reference/kalshi/trades",
+                  "api-reference/kalshi/orderbooks"
+                ]
+              },
+              {
+                "group": "Dflow",
+                "pages": [
+                  "api-reference/dflow/trades",
+                  "api-reference/dflow/positions",
+                  "api-reference/dflow/pnl"
+                ]
+              },
+              {
+                "group": "Binance",
+                "pages": [
+                  "api-reference/binance/ticks",
+                  "api-reference/binance/candles"
+                ]
+              }
             ]
           },
           {
-            "group": "API Reference",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Cross-Platform Matching",
-            "pages": [
-              "api-reference/matching/find-matches",
-              "api-reference/matching/matched-pairs",
-              "api-reference/matching/batch-matches"
-            ]
-          },
-          {
-            "group": "Polymarket",
-            "pages": [
-              "api-reference/markets/list-markets",
-              "api-reference/markets/events",
-              "api-reference/markets/crypto-updown",
-              "api-reference/markets/candlesticks",
-              "api-reference/markets/market-price",
-              "api-reference/markets/volume",
-              "api-reference/markets/volume-chart",
-              "api-reference/markets/open-interest",
-              "api-reference/markets/orderbooks",
-              "api-reference/trading/trades",
-              "api-reference/trading/activity"
-            ]
-          },
-          {
-            "group": "Polymarket Wallets",
-            "pages": [
-              "api-reference/wallet/wallet-profile",
-              "api-reference/wallet/positions",
-              "api-reference/wallet/pnl",
-              "api-reference/wallet/wallet-markets",
-              "api-reference/wallet/similar-wallets"
-            ]
-          },
-          {
-            "group": "Smart Money & Analytics",
-            "pages": [
-              "api-reference/smart-money/smart-activity",
-              "api-reference/smart-money/smart-money-market",
-              "api-reference/analytics/leaderboard",
-              "api-reference/analytics/market-leaderboard",
-              "api-reference/analytics/cohort-stats",
-              "api-reference/analytics/filter-wallets"
-            ]
-          },
-          {
-            "group": "Kalshi",
-            "pages": [
-              "api-reference/kalshi/list-markets",
-              "api-reference/kalshi/trades",
-              "api-reference/kalshi/orderbooks"
-            ]
-          },
-          {
-            "group": "Dflow",
-            "pages": [
-              "api-reference/dflow/trades",
-              "api-reference/dflow/positions",
-              "api-reference/dflow/pnl"
-            ]
-          },
-          {
-            "group": "Binance",
-            "pages": [
-              "api-reference/binance/ticks",
-              "api-reference/binance/candles"
+            "version": "v1",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "index",
+                  "quickstart",
+                  "authentication",
+                  "mcp-server"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/v1/introduction"
+                ]
+              },
+              {
+                "group": "Cross-Platform Matching",
+                "pages": [
+                  "api-reference/v1/matching/find-matches",
+                  "api-reference/v1/matching/matched-pairs",
+                  "api-reference/v1/matching/batch-matches"
+                ]
+              },
+              {
+                "group": "Polymarket",
+                "pages": [
+                  "api-reference/v1/markets/list-markets",
+                  "api-reference/v1/markets/candlesticks",
+                  "api-reference/v1/markets/market-price",
+                  "api-reference/v1/markets/volume",
+                  "api-reference/v1/markets/open-interest",
+                  "api-reference/v1/markets/orderbooks",
+                  "api-reference/v1/trading/trades",
+                  "api-reference/v1/trading/activity"
+                ]
+              },
+              {
+                "group": "Polymarket Wallets",
+                "pages": [
+                  "api-reference/v1/wallet/positions",
+                  "api-reference/v1/wallet/pnl"
+                ]
+              },
+              {
+                "group": "Kalshi",
+                "pages": [
+                  "api-reference/v1/kalshi/list-markets",
+                  "api-reference/v1/kalshi/trades",
+                  "api-reference/v1/kalshi/orderbooks"
+                ]
+              },
+              {
+                "group": "Dflow",
+                "pages": [
+                  "api-reference/v1/dflow/trades",
+                  "api-reference/v1/dflow/positions",
+                  "api-reference/v1/dflow/pnl"
+                ]
+              }
             ]
           }
         ]
@@ -205,13 +274,19 @@
     }
   },
   "api": {
-    "baseUrl": "https://api.predexon.com",
-    "auth": {
-      "method": "key",
-      "name": "x-api-key"
+    "mdx": {
+      "server": "https://api.predexon.com",
+      "auth": {
+        "method": "key",
+        "name": "x-api-key"
+      }
+    },
+    "playground": {
+      "display": "interactive",
+      "proxy": true
     }
   },
-  "openapi": ["/api-reference/openapi.json", "/trading-api/openapi-trading.json"],
+  "openapi": ["/api-reference/openapi-v1.json", "/api-reference/openapi-v2.json", "/trading-api/openapi-trading.json"],
   "contextual": {
     "options": ["copy", "view", "chatgpt", "claude"]
   },

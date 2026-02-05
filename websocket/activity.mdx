@@ -3,99 +3,128 @@ title: "Activity Events"
 description: "Real-time split, merge, and redemption events"
 ---
 
-## Message Format
+The activity channel (`"activity"`) delivers three event types: `split`, `merge`, and `redeem`. These represent position management operations on Polymarket's Conditional Token Framework.
 
-When a split, merge, or redemption matches your subscription, you receive a message with `type: "event"`:
+## split
+
+A user deposits collateral (USDC) to mint outcome tokens for a market.
 
 ```json
 {
   "type": "event",
-  "subscription_id": "sub_...",
+  "subscription_id": "sub_2f4b15b33798",
   "data": {
-    "event_type": "split|merge|redeem",
-    "user": "0x...",
-    "condition_id": "0x...",
-    "collateral_token": "0x...",
-    "amount": 0,
-    "amount_normalized": 0,
-    "payout": 5000000,
-    "payout_normalized": 5,
-    "tx_hash": "0x...",
-    "log_index": "0x269",
-    "block_number": "0x4eab535",
-    "timestamp": 1770101360,
-    "title": "Spread: Trail Blazers (-3.5)",
-    "market_slug": "nba-mia-por-...",
-    "market_id": "1245288",
-    "image": "https://...",
+    "event_type": "split",
+    "user": "0x6d38b759c90c3158fa7b4fa45b0145eefd58d910",
+    "condition_id": "0x7fc83e5029c8e7b752f2fda61158f6cbc185c0a7b60d34d56231fcc09c62ce44",
+    "collateral_token": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "amount": 100000000,
+    "amount_normalized": 100,
+    "payout": null,
+    "payout_normalized": null,
+    "tx_hash": "0x0708391d4276731737d14a388491afb8a9c2f5b133f597189993b3ebf9154c37",
+    "log_index": "0x355",
+    "block_number": "0x4ebcd4d",
+    "timestamp": 1770244769,
+    "title": "Bitcoin Up or Down - February 4, 5:45PM-6:00PM ET",
+    "market_slug": "btc-updown-15m-1770245100",
+    "market_id": "1329555",
+    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png",
     "tokens": [
-      {"token_id": "...", "label": "Trail Blazers"},
-      {"token_id": "...", "label": "Heat"}
+      { "token_id": "3461486922...", "label": "Up" },
+      { "token_id": "9291673453...", "label": "Down" }
     ]
   }
 }
 ```
 
-## Event Types
+## merge
 
-| `event_type` | Description |
-|--------------|-------------|
-| `split` | User split collateral into outcome tokens |
-| `merge` | User merged outcome tokens back into collateral |
-| `redeem` | User redeemed winning outcome tokens for payout |
-
-## Field Reference
-
-### Core Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `event_type` | string | `"split"`, `"merge"`, or `"redeem"` |
-| `user` | string | Wallet address that performed the action |
-| `condition_id` | string | Market condition ID |
-| `collateral_token` | string | Collateral token contract address |
-
-### Amounts
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | number | Raw amount (on-chain precision) |
-| `amount_normalized` | number | Amount normalized for display |
-| `payout` | number | Raw payout amount (redemptions) |
-| `payout_normalized` | number | Payout normalized for display |
-
-### Transaction Details
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `tx_hash` | string | Transaction hash |
-| `log_index` | string | Log index within the transaction |
-| `block_number` | string | Block number (hex) |
-| `timestamp` | number | Unix timestamp |
-
-### Market Metadata
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string \| null | Market question/title |
-| `market_slug` | string \| null | URL-friendly market identifier |
-| `market_id` | string \| null | Numeric market ID |
-| `image` | string \| null | Market image URL |
-| `tokens` | array | Outcome tokens with `token_id` and `label` |
-
-## Subscribe to Activity
+A user returns a full set of outcome tokens to redeem collateral (USDC) before market resolution.
 
 ```json
 {
-  "action": "subscribe",
-  "platform": "polymarket",
-  "version": 1,
-  "type": "activity",
-  "filters": {
-    "users": ["0x1234..."]
+  "type": "event",
+  "subscription_id": "sub_2f4b15b33798",
+  "data": {
+    "event_type": "merge",
+    "user": "0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86",
+    "condition_id": "0x4dab1a074a9dbfc122f49b1b4e683d0b9960738107623d2dfd974eb98865a020",
+    "collateral_token": null,
+    "amount": 40980000,
+    "amount_normalized": 40.98,
+    "payout": null,
+    "payout_normalized": null,
+    "tx_hash": "0xd198bdd0226e5225a103aaaa01cf38aac4bc34891dd8ba31832f454cb7d65da1",
+    "log_index": "0x54f",
+    "block_number": "0x4ebcd51",
+    "timestamp": 1770244777,
+    "title": "Will \"NUEVAYOL\" be played first at the Super Bowl halftime show?",
+    "market_slug": "will-nuevayol-be-played-first-at-the-super-bowl-halftime-show",
+    "market_id": "811834",
+    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/...",
+    "tokens": [
+      { "token_id": "8405376573...", "label": "Yes" },
+      { "token_id": "3675765791...", "label": "No" }
+    ]
   }
 }
 ```
+
+## redeem
+
+A user redeems winning outcome tokens for collateral (USDC) after a market has resolved.
+
+```json
+{
+  "type": "event",
+  "subscription_id": "sub_2f4b15b33798",
+  "data": {
+    "event_type": "redeem",
+    "user": "0x1f4c2a421a36e5da4e013c557dc29fdec7cb2e01",
+    "condition_id": "0x6b6de56b0057be1b236ef4e52745ca1160497419789ffe3c6f0f95b12e195762",
+    "collateral_token": null,
+    "amount": 0,
+    "amount_normalized": 0,
+    "payout": 20000000,
+    "payout_normalized": 20,
+    "tx_hash": "0x8fbd25676f0b4d0a2af786716f406100f24492b1246bb16b580cb7a5aefd0931",
+    "log_index": "0x26d",
+    "block_number": "0x4ebcd4a",
+    "timestamp": 1770244763,
+    "title": "Will Sunderland AFC win on 2026-02-02?",
+    "market_slug": "epl-sun-bur-2026-02-02-sun",
+    "market_id": "1225150",
+    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/...",
+    "tokens": [
+      { "token_id": "3331904137...", "label": "Yes" },
+      { "token_id": "9751235886...", "label": "No" }
+    ]
+  }
+}
+```
+
+## Field Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_type` | `"split"` \| `"merge"` \| `"redeem"` | |
+| `user` | string | User address |
+| `condition_id` | string | Market condition ID |
+| `collateral_token` | string \| null | Collateral token contract address (USDC) |
+| `amount` | number | Collateral amount (raw, 6 decimal places) |
+| `amount_normalized` | number | Human-readable collateral amount |
+| `payout` | number \| null | Payout amount in raw units (redeem only) |
+| `payout_normalized` | number \| null | Human-readable payout (redeem only) |
+| `tokens` | array \| null | Outcome tokens for this market |
+| `title` | string \| null | Market title |
+| `market_slug` | string \| null | Market URL slug |
+| `market_id` | string \| null | Internal market ID |
+| `image` | string \| null | Market image URL |
+| `tx_hash` | string | Transaction hash |
+| `log_index` | string | Log index (hex) |
+| `block_number` | string | Block number (hex) |
+| `timestamp` | number | Unix timestamp in seconds |
 
 ## Example: Tracking Redemptions
 

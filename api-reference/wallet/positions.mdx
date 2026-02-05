@@ -1,53 +1,7 @@
 ---
 title: "Wallet Positions"
-openapi: "GET /v1/polymarket/wallet/positions/{wallet}"
+openapi: "GET /v2/polymarket/wallet/positions/{wallet}"
 description: "Get open and historical positions for a wallet address"
 ---
 
 Fetch positions for a Polymarket wallet with cost basis, current value, and P&L.
-
-<ResponseExample>
-```json 200
-{
-  "wallet_address": "0x1234...",
-  "positions": [
-    {
-      "market": {
-        "condition_id": "0x1a2b3c4d...",
-        "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
-        "title": "Will Donald Trump win the 2024 Presidential Election?",
-        "side": "YES",
-        "token_id": "21742633...",
-        "status": "open"
-      },
-      "position": {
-        "shares": 1500.0,
-        "avg_entry_price": 0.42,
-        "total_cost_usd": 630.0
-      },
-      "current": {
-        "price": 0.62,
-        "value_usd": 930.0
-      },
-      "pnl": {
-        "unrealized_usd": 300.0,
-        "unrealized_pct": 47.62,
-        "realized_usd": 0.0
-      }
-    }
-  ],
-  "summary": {
-    "total_positions": 15,
-    "total_value_usd": 12500.00,
-    "total_cost_usd": 10000.00,
-    "total_unrealized_pnl_usd": 2500.00,
-    "total_realized_pnl_usd": 1200.00
-  },
-  "pagination": {
-    "limit": 50,
-    "has_more": false,
-    "next_pagination_key": null
-  }
-}
-```
-</ResponseExample>

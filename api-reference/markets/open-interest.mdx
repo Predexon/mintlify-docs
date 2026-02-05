@@ -1,23 +1,7 @@
 ---
 title: "Open Interest Time Series"
-openapi: "GET /v1/polymarket/markets/{condition_id}/open_interest"
+openapi: "GET /v2/polymarket/markets/{condition_id}/open_interest"
 description: "Get historical open interest data for a market"
 ---
 
 Fetch historical open interest for a market. Open interest represents total outstanding positions (can increase or decrease, unlike cumulative volume).
-
-<ResponseExample>
-```json 200
-{
-  "condition_id": "0x1a2b3c4d...",
-  "granularity": "week",
-  "start_time": 1704067200,
-  "end_time": 1735689600,
-  "open_interest_over_time": [
-    {"timestamp": 1704067200, "open_interest_usd": 5250000.00},
-    {"timestamp": 1704672000, "open_interest_usd": 5890000.00},
-    {"timestamp": 1705276800, "open_interest_usd": 6120000.00}
-  ]
-}
-```
-</ResponseExample>

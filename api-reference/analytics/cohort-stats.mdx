@@ -1,40 +1,7 @@
 ---
 title: "Cohort Stats"
-openapi: "GET /v1/polymarket/cohorts/stats"
+openapi: "GET /v2/polymarket/cohorts/stats"
 description: "Compare performance across trading style cohorts"
 ---
 
 Understand which trading styles perform best. Cohorts are based on `primary_trading_style`: WHALE, MARKET_MAKER, ACTIVE_TRADER, BUY_AND_HOLD, DEGEN, HIGH_CONVICTION, CONTRARIAN, VALUE_HUNTER.
-
-<ResponseExample>
-```json 200
-{
-  "window": "all_time",
-  "min_trades": 10,
-  "cohorts": [
-    {
-      "style": "WHALE",
-      "wallet_count": 245,
-      "avg_pnl": 85000.00,
-      "median_pnl": 42000.00,
-      "avg_volume": 1200000.00,
-      "avg_roi": 0.22,
-      "avg_win_rate": 0.61,
-      "avg_profit_factor": 1.65,
-      "avg_trades": 520
-    },
-    {
-      "style": "DEGEN",
-      "wallet_count": 1820,
-      "avg_pnl": -2500.00,
-      "median_pnl": -1200.00,
-      "avg_volume": 45000.00,
-      "avg_roi": -0.08,
-      "avg_win_rate": 0.44,
-      "avg_profit_factor": 0.82,
-      "avg_trades": 180
-    }
-  ]
-}
-```
-</ResponseExample>

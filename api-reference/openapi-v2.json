@@ -3,7 +3,7 @@
   "info": {
     "title": "Predexon API",
     "description": "Prediction market data aggregation and matching API",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "servers": [
     {
@@ -16,14 +16,14 @@
     }
   ],
   "paths": {
-    "/v1/matching-markets": {
+    "/v2/matching-markets": {
       "get": {
         "tags": [
           "matching"
         ],
         "summary": "Get Matching Markets",
         "description": "Find matching markets across Polymarket and Kalshi platforms.\n\nProvide exactly ONE of:\n- polymarket_condition_id\n- polymarket_market_slug\n- polymarket_market_id\n- kalshi_market_ticker\n\nReturns:\n- Exact matches: Markets representing the same event\n- Related matches: Markets for correlated events",
-        "operationId": "get_matching_markets_v1_matching_markets_get",
+        "operationId": "get_matching_markets_v2_matching_markets_get",
         "parameters": [
           {
             "name": "polymarket_condition_id",
@@ -135,7 +135,7 @@
                       "$ref": "#/components/schemas/KalshiMatchResponse"
                     }
                   ],
-                  "title": "Response Get Matching Markets V1 Matching Markets Get"
+                  "title": "Response Get Matching Markets V2 Matching Markets Get"
                 }
               }
             }
@@ -183,14 +183,14 @@
         }
       }
     },
-    "/v1/matching-markets/batch": {
+    "/v2/matching-markets/batch": {
       "get": {
         "tags": [
           "matching"
         ],
         "summary": "Get Batch Matching Markets",
         "description": "Find matching markets for multiple market identifiers at once.\n\nProvide exactly ONE of:\n- polymarket_condition_ids\n- polymarket_market_slugs\n- polymarket_market_ids\n- kalshi_market_tickers\n\nReturns a dictionary mapping each input identifier to its matches.",
-        "operationId": "get_batch_matching_markets_v1_matching_markets_batch_get",
+        "operationId": "get_batch_matching_markets_v2_matching_markets_batch_get",
         "parameters": [
           {
             "name": "polymarket_condition_ids",
@@ -352,14 +352,14 @@
         }
       }
     },
-    "/v1/matching-markets/pairs": {
+    "/v2/matching-markets/pairs": {
       "get": {
         "tags": [
           "matching"
         ],
         "summary": "Get Matched Pairs",
         "description": "Get all exact market pairs across Polymarket and Kalshi.\n\nReturns exact match pairs with real-time price data and arbitrage calculations.\nResults are ordered by similarity score (highest first) and paginated.\n\nIncludes pricing data: yes/no bid/ask prices, spreads, and arbitrage opportunities.",
-        "operationId": "get_matched_pairs_v1_matching_markets_pairs_get",
+        "operationId": "get_matched_pairs_v2_matching_markets_pairs_get",
         "parameters": [
           {
             "name": "active_only",
@@ -470,14 +470,14 @@
         }
       }
     },
-    "/v1/polymarket/wallet/pnl/{wallet}": {
+    "/v2/polymarket/wallet/pnl/{wallet}": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Wallet Pnl",
         "description": "Fetch realized profit and loss (PnL) for a specific wallet address.\n\nReturns realized gains only - from confirmed sells or redeems.\nUses user_pnl_daily for historical data and user_pnl_summary for live data.\n\nWhen condition_id is provided, returns realized PnL for that specific market only.\nThis handles split/merge operations correctly by aggregating both sides.",
-        "operationId": "get_wallet_pnl_v1_polymarket_wallet_pnl__wallet__get",
+        "operationId": "get_wallet_pnl_v2_polymarket_wallet_pnl__wallet__get",
         "parameters": [
           {
             "name": "wallet",
@@ -599,14 +599,14 @@
         }
       }
     },
-    "/v1/polymarket/wallet/positions/{wallet}": {
+    "/v2/polymarket/wallet/positions/{wallet}": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Wallet Positions",
         "description": "Fetch current positions for a wallet address.\n\nReturns all open positions with cost basis, current market prices, and P&L calculations.\nUses real-time PostgreSQL data for positions.\nSupports filtering by market_slug or condition_id.",
-        "operationId": "get_wallet_positions_v1_polymarket_wallet_positions__wallet__get",
+        "operationId": "get_wallet_positions_v2_polymarket_wallet_positions__wallet__get",
         "parameters": [
           {
             "name": "wallet",
@@ -779,14 +779,14 @@
         }
       }
     },
-    "/v1/polymarket/candlesticks/{condition_id}": {
+    "/v2/polymarket/candlesticks/{condition_id}": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Candlesticks",
         "description": "Fetch historical candlestick data for a market.\n\nReturns combined OHLCV data from both YES and NO tokens, normalized to YES perspective.\nNO token prices are converted as (1 - price) and volumes are combined.",
-        "operationId": "get_candlesticks_v1_polymarket_candlesticks__condition_id__get",
+        "operationId": "get_candlesticks_v2_polymarket_candlesticks__condition_id__get",
         "parameters": [
           {
             "name": "condition_id",
@@ -884,14 +884,14 @@
         }
       }
     },
-    "/v1/polymarket/market-price/{token_id}": {
+    "/v2/polymarket/market-price/{token_id}": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Market Price",
         "description": "Fetch the current or historical market price for a token.\n\nUses last 5 trades across both tokens (Yes/No) of the market:\n- If all prices within $0.10: weighted average by USD amount\n- Otherwise: last traded price",
-        "operationId": "get_market_price_v1_polymarket_market_price__token_id__get",
+        "operationId": "get_market_price_v2_polymarket_market_price__token_id__get",
         "parameters": [
           {
             "name": "token_id",
@@ -978,14 +978,14 @@
         }
       }
     },
-    "/v1/polymarket/activity": {
+    "/v2/polymarket/activity": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Activity",
         "description": "Fetch activity data for a specific user.\n\nUses the MV-populated activity_unified_table for optimal single-table query performance.",
-        "operationId": "get_activity_v1_polymarket_activity_get",
+        "operationId": "get_activity_v2_polymarket_activity_get",
         "parameters": [
           {
             "name": "wallet",
@@ -1169,14 +1169,14 @@
         }
       }
     },
-    "/v1/polymarket/markets": {
+    "/v2/polymarket/markets": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Markets",
         "description": "List markets with filtering and sorting from PostgreSQL database.\n\nConsolidates active and closed markets into a single endpoint.\nUse status=open for active markets only.\n\nRolling metrics (volume_1d/7d/30d, trades, OI) are sourced from\nthe market_metrics_summary table, refreshed hourly by the indexer cron.",
-        "operationId": "get_markets_v1_polymarket_markets_get",
+        "operationId": "get_markets_v2_polymarket_markets_get",
         "parameters": [
           {
             "name": "status",
@@ -1604,14 +1604,14 @@
         }
       }
     },
-    "/v1/polymarket/markets/{token_id}/volume": {
+    "/v2/polymarket/markets/{token_id}/volume": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Market Volume Time Series",
         "description": "Return historical time series of traded volume for a token (day+ granularity).",
-        "operationId": "get_market_volume_time_series_v1_polymarket_markets__token_id__volume_get",
+        "operationId": "get_market_volume_time_series_v2_polymarket_markets__token_id__volume_get",
         "parameters": [
           {
             "name": "token_id",
@@ -1718,14 +1718,14 @@
         }
       }
     },
-    "/v1/polymarket/markets/{condition_id}/open_interest": {
+    "/v2/polymarket/markets/{condition_id}/open_interest": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Market Open Interest Time Series",
         "description": "Provide historical open interest (total value of tokens circulating from split, merge, redeem, and conversion events) with min granularity day.",
-        "operationId": "get_market_open_interest_time_series_v1_polymarket_markets__condition_id__open_interest_get",
+        "operationId": "get_market_open_interest_time_series_v2_polymarket_markets__condition_id__open_interest_get",
         "parameters": [
           {
             "name": "condition_id",
@@ -1832,14 +1832,14 @@
         }
       }
     },
-    "/v1/polymarket/orderbooks": {
+    "/v2/polymarket/orderbooks": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Orderbooks",
         "description": "Fetch historical orderbook snapshots for a specific asset (token ID) over a specified time range.\n\nReturns snapshots of the order book including bids, asks, and market metadata in order.\nAll timestamps are in milliseconds. Orderbook data has history starting from January 1st, 2026.",
-        "operationId": "get_orderbooks_v1_polymarket_orderbooks_get",
+        "operationId": "get_orderbooks_v2_polymarket_orderbooks_get",
         "parameters": [
           {
             "name": "token_id",
@@ -1951,14 +1951,14 @@
         }
       }
     },
-    "/v1/polymarket/trades": {
+    "/v2/polymarket/trades": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Trades",
         "description": "Fetch historical trade data.\n\nReturns trades from Polymarket with support for:\n- Filtering by market_slug, condition_id, token_id, or user\n- Time range filtering\n- Cursor-based pagination\n\nAt least one of market_slug, condition_id, token_id, or user must be provided.",
-        "operationId": "get_trades_v1_polymarket_trades_get",
+        "operationId": "get_trades_v2_polymarket_trades_get",
         "parameters": [
           {
             "name": "market_slug",
@@ -2175,14 +2175,14 @@
         }
       }
     },
-    "/v1/polymarket/volume-chart/{condition_id}": {
+    "/v2/polymarket/volume-chart/{condition_id}": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Volume Chart",
         "description": "Fetch volume chart data for a market, broken down by YES/NO side.\n\nReturns per-period total, YES, and NO volume aggregated from trade events.",
-        "operationId": "get_volume_chart_v1_polymarket_volume_chart__condition_id__get",
+        "operationId": "get_volume_chart_v2_polymarket_volume_chart__condition_id__get",
         "parameters": [
           {
             "name": "condition_id",
@@ -2275,7 +2275,7 @@
         }
       }
     },
-    "/v1/polymarket/wallet/{wallet}": {
+    "/v2/polymarket/wallet/{wallet}": {
       "get": {
         "tags": [
           "polymarket",
@@ -2283,7 +2283,7 @@
         ],
         "summary": "Get Wallet Profile",
         "description": "Get complete smart wallet profile.\n\nReturns all metrics across all time windows and style classifications.\nUses PostgreSQL for all_time (real-time) and ClickHouse for rolling windows.",
-        "operationId": "get_wallet_profile_v1_polymarket_wallet__wallet__get",
+        "operationId": "get_wallet_profile_v2_polymarket_wallet__wallet__get",
         "parameters": [
           {
             "name": "wallet",
@@ -2341,7 +2341,7 @@
         }
       }
     },
-    "/v1/polymarket/leaderboard": {
+    "/v2/polymarket/leaderboard": {
       "get": {
         "tags": [
           "polymarket",
@@ -2349,7 +2349,7 @@
         ],
         "summary": "Get Leaderboard",
         "description": "Get global leaderboard of smart wallets.\n\nSupports filtering by trading styles and numeric thresholds.\nUses ClickHouse rolling tables for all time windows.",
-        "operationId": "get_leaderboard_v1_polymarket_leaderboard_get",
+        "operationId": "get_leaderboard_v2_polymarket_leaderboard_get",
         "parameters": [
           {
             "name": "window",
@@ -2369,7 +2369,7 @@
             "schema": {
               "$ref": "#/components/schemas/LeaderboardSortBy",
               "description": "Sort field",
-              "default": "pnl"
+              "default": "realized_pnl"
             },
             "description": "Sort field"
           },
@@ -2421,7 +2421,7 @@
             "description": "Comma-separated styles to exclude"
           },
           {
-            "name": "min_pnl",
+            "name": "min_realized_pnl",
             "in": "query",
             "required": false,
             "schema": {
@@ -2433,13 +2433,13 @@
                   "type": "null"
                 }
               ],
-              "description": "Minimum PnL in USD",
-              "title": "Min Pnl"
+              "description": "Minimum realized PnL in USD",
+              "title": "Min Realized Pnl"
             },
-            "description": "Minimum PnL in USD"
+            "description": "Minimum realized PnL in USD"
           },
           {
-            "name": "max_pnl",
+            "name": "max_realized_pnl",
             "in": "query",
             "required": false,
             "schema": {
@@ -2451,10 +2451,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Maximum PnL in USD",
-              "title": "Max Pnl"
+              "description": "Maximum realized PnL in USD",
+              "title": "Max Realized Pnl"
             },
-            "description": "Maximum PnL in USD"
+            "description": "Maximum realized PnL in USD"
           },
           {
             "name": "min_volume",
@@ -2786,7 +2786,7 @@
         }
       }
     },
-    "/v1/polymarket/leaderboard/market/{condition_id}": {
+    "/v2/polymarket/leaderboard/market/{condition_id}": {
       "get": {
         "tags": [
           "polymarket",
@@ -2794,7 +2794,7 @@
         ],
         "summary": "Get Market Leaderboard",
         "description": "Get leaderboard for a specific market.\n\nShows wallet rankings for trading performance within a single market.\nUses ClickHouse user_market_metrics_rolling for all time windows.",
-        "operationId": "get_market_leaderboard_v1_polymarket_leaderboard_market__condition_id__get",
+        "operationId": "get_market_leaderboard_v2_polymarket_leaderboard_market__condition_id__get",
         "parameters": [
           {
             "name": "condition_id",
@@ -2825,7 +2825,7 @@
             "schema": {
               "$ref": "#/components/schemas/LeaderboardSortBy",
               "description": "Sort field",
-              "default": "pnl"
+              "default": "realized_pnl"
             },
             "description": "Sort field"
           },
@@ -3085,7 +3085,7 @@
         }
       }
     },
-    "/v1/polymarket/wallet/{wallet}/markets": {
+    "/v2/polymarket/wallet/{wallet}/markets": {
       "get": {
         "tags": [
           "polymarket",
@@ -3093,7 +3093,7 @@
         ],
         "summary": "Get Wallet Markets",
         "description": "Get per-market breakdown for a wallet.\n\nShows performance metrics for each market the wallet has traded in.\nUses ClickHouse rolling tables for all time windows.",
-        "operationId": "get_wallet_markets_v1_polymarket_wallet__wallet__markets_get",
+        "operationId": "get_wallet_markets_v2_polymarket_wallet__wallet__markets_get",
         "parameters": [
           {
             "name": "wallet",
@@ -3124,7 +3124,7 @@
             "schema": {
               "$ref": "#/components/schemas/LeaderboardSortBy",
               "description": "Sort field",
-              "default": "pnl"
+              "default": "realized_pnl"
             },
             "description": "Sort field"
           },
@@ -3235,15 +3235,15 @@
         }
       }
     },
-    "/v1/polymarket/wallets/filter": {
+    "/v2/polymarket/wallets/filter": {
       "get": {
         "tags": [
           "polymarket",
           "smart-wallet"
         ],
         "summary": "Filter Wallets By Markets",
-        "description": "Filter wallets by market trades with AND/OR logic, with metric filters on combined performance.\n\n**Use Cases:**\n- Find all wallets that traded Market A AND Market B AND Market C (intersection)\n- Find all wallets that traded Market A OR Market B OR Market C (union)\n- Filter by combined performance: wallets with combined win_rate > 50% across these markets\n\n**Query Logic:**\n- AND: Returns wallets that have traded ALL specified markets\n- OR: Returns wallets that have traded ANY of the specified markets\n\n**Metrics:**\nAll metrics (pnl, volume, win_rate, roi, profit_factor) are aggregated across the\nspecified markets only. Derived metrics (win_rate, ROI, profit_factor) are properly\ncalculated from underlying sums, not averaged.\n\nUses ClickHouse for fast aggregation across markets.",
-        "operationId": "filter_wallets_by_markets_v1_polymarket_wallets_filter_get",
+        "description": "Filter wallets by market trades with AND/OR logic, with metric filters on combined performance.\n\n**Use Cases:**\n- Find all wallets that traded Market A AND Market B AND Market C (intersection)\n- Find all wallets that traded Market A OR Market B OR Market C (union)\n- Filter by combined performance: wallets with combined win_rate > 50% across these markets\n\n**Query Logic:**\n- AND: Returns wallets that have traded ALL specified markets\n- OR: Returns wallets that have traded ANY of the specified markets\n\n**Metrics:**\nAll metrics (realized_pnl, volume, win_rate, roi, profit_factor) are aggregated across the\nspecified markets only. Derived metrics (win_rate, ROI, profit_factor) are properly\ncalculated from underlying sums, not averaged.\n\nUses ClickHouse for fast aggregation across markets.",
+        "operationId": "filter_wallets_by_markets_v2_polymarket_wallets_filter_get",
         "parameters": [
           {
             "name": "markets",
@@ -3288,7 +3288,7 @@
             "schema": {
               "$ref": "#/components/schemas/LeaderboardSortBy",
               "description": "Sort field (based on combined metrics)",
-              "default": "pnl"
+              "default": "realized_pnl"
             },
             "description": "Sort field (based on combined metrics)"
           },
@@ -3304,7 +3304,7 @@
             "description": "Sort order"
           },
           {
-            "name": "min_pnl",
+            "name": "min_realized_pnl",
             "in": "query",
             "required": false,
             "schema": {
@@ -3316,13 +3316,13 @@
                   "type": "null"
                 }
               ],
-              "description": "Minimum combined PnL across specified markets (USD)",
-              "title": "Min Pnl"
+              "description": "Minimum combined realized PnL across specified markets (USD)",
+              "title": "Min Realized Pnl"
             },
-            "description": "Minimum combined PnL across specified markets (USD)"
+            "description": "Minimum combined realized PnL across specified markets (USD)"
           },
           {
-            "name": "max_pnl",
+            "name": "max_realized_pnl",
             "in": "query",
             "required": false,
             "schema": {
@@ -3334,10 +3334,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Maximum combined PnL across specified markets (USD)",
-              "title": "Max Pnl"
+              "description": "Maximum combined realized PnL across specified markets (USD)",
+              "title": "Max Realized Pnl"
             },
-            "description": "Maximum combined PnL across specified markets (USD)"
+            "description": "Maximum combined realized PnL across specified markets (USD)"
           },
           {
             "name": "min_volume",
@@ -3631,15 +3631,15 @@
         }
       }
     },
-    "/v1/polymarket/markets/smart-activity": {
+    "/v2/polymarket/markets/smart-activity": {
       "get": {
         "tags": [
           "polymarket",
           "smart-wallet"
         ],
         "summary": "Get Smart Activity Markets",
-        "description": "Discover markets where high-performing wallets are active.\n\n**Use Case:** Find alpha by seeing where profitable traders are putting their money.\n\n**How it works:**\n1. Define \"smart wallets\" using the filter criteria (min_pnl, min_roi, etc.)\n2. Find all markets these wallets have traded\n3. Rank markets by smart wallet activity (volume, count, PnL)\n\nReturns markets sorted by smart wallet activity metrics.",
-        "operationId": "get_smart_activity_markets_v1_polymarket_markets_smart_activity_get",
+        "description": "Discover markets where high-performing wallets are active.\n\n**Use Case:** Find alpha by seeing where profitable traders are putting their money.\n\n**How it works:**\n1. Define \"smart wallets\" using the filter criteria (min_realized_pnl, min_roi, etc.)\n2. Find all markets these wallets have traded\n3. Rank markets by smart wallet activity (volume, count, realized PnL)\n\nReturns markets sorted by smart wallet activity metrics.",
+        "operationId": "get_smart_activity_markets_v2_polymarket_markets_smart_activity_get",
         "parameters": [
           {
             "name": "window",
@@ -3675,7 +3675,7 @@
             "description": "Sort order"
           },
           {
-            "name": "min_pnl",
+            "name": "min_realized_pnl",
             "in": "query",
             "required": false,
             "schema": {
@@ -3687,10 +3687,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Minimum global PnL to be 'smart' (USD)",
-              "title": "Min Pnl"
+              "description": "Minimum global realized PnL to be 'smart' (USD)",
+              "title": "Min Realized Pnl"
             },
-            "description": "Minimum global PnL to be 'smart' (USD)"
+            "description": "Minimum global realized PnL to be 'smart' (USD)"
           },
           {
             "name": "min_roi",
@@ -3864,15 +3864,15 @@
         }
       }
     },
-    "/v1/polymarket/market/{condition_id}/smart-money": {
+    "/v2/polymarket/market/{condition_id}/smart-money": {
       "get": {
         "tags": [
           "polymarket",
           "smart-wallet"
         ],
         "summary": "Get Smart Money Positioning",
-        "description": "Get smart money positioning for a specific market.\n\n**Use Case:** See what profitable traders are doing on a specific market.\n\n**Returns:**\n- How many smart wallets are net buyers vs net sellers\n- Average entry prices for smart wallets\n- Total volume and PnL from smart wallets",
-        "operationId": "get_smart_money_positioning_v1_polymarket_market__condition_id__smart_money_get",
+        "description": "Get smart money positioning for a specific market.\n\n**Use Case:** See what profitable traders are doing on a specific market.\n\n**Returns:**\n- How many smart wallets are net buyers vs net sellers\n- Average entry prices for smart wallets\n- Total volume and realized PnL from smart wallets",
+        "operationId": "get_smart_money_positioning_v2_polymarket_market__condition_id__smart_money_get",
         "parameters": [
           {
             "name": "condition_id",
@@ -3897,7 +3897,7 @@
             "description": "Time window for metrics"
           },
           {
-            "name": "min_pnl",
+            "name": "min_realized_pnl",
             "in": "query",
             "required": false,
             "schema": {
@@ -3909,10 +3909,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Minimum global PnL to be 'smart' (USD)",
-              "title": "Min Pnl"
+              "description": "Minimum global realized PnL to be 'smart' (USD)",
+              "title": "Min Realized Pnl"
             },
-            "description": "Minimum global PnL to be 'smart' (USD)"
+            "description": "Minimum global realized PnL to be 'smart' (USD)"
           },
           {
             "name": "min_roi",
@@ -4064,7 +4064,7 @@
         }
       }
     },
-    "/v1/polymarket/wallet/{wallet}/similar": {
+    "/v2/polymarket/wallet/{wallet}/similar": {
       "get": {
         "tags": [
           "polymarket",
@@ -4072,7 +4072,7 @@
         ],
         "summary": "Get Similar Wallets",
         "description": "Find wallets with similar market portfolios (copy-trade detection).\n\n**Use Case:**\n- Find wallets that trade similar markets to a target wallet\n- Detect potential copy-trading patterns\n- Discover traders with similar strategies\n\n**How it works:**\n1. Get all markets the target wallet has traded\n2. Find other wallets that traded the same markets\n3. Rank by overlap percentage and count",
-        "operationId": "get_similar_wallets_v1_polymarket_wallet__wallet__similar_get",
+        "operationId": "get_similar_wallets_v2_polymarket_wallet__wallet__similar_get",
         "parameters": [
           {
             "name": "wallet",
@@ -4222,7 +4222,7 @@
         }
       }
     },
-    "/v1/polymarket/cohorts/stats": {
+    "/v2/polymarket/cohorts/stats": {
       "get": {
         "tags": [
           "polymarket",
@@ -4230,7 +4230,7 @@
         ],
         "summary": "Get Cohort Stats",
         "description": "Compare performance across trading style cohorts.\n\n**Use Case:** Understand which trading styles perform best.\n\n**Cohorts:** Based on primary_trading_style classification:\n- WHALE: Large position traders\n- MARKET_MAKER: Balanced buy/sell with frequent trading\n- ACTIVE_TRADER: High trade frequency\n- BUY_AND_HOLD: Long holding periods\n- DEGEN: High-risk patterns\n- HIGH_CONVICTION: Buys at high prices\n- CONTRARIAN: Takes unpopular sides\n- VALUE_HUNTER: Enters at uncertain odds\n\nReturns aggregate statistics for each cohort.",
-        "operationId": "get_cohort_stats_v1_polymarket_cohorts_stats_get",
+        "operationId": "get_cohort_stats_v2_polymarket_cohorts_stats_get",
         "parameters": [
           {
             "name": "window",
@@ -4298,14 +4298,14 @@
         }
       }
     },
-    "/v1/polymarket/crypto-updown": {
+    "/v2/polymarket/crypto-updown": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Crypto Updown",
         "description": "List crypto up/down prediction markets.\n\nReturns Bitcoin, Ethereum, Solana, and XRP up/down markets across\nall timeframes (15m, 1h, 4h, daily). Supports filtering by asset,\ntimeframe, status, and time range.\n\n**Common queries:**\n- Current open markets: `?status=open`\n- BTC 15m timeline: `?asset=btc&timeframe=15m&sort=asc`\n- Recent BTC 15m results: `?asset=btc&timeframe=15m&status=closed&limit=20`\n- Time window: `?end_after=<unix_ts>&end_before=<unix_ts>&sort=asc`",
-        "operationId": "get_crypto_updown_v1_polymarket_crypto_updown_get",
+        "operationId": "get_crypto_updown_v2_polymarket_crypto_updown_get",
         "parameters": [
           {
             "name": "asset",
@@ -4463,14 +4463,14 @@
         }
       }
     },
-    "/v1/polymarket/events": {
+    "/v2/polymarket/events": {
       "get": {
         "tags": [
           "polymarket"
         ],
         "summary": "Get Events",
         "description": "List events with filtering and sorting from PostgreSQL database.\n\nEvents are top-level groupings that contain one or more markets.\nUse status=open for active events only.",
-        "operationId": "get_events_v1_polymarket_events_get",
+        "operationId": "get_events_v2_polymarket_events_get",
         "parameters": [
           {
             "name": "status",
@@ -4658,14 +4658,14 @@
         }
       }
     },
-    "/v1/kalshi/markets": {
+    "/v2/kalshi/markets": {
       "get": {
         "tags": [
           "kalshi"
         ],
         "summary": "Get Kalshi Markets",
         "description": "List Kalshi markets with filtering and sorting.\n\nReturns markets from the Kalshi prediction market platform with support for:\n- Status filtering (open, closed)\n- Price range filtering (0-100 scale)\n- Volume and open interest thresholds\n- Text search in titles\n- Filtering by ticker, event ticker, or series ticker\n- Multiple sort options\n- Cursor-based pagination via pagination_key\n\nPrices are returned as decimals (0-1) for API consistency.",
-        "operationId": "get_kalshi_markets_v1_kalshi_markets_get",
+        "operationId": "get_kalshi_markets_v2_kalshi_markets_get",
         "parameters": [
           {
             "name": "status",
@@ -4917,14 +4917,14 @@
         }
       }
     },
-    "/v1/kalshi/trades": {
+    "/v2/kalshi/trades": {
       "get": {
         "tags": [
           "kalshi"
         ],
         "summary": "Get Kalshi Trades",
         "description": "Fetch historical Kalshi trade data.\n\nReturns trades from the Kalshi prediction market with support for:\n- Filtering by ticker (exact match) or event_ticker (prefix match)\n- Time range filtering\n- Taker side filtering (yes/no)\n- Minimum contract count filtering\n- Cursor-based pagination\n\nAt least one of `ticker` or `event_ticker` must be provided.",
-        "operationId": "get_kalshi_trades_v1_kalshi_trades_get",
+        "operationId": "get_kalshi_trades_v2_kalshi_trades_get",
         "parameters": [
           {
             "name": "ticker",
@@ -5123,14 +5123,14 @@
         }
       }
     },
-    "/v1/kalshi/orderbooks": {
+    "/v2/kalshi/orderbooks": {
       "get": {
         "tags": [
           "kalshi"
         ],
         "summary": "Get Kalshi Orderbooks",
         "description": "Fetch historical orderbook snapshots for a Kalshi market over a specified time range.\n\nReturns snapshots of the order book including yes bids, yes asks, and market metadata.\nAll timestamps are in milliseconds. Prices are in cents (1-99 representing $0.01 to $0.99).",
-        "operationId": "get_kalshi_orderbooks_v1_kalshi_orderbooks_get",
+        "operationId": "get_kalshi_orderbooks_v2_kalshi_orderbooks_get",
         "parameters": [
           {
             "name": "ticker",
@@ -5242,7 +5242,7 @@
         }
       }
     },
-    "/v1/dflow/trades": {
+    "/v2/dflow/trades": {
       "get": {
         "tags": [
           "dflow",
@@ -5250,7 +5250,7 @@
         ],
         "summary": "Get Dflow Trades",
         "description": "Fetch trade history for a wallet on Dflow.\n\nReturns trades from the Dflow platform with support for:\n- Filtering by market_ticker, outcome_mint, or trade_type\n- Time range filtering\n- Cursor-based pagination (efficient for deep pagination)\n- Enriched with market metadata (title, category, side)",
-        "operationId": "get_dflow_trades_v1_dflow_trades_get",
+        "operationId": "get_dflow_trades_v2_dflow_trades_get",
         "parameters": [
           {
             "name": "wallet",
@@ -5441,7 +5441,7 @@
         }
       }
     },
-    "/v1/dflow/wallet/pnl/{wallet}": {
+    "/v2/dflow/wallet/pnl/{wallet}": {
       "get": {
         "tags": [
           "dflow",
@@ -5449,7 +5449,7 @@
         ],
         "summary": "Get Dflow Wallet Pnl",
         "description": "Fetch realized profit and loss (PnL) history for a specific wallet address on Dflow.\n\nReturns cumulative realized PnL over time with data points for every interval\nin the specified granularity.",
-        "operationId": "get_dflow_wallet_pnl_v1_dflow_wallet_pnl__wallet__get",
+        "operationId": "get_dflow_wallet_pnl_v2_dflow_wallet_pnl__wallet__get",
         "parameters": [
           {
             "name": "wallet",
@@ -5553,7 +5553,7 @@
         }
       }
     },
-    "/v1/dflow/wallet/positions/{wallet}": {
+    "/v2/dflow/wallet/positions/{wallet}": {
       "get": {
         "tags": [
           "dflow",
@@ -5561,7 +5561,7 @@
         ],
         "summary": "Get Dflow Wallet Positions",
         "description": "Fetch current positions for a wallet address on Dflow.\n\nReturns all positions with total cost basis, realized PnL, and fees paid.\n\n- **Open positions**: Currently holding tokens (total_qty_bought > total_qty_sold)\n- **Closed positions**: No longer holding but has trading history\n\nEnriched with market metadata (title, subtitles) from PostgreSQL.\nUses cursor-based pagination for efficient deep pagination.",
-        "operationId": "get_dflow_wallet_positions_v1_dflow_wallet_positions__wallet__get",
+        "operationId": "get_dflow_wallet_positions_v2_dflow_wallet_positions__wallet__get",
         "parameters": [
           {
             "name": "wallet",
@@ -5727,14 +5727,14 @@
         }
       }
     },
-    "/v1/binance/ticks/{symbol}": {
+    "/v2/binance/ticks/{symbol}": {
       "get": {
         "tags": [
           "binance"
         ],
         "summary": "Get Binance Ticks",
         "description": "Fetch raw book ticker data at microsecond granularity.\n\nReturns bid/ask/mid/spread for each tick. Use cursor-based pagination\nto iterate through large time ranges (e.g. a 15m window is ~63K ticks).",
-        "operationId": "get_binance_ticks_v1_binance_ticks__symbol__get",
+        "operationId": "get_binance_ticks_v2_binance_ticks__symbol__get",
         "parameters": [
           {
             "name": "symbol",
@@ -5847,14 +5847,14 @@
         }
       }
     },
-    "/v1/binance/candles/{symbol}": {
+    "/v2/binance/candles/{symbol}": {
       "get": {
         "tags": [
           "binance"
         ],
         "summary": "Get Binance Candles",
         "description": "Fetch OHLCV candlestick data for a Binance trading pair.\n\nCandle prices are derived from book ticker mid-prices (not trade prices).\nIntervals 1s and 1m read from pre-aggregated materialized views.\nLarger intervals (5m, 15m, 1h, 4h, 1d) are aggregated on-the-fly from 1m candles.\n\n**Backtesting crypto up/down markets:**\n- Use `interval=15m` for 15-minute prediction markets\n- Use `interval=1h` for 1-hour prediction markets\n- Use `interval=4h` and `interval=1d` for longer timeframes",
-        "operationId": "get_binance_candles_v1_binance_candles__symbol__get",
+        "operationId": "get_binance_candles_v2_binance_candles__symbol__get",
         "parameters": [
           {
             "name": "symbol",
@@ -6147,10 +6147,10 @@
       },
       "AllTimeMetrics": {
         "properties": {
-          "pnl": {
+          "realized_pnl": {
             "type": "number",
-            "title": "Pnl",
-            "description": "Profit/loss in USD"
+            "title": "Realized Pnl",
+            "description": "Realized profit/loss in USD (from closed positions)"
           },
           "volume": {
             "type": "number",
@@ -6258,20 +6258,20 @@
             "title": "Max Loss Streak",
             "description": "Maximum consecutive losses"
           },
-          "best_position_pnl": {
+          "best_position_realized_pnl": {
             "type": "number",
-            "title": "Best Position Pnl",
-            "description": "Best single position PnL in USD"
+            "title": "Best Position Realized Pnl",
+            "description": "Best single position realized PnL in USD"
           },
-          "worst_position_pnl": {
+          "worst_position_realized_pnl": {
             "type": "number",
-            "title": "Worst Position Pnl",
-            "description": "Worst single position PnL in USD"
+            "title": "Worst Position Realized Pnl",
+            "description": "Worst single position realized PnL in USD"
           }
         },
         "type": "object",
         "required": [
-          "pnl",
+          "realized_pnl",
           "volume",
           "roi",
           "trades",
@@ -6286,8 +6286,8 @@
           "active_positions",
           "max_win_streak",
           "max_loss_streak",
-          "best_position_pnl",
-          "worst_position_pnl"
+          "best_position_realized_pnl",
+          "worst_position_realized_pnl"
         ],
         "title": "AllTimeMetrics",
         "description": "Extended metrics available only for all-time window."
@@ -6611,20 +6611,20 @@
             "title": "Total Volume",
             "description": "Total volume from this cohort (USD)"
           },
-          "total_pnl": {
+          "total_realized_pnl": {
             "type": "number",
-            "title": "Total Pnl",
-            "description": "Total PnL from this cohort (USD)"
+            "title": "Total Realized Pnl",
+            "description": "Total realized PnL from this cohort (USD)"
           },
-          "avg_pnl": {
+          "avg_realized_pnl": {
             "type": "number",
-            "title": "Avg Pnl",
-            "description": "Average PnL per wallet (USD)"
+            "title": "Avg Realized Pnl",
+            "description": "Average realized PnL per wallet (USD)"
           },
-          "median_pnl": {
+          "median_realized_pnl": {
             "type": "number",
-            "title": "Median Pnl",
-            "description": "Median PnL (USD) - approximated"
+            "title": "Median Realized Pnl",
+            "description": "Median realized PnL (USD) - approximated"
           },
           "avg_roi": {
             "type": "number",
@@ -6681,9 +6681,9 @@
           "cohort_name",
           "wallet_count",
           "total_volume",
-          "total_pnl",
-          "avg_pnl",
-          "median_pnl",
+          "total_realized_pnl",
+          "avg_realized_pnl",
+          "median_realized_pnl",
           "avg_roi",
           "avg_win_rate",
           "avg_profit_factor",
@@ -8143,7 +8143,7 @@
       "LeaderboardSortBy": {
         "type": "string",
         "enum": [
-          "pnl",
+          "realized_pnl",
           "volume",
           "roi",
           "profit_factor",
@@ -9581,6 +9581,42 @@
               }
             ],
             "title": "Losing Positions"
+          },
+          "fees_paid": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fees Paid",
+            "description": "Total taker fees paid (USD)"
+          },
+          "fees_refunded": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fees Refunded",
+            "description": "Total maker rebates received (USD)"
+          },
+          "net_fees": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Fees",
+            "description": "Net fees: fees_paid - fees_refunded (negative means net rebate)"
           }
         },
         "type": "object",
@@ -9778,10 +9814,10 @@
             "title": "Smart Volume",
             "description": "Total volume from smart wallets (USD)"
           },
-          "smart_pnl": {
+          "smart_realized_pnl": {
             "type": "number",
-            "title": "Smart Pnl",
-            "description": "Total PnL from smart wallets (USD)"
+            "title": "Smart Realized Pnl",
+            "description": "Total realized PnL from smart wallets (USD)"
           },
           "avg_smart_roi": {
             "type": "number",
@@ -9804,7 +9840,7 @@
           "condition_id",
           "smart_wallet_count",
           "smart_volume",
-          "smart_pnl",
+          "smart_realized_pnl",
           "avg_smart_roi",
           "avg_smart_win_rate",
           "net_buyers_pct"
@@ -9851,7 +9887,7 @@
         "enum": [
           "smart_volume",
           "smart_wallet_count",
-          "smart_pnl",
+          "smart_realized_pnl",
           "avg_smart_roi"
         ],
         "title": "SmartActivitySortBy",
@@ -9938,10 +9974,10 @@
             "title": "Avg Smart Sell Price",
             "description": "Volume-weighted average sell price of smart wallets (0-1)"
           },
-          "total_smart_pnl": {
+          "total_smart_realized_pnl": {
             "type": "number",
-            "title": "Total Smart Pnl",
-            "description": "Total PnL from smart wallets (USD)"
+            "title": "Total Smart Realized Pnl",
+            "description": "Total realized PnL from smart wallets (USD)"
           },
           "avg_smart_roi": {
             "type": "number",
@@ -9967,7 +10003,7 @@
           "total_smart_sell_volume",
           "avg_smart_buy_price",
           "avg_smart_sell_price",
-          "total_smart_pnl",
+          "total_smart_realized_pnl",
           "avg_smart_roi",
           "avg_smart_win_rate"
         ],
@@ -10853,10 +10889,10 @@
       },
       "WindowMetrics": {
         "properties": {
-          "pnl": {
+          "realized_pnl": {
             "type": "number",
-            "title": "Pnl",
-            "description": "Profit/loss in USD"
+            "title": "Realized Pnl",
+            "description": "Realized profit/loss in USD (from closed positions)"
           },
           "volume": {
             "type": "number",
@@ -10937,7 +10973,7 @@
         },
         "type": "object",
         "required": [
-          "pnl",
+          "realized_pnl",
           "volume",
           "roi",
           "trades",

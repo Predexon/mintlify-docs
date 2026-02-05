@@ -1,31 +1,7 @@
 ---
 title: "Wallet PnL"
-openapi: "GET /v1/dflow/wallet/pnl/{wallet}"
+openapi: "GET /v2/dflow/wallet/pnl/{wallet}"
 description: "Fetch realized profit and loss history for a Dflow wallet"
 ---
 
 Fetch cumulative realized P&L over time for a Dflow wallet.
-
-<ResponseExample>
-```json 200
-{
-  "wallet_address": "7vfCXTUXx...",
-  "granularity": "day",
-  "start_time": 1704067200,
-  "end_time": 1705420800,
-  "pnl_over_time": [
-    {"timestamp": 1704067200, "pnl_to_date": 0},
-    {"timestamp": 1704153600, "pnl_to_date": 125.50},
-    {"timestamp": 1704240000, "pnl_to_date": 89.25},
-    {"timestamp": 1704326400, "pnl_to_date": 234.75}
-  ]
-}
-```
-
-```json 400
-{
-  "error": "Bad Request",
-  "message": "granularity parameter is required"
-}
-```
-</ResponseExample>

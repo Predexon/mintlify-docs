@@ -1,31 +1,7 @@
 ---
 title: "Trades History"
-openapi: "GET /v1/kalshi/trades"
+openapi: "GET /v2/kalshi/trades"
 description: "Fetch historical Kalshi trade data"
 ---
 
 Fetch historical trade data from Kalshi markets. Requires at least one of `ticker` or `event_ticker`.
-
-<ResponseExample>
-```json 200
-{
-  "trades": [
-    {
-      "trade_id": "abc123def456",
-      "ticker": "KXBTC-25JAN10-B100000",
-      "count": 250,
-      "yes_price": 0.53,
-      "no_price": 0.47,
-      "taker_side": "yes",
-      "created_time": 1704153600
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 12345,
-    "has_more": true
-  }
-}
-```
-</ResponseExample>

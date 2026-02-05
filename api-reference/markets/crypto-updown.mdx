@@ -1,33 +1,7 @@
 ---
 title: "Crypto Up/Down Markets"
-openapi: "GET /v1/polymarket/crypto-updown"
+openapi: "GET /v2/polymarket/crypto-updown"
 description: "List crypto up/down prediction markets"
 ---
 
 Bitcoin, Ethereum, Solana, and XRP up/down markets across all timeframes (15m, 1h, 4h, daily). Filter by asset, timeframe, status, and time range.
-
-<ResponseExample>
-```json 200
-{
-  "markets": [
-    {
-      "condition_id": "0xabc123...",
-      "asset": "btc",
-      "timeframe": "daily",
-      "title": "Will Bitcoin go up today?",
-      "end_time": 1704153600,
-      "status": "open",
-      "yes_price": 0.62,
-      "no_price": 0.38,
-      "volume": 150000.00
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 240,
-    "has_more": true
-  }
-}
-```
-</ResponseExample>

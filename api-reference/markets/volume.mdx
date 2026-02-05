@@ -1,23 +1,7 @@
 ---
 title: "Volume Time Series"
-openapi: "GET /v1/polymarket/markets/{token_id}/volume"
+openapi: "GET /v2/polymarket/markets/{token_id}/volume"
 description: "Get historical cumulative volume data for a market"
 ---
 
 Fetch historical cumulative trading volume for a token.
-
-<ResponseExample>
-```json 200
-{
-  "token_id": "21742633...",
-  "granularity": "day",
-  "start_time": 1704067200,
-  "end_time": 1706745600,
-  "volume_over_time": [
-    {"timestamp": 1704067200, "volume": 1250000.00},
-    {"timestamp": 1704153600, "volume": 1450000.00},
-    {"timestamp": 1704240000, "volume": 1680000.00}
-  ]
-}
-```
-</ResponseExample>

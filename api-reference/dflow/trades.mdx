@@ -1,43 +1,7 @@
 ---
 title: "Trades"
-openapi: "GET /v1/dflow/trades"
+openapi: "GET /v2/dflow/trades"
 description: "Fetch trade history for a wallet on Dflow"
 ---
 
 Fetch trade history for a wallet on Dflow with market metadata.
-
-<ResponseExample>
-```json 200
-{
-  "trades": [
-    {
-      "tx_hash": "5xKpN2...",
-      "wallet": "7vfCXTUXx...",
-      "market_ticker": "BTCPRICE-26JAN",
-      "outcome_mint": "8xPqM3...",
-      "trade_type": "BUY_FILL",
-      "shares": 100,
-      "price": 0.65,
-      "cost_usd": 65.00,
-      "timestamp": 1705420800,
-      "title": "Bitcoin above $100k by Jan 2026?",
-      "category": "Crypto",
-      "side": "YES"
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 127,
-    "has_more": true
-  }
-}
-```
-
-```json 400
-{
-  "error": "Bad Request",
-  "message": "wallet parameter is required"
-}
-```
-</ResponseExample>

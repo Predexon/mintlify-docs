@@ -1,24 +1,7 @@
 ---
 title: "Wallet P&L"
-openapi: "GET /v1/polymarket/wallet/pnl/{wallet}"
+openapi: "GET /v2/polymarket/wallet/pnl/{wallet}"
 description: "Get realized P&L time series for a wallet"
 ---
 
 Fetch cumulative realized P&L over time for a wallet. For unrealized P&L, use the [Positions endpoint](/api-reference/wallet/positions).
-
-<ResponseExample>
-```json 200
-{
-  "wallet_address": "0x1234...",
-  "granularity": "week",
-  "start_time": 1704067200,
-  "end_time": 1735689600,
-  "pnl_over_time": [
-    {"timestamp": 1704067200, "pnl_to_date": 0.0},
-    {"timestamp": 1704672000, "pnl_to_date": 250.50},
-    {"timestamp": 1705276800, "pnl_to_date": 180.25},
-    {"timestamp": 1705881600, "pnl_to_date": 425.75}
-  ]
-}
-```
-</ResponseExample>

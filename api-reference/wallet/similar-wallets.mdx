@@ -1,31 +1,7 @@
 ---
 title: "Similar Wallets"
-openapi: "GET /v1/polymarket/wallet/{wallet}/similar"
+openapi: "GET /v2/polymarket/wallet/{wallet}/similar"
 description: "Find wallets with similar market portfolios"
 ---
 
 Detect potential copy-trading patterns and discover traders with similar strategies. Finds all markets the target wallet has traded, then ranks other wallets by overlap percentage and count.
-
-<ResponseExample>
-```json 200
-{
-  "wallet": "0x1234567890abcdef...",
-  "total_markets_traded": 45,
-  "similar_wallets": [
-    {
-      "wallet": "0xabcdef1234567890...",
-      "overlap_markets": 38,
-      "overlap_pct": 0.844,
-      "pnl": 8200.00,
-      "volume": 180000.00,
-      "trades": 620
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "has_more": true,
-    "next_pagination_key": "eyJ3YWxsZXQiOiIweGFiYyJ9"
-  }
-}
-```
-</ResponseExample>

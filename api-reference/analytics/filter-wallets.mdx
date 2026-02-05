@@ -1,35 +1,7 @@
 ---
 title: "Filter Wallets by Markets"
-openapi: "GET /v1/polymarket/wallets/filter"
+openapi: "GET /v2/polymarket/wallets/filter"
 description: "Filter wallets by market trades with AND/OR logic"
 ---
 
 Find wallets that traded specific markets with configurable logic. Use AND to find wallets that traded *all* specified markets, or OR to find wallets that traded *any* of them. Filter by combined performance metrics across those markets.
-
-<ResponseExample>
-```json 200
-{
-  "markets_queried": [
-    "0xabc123...",
-    "0xdef456..."
-  ],
-  "market_logic": "and",
-  "wallets": [
-    {
-      "wallet": "0x1234567890abcdef...",
-      "combined_pnl": 8500.00,
-      "combined_volume": 45000.00,
-      "combined_trades": 62,
-      "combined_roi": 0.189,
-      "markets_traded": 2
-    }
-  ],
-  "window": "all_time",
-  "pagination": {
-    "limit": 100,
-    "has_more": true,
-    "next_pagination_key": "eyJ3YWxsZXQiOiIweDEyMzQifQ=="
-  }
-}
-```
-</ResponseExample>

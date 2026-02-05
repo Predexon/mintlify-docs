@@ -1,38 +1,9 @@
 ---
 title: "Orderbook History"
-openapi: "GET /v1/polymarket/orderbooks"
+openapi: "GET /v2/polymarket/orderbooks"
 description: "Get historical orderbook snapshots for a token"
 ---
 
 Fetch historical orderbook snapshots for a token. Data starts from **January 1st, 2026**.
 
 <Warning>Timestamps are in **milliseconds** for this endpoint.</Warning>
-
-<ResponseExample>
-```json 200
-{
-  "snapshots": [
-    {
-      "assetId": "21742633...",
-      "market": "0x1a2b3c4d...",
-      "timestamp": 1704067200000,
-      "tickSize": "0.01",
-      "bids": [
-        {"price": "0.55", "size": "10000"},
-        {"price": "0.54", "size": "25000"}
-      ],
-      "asks": [
-        {"price": "0.56", "size": "8000"},
-        {"price": "0.57", "size": "20000"}
-      ]
-    }
-  ],
-  "pagination": {
-    "limit": 50,
-    "count": 50,
-    "pagination_key": "eyJhc3NldElkIjoi...",
-    "has_more": true
-  }
-}
-```
-</ResponseExample>
