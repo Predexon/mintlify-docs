@@ -1,0 +1,44 @@
+---
+title: "Security"
+description: "Local-first signing, endpoint hardcoding, and response validation"
+---
+
+## Architecture
+
+<CardGroup cols={2}>
+  <Card title="Local-First Signing" icon="key">
+    Private keys never leave your environment. All order signing happens locally.
+  </Card>
+  <Card title="Hard-Locked Endpoint" icon="lock">
+    The SDK only communicates with `https://trade.predexon.com`. This cannot be overridden.
+  </Card>
+</CardGroup>
+
+The SDK hard-locks to `https://trade.predexon.com` to prevent man-in-the-middle attacks. A compromised base URL could steal your API key or serve malicious transactions for signing. HTTP redirects are rejected to prevent API key leakage.
+
+## Response Validation
+
+The SDK validates server responses before signing to ensure you're not signing malicious data.
+
+### Polymarket
+
+- **CLOB auth typed data**: Domain name, version, and chainId must match expected values
+- **Redemption transactions**: Only whitelisted contract addresses allowed; transactions built locally from server-provided conditionId
+- **Approval transactions**: Chain ID must be Polygon (137), targets restricted to approved USDC and CTF contracts
+
+### Kalshi
+
+- **Echo validation**: Server response must echo back your original ticker, outcome, side, and amount
+- **Signer validation**: Your wallet must be a required signer; no unexpected signers allowed
+- **Fee payer validation**: Must be your wallet or a known sponsor address
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="/sdk/configuration">
+    Set up API keys and wallets
+  </Card>
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/errors">
+    Handle security-related errors
+  </Card>
+</CardGroup>

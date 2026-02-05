@@ -1,0 +1,62 @@
+---
+title: "Installation"
+description: "Install the Predexon Trade SDK and set up your project"
+---
+
+## Install
+
+```bash
+npm install @predexon/trade-sdk
+```
+
+<Info>
+Current version: **0.0.7**
+</Info>
+
+## Requirements
+
+| Requirement | Version |
+|-------------|---------|
+| Node.js | 20.18+ |
+| TypeScript | 5+ (if you want types) |
+
+## Peer Dependencies
+
+Core SDK has no peer dependencies. Server adapters require additional packages—see [Wallet Adapters](/sdk/wallet-adapters).
+
+## Module Formats
+
+The SDK ships as dual ESM/CJS:
+
+<CodeGroup>
+```typescript ESM (recommended)
+import { PredexonSDK } from '@predexon/trade-sdk';
+```
+
+```javascript CommonJS
+const { PredexonSDK } = require('@predexon/trade-sdk');
+```
+</CodeGroup>
+
+## Verify Installation
+
+```typescript
+import { PredexonSDK } from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+});
+
+console.log('SDK initialized successfully');
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/sdk/quickstart">
+    Place your first order
+  </Card>
+  <Card title="Configuration" icon="gear" href="/sdk/configuration">
+    Configure SDK options
+  </Card>
+</CardGroup>

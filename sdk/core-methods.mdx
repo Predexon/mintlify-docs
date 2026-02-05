@@ -1,0 +1,391 @@
+---
+title: "Core Methods"
+description: "SDK method reference"
+---
+
+## enableTrading
+
+Enable trading for a venue. Call once per wallet before placing orders.
+
+```typescript
+await sdk.enableTrading({
+  core: { venue: 'polymarket', wallet: '0x...' },
+  approvals: 'sign', // optional: 'sign' | 'broadcast' | 'skip'
+});
+```
+
+### Polymarket
+
+Registers CLOB credentials and approves trading contracts.
+
+| Approval Mode | Wallet Requirement | Behavior |
+|---------------|-------------------|----------|
+| `'sign'` | `signTransaction` | Wallet signs, server broadcasts |
+| `'broadcast'` | `sendTransaction` | Wallet signs and broadcasts |
+| `'skip'` | None | Skip approvals (use if already approved) |
+
+### Kalshi
+
+Registers your Solana wallet via message signing.
+
+```typescript
+await sdk.enableTrading({
+  core: { venue: 'kalshi', wallet: '7xKX...' },
+});
+```
+
+### Response
+
+```typescript
+interface EnableTradingResponse {
+  venue: 'polymarket' | 'kalshi';
+  tradingEnabled: boolean;
+  // Polymarket only:
+  approvalsComplete?: boolean;
+  clobRegistered?: boolean;
+  approvalTxHashes?: string[];
+  // Kalshi only:
+  ownershipVerified?: boolean;
+}
+```
+
+---
+
+## placeOrder
+
+Place an order. This is the primary trading method.
+
+```typescript
+await sdk.placeOrder({
+  core: {
+    venue: 'polymarket',
+    wallet: '0x...',
+    side: 'buy',
+    amount: '100',    // $100 USDC
+    type: 'market',
+  },
+  flags: { tokenId: '...' },
+});
+```
+
+### Polymarket Examples
+
+**Market order — buy $100 worth:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '100', type: 'market' },
+  flags: { tokenId: '...' },
+});
+```
+
+**Limit order — buy 100 shares at $0.65:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', size: '100', price: '0.65', type: 'limit' },
+  flags: { tokenId: '...' },
+});
+```
+
+**Sell order — sell 50 shares:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'sell', size: '50', type: 'market' },
+  flags: { tokenId: '...' },
+});
+```
+
+### Kalshi Examples
+
+**Market buy — spend $50 USDC:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'kalshi', wallet: '7xKX...', side: 'buy', amount: '50', type: 'market' },
+  flags: { ticker: 'PRES-2024-DEM', outcome: 'Yes' },
+});
+```
+
+**Market sell — sell 25 tokens:**
+```typescript
+await sdk.placeOrder({
+  core: { venue: 'kalshi', wallet: '7xKX...', side: 'sell', size: '25', type: 'market' },
+  flags: { ticker: 'PRES-2024-DEM', outcome: 'Yes' },
+});
+```
+
+### Response
+
+```typescript
+interface PlaceOrderResponse {
+  orderId: string;
+  venue: 'polymarket' | 'kalshi';
+  status: 'filled' | 'pending' | 'canceled' | 'failed' | 'reverted';
+  price: string | null;
+  amount?: string;
+  size?: string;
+  filledAmount?: string;
+  createdAt: string;
+  message?: string;
+}
+```
+
+| Status | Description |
+|--------|-------------|
+| `filled` | Fully executed |
+| `pending` | Processing or resting on book |
+| `canceled` | User canceled |
+| `failed` | Rejected (invalid params, insufficient balance) |
+| `reverted` | On-chain revert (Kalshi only) |
+
+<Accordion title="Order Parameters Reference">
+
+### Units
+
+All numeric inputs are human-readable strings:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `amount` | USDC to spend | `'100'` = $100 |
+| `size` | Number of shares/tokens | `'50'` = 50 shares |
+| `price` | Price per share (0-1) | `'0.65'` = $0.65 |
+
+### Required Fields by Order Type
+
+**Polymarket:**
+
+| Order Type | Side | Required Fields |
+|------------|------|-----------------|
+| Market | BUY | `amount` OR `size` |
+| Market | SELL | `size` |
+| Limit | BUY/SELL | `size` + `price` |
+
+**Kalshi** (market orders only):
+
+| Side | Required Fields |
+|------|-----------------|
+| BUY | `amount` |
+| SELL | `size` |
+
+### Flags
+
+**Polymarket:**
+```typescript
+flags: {
+  tokenId: string,        // Required
+  feeRateBps?: string,    // Optional (omit to let CLOB resolve)
+  expiration?: string,    // Optional (Unix timestamp, '0' = no expiration)
+}
+```
+
+<Warning>
+Do not pass `feeRateBps: '0'` on markets that require fees. Omit the field to let the CLOB resolve the correct fee.
+</Warning>
+
+**Kalshi:**
+```typescript
+flags: {
+  ticker: string,         // Required (e.g., 'PRES-2024-DEM')
+  outcome: 'Yes' | 'No',  // Required
+}
+```
+
+</Accordion>
+
+<Accordion title="Advanced: prepareOrder + submitOrder">
+
+For custom signing flows (HSM, multisig) or order inspection before submission:
+
+**Polymarket:**
+```typescript
+// Step 1: Prepare (builds and signs order without submitting)
+const prepared = await sdk.prepareOrder({
+  core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '100', type: 'market' },
+  flags: { tokenId: '...' },
+});
+
+// Step 2: Submit
+const result = await sdk.submitOrder({
+  order: prepared.order,
+  signature: prepared.signature,
+  orderType: 'market',
+});
+```
+
+**Kalshi:**
+```typescript
+const prepared = await sdk.prepareOrder({
+  core: { venue: 'kalshi', wallet: '7xKX...', side: 'buy', amount: '50', type: 'market' },
+  flags: { ticker: 'TICKER', outcome: 'Yes' },
+});
+
+// Sign the transaction with your Solana wallet
+const signedTx = await solanaSigner.signSolanaTransaction(prepared.transaction);
+
+const result = await sdk.submitOrder({
+  walletAddress: '7xKX...',
+  signedTransaction: signedTx,
+  orderParams: prepared.orderParams,
+});
+```
+
+</Accordion>
+
+---
+
+## Order Management
+
+<Warning>
+**Kalshi limitation:** `getOpenOrders`, `cancelOrder`, and `cancelAllOrders` are not supported on Kalshi. Kalshi uses atomic swaps with no resting orders.
+</Warning>
+
+### getOpenOrders
+
+List open orders for a wallet.
+
+```typescript
+const orders = await sdk.getOpenOrders({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+```
+
+```typescript
+interface OpenOrder {
+  orderId: string;
+  tokenId: string;
+  side: string;
+  amount: string;
+  price: string;
+  status: string;
+  createdAt: string;
+}
+```
+
+### cancelOrder
+
+Cancel a specific order.
+
+```typescript
+await sdk.cancelOrder({
+  core: { venue: 'polymarket', wallet: '0x...' },
+  orderId: 'order-id-123',
+});
+```
+
+### cancelAllOrders
+
+Cancel all open orders.
+
+```typescript
+const result = await sdk.cancelAllOrders({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+// result.cancelled = number of orders canceled
+```
+
+---
+
+## Portfolio
+
+### getPositions
+
+Get current positions.
+
+```typescript
+const positions = await sdk.getPositions({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+```
+
+```typescript
+interface Position {
+  venue: 'polymarket' | 'kalshi';
+  tokenId?: string;        // Polymarket
+  ticker?: string;         // Kalshi
+  title?: string | null;
+  outcome: string;
+  size: string;
+  status: 'active' | 'resolved' | 'redeemable';
+  result?: 'won' | 'lost' | null;
+  currentPrice?: string | null;
+  currentValue?: string | null;
+  pnl?: string | null;
+}
+```
+
+### getBalance
+
+Get wallet balance.
+
+```typescript
+const balances = await sdk.getBalance({
+  core: { venue: 'polymarket', wallet: '0x...' },
+});
+```
+
+```typescript
+interface Balance {
+  venue: 'polymarket' | 'kalshi';
+  available: string;  // Available for trading
+  locked: string;     // In open orders
+  total: string;
+}
+```
+
+---
+
+## redeem
+
+Redeem resolved positions to claim USDC.
+
+### Polymarket
+
+```typescript
+const result = await sdk.redeem({
+  core: { venue: 'polymarket', wallet: '0x...' },
+  flags: { tokenId: 'resolved-token-id' },
+  redemption: 'sign', // optional: 'sign' | 'broadcast'
+});
+```
+
+| Redemption Mode | Wallet Requirement | Behavior |
+|-----------------|-------------------|----------|
+| `'sign'` | `signTransaction` | Wallet signs, server broadcasts |
+| `'broadcast'` | `sendTransaction` | Wallet signs and broadcasts |
+
+<Info>
+If `redemption` is omitted, the SDK auto-detects based on wallet capabilities.
+</Info>
+
+### Kalshi
+
+```typescript
+const result = await sdk.redeem({
+  core: { venue: 'kalshi', wallet: '7xKX...' },
+  flags: { ticker: 'TICKER', outcome: 'Yes' },
+});
+```
+
+### Response
+
+```typescript
+interface RedeemResponse {
+  transactionHash: string;
+  venue: 'polymarket' | 'kalshi';
+  status: 'completed' | 'reverted' | 'pending';
+  amountRedeemed?: string;
+  sizeRedeemed?: string;
+  message?: string;
+}
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/errors">
+    Handle errors and retries
+  </Card>
+  <Card title="Security" icon="shield" href="/sdk/security">
+    Security architecture
+  </Card>
+</CardGroup>

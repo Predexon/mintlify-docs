@@ -1,0 +1,290 @@
+---
+title: "Wallet Adapters"
+description: "Adapters for EVM, Solana, and server-side wallet integrations"
+---
+
+The SDK provides adapters to normalize different wallet implementations into a unified interface. EVM adapters return an **`EvmWallet`** — pass it to `PredexonSdkConfig.wallet`. Solana adapters return a **`SolanaSigner`** — pass it to `PredexonSdkConfig.solanaSigner`.
+
+<Warning>
+**The SDK is designed for server-side use.** Using the SDK in browser code exposes your API key to end users. If you need browser wallet signing, proxy SDK calls through your backend.
+</Warning>
+
+---
+
+## Server Adapters (Recommended)
+
+Import server adapters from the `/server` subpath:
+
+```typescript
+import {
+  createTurnkeyAdapter,
+  createPrivyServerAdapter,
+  createRawKeyAdapter,
+} from '@predexon/trade-sdk/server';
+```
+
+### createTurnkeyAdapter
+
+Creates an EVM wallet backed by Turnkey's secure key infrastructure.
+
+```typescript
+import { PredexonSDK } from '@predexon/trade-sdk';
+import { createTurnkeyAdapter } from '@predexon/trade-sdk/server';
+
+const wallet = createTurnkeyAdapter({
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.TURNKEY_SIGN_WITH!, // wallet address or wallet ID
+  rpcUrl: process.env.POLYGON_RPC_URL, // optional, enables sendTransaction
+});
+
+const sdk = new PredexonSDK({ apiKey: process.env.PREDEXON_API_KEY!, wallet });
+```
+
+**Peer dependencies:**
+```bash
+npm install @turnkey/api-key-stamper @turnkey/http @turnkey/viem
+```
+
+### createPrivyServerAdapter
+
+Creates an EVM wallet for Privy embedded wallets using server-side credentials.
+
+```typescript
+import { PredexonSDK } from '@predexon/trade-sdk';
+import { createPrivyServerAdapter } from '@predexon/trade-sdk/server';
+
+const wallet = createPrivyServerAdapter({
+  appId: process.env.PRIVY_APP_ID!,
+  appSecret: process.env.PRIVY_APP_SECRET!,
+  authorizationPrivateKey: process.env.PRIVY_AUTHORIZATION_PRIVATE_KEY!,
+  walletAddress: userEmbeddedWalletAddress, // the user's Privy embedded wallet
+});
+
+const sdk = new PredexonSDK({ apiKey: process.env.PREDEXON_API_KEY!, wallet });
+```
+
+**Peer dependency:**
+```bash
+npm install @privy-io/node
+```
+
+### createRawKeyAdapter
+
+Creates an EVM wallet from a raw private key. **For development and testing only.**
+
+```typescript
+import { PredexonSDK } from '@predexon/trade-sdk';
+import { createRawKeyAdapter } from '@predexon/trade-sdk/server';
+
+const wallet = createRawKeyAdapter({
+  privateKey: process.env.PRIVATE_KEY!,
+  rpcUrl: process.env.POLYGON_RPC_URL, // optional, enables sendTransaction
+});
+
+const sdk = new PredexonSDK({ apiKey: process.env.PREDEXON_API_KEY!, wallet });
+```
+
+---
+
+## EVM Adapters
+
+Import EVM adapters from the main entry:
+
+```typescript
+import { createViemAdapter, createEip1193Adapter } from '@predexon/trade-sdk';
+```
+
+### createViemAdapter
+
+Adapts any viem `WalletClient` to the SDK interface. This adapter is **synchronous**.
+
+```typescript
+import { PredexonSDK, createViemAdapter } from '@predexon/trade-sdk';
+import { createWalletClient, http } from 'viem';
+import { polygon } from 'viem/chains';
+import { privateKeyToAccount } from 'viem/accounts';
+
+// Server-side with local account
+const account = privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`);
+const walletClient = createWalletClient({
+  account,
+  chain: polygon,
+  transport: http(process.env.POLYGON_RPC_URL),
+});
+
+const wallet = createViemAdapter(walletClient);
+const sdk = new PredexonSDK({ apiKey: process.env.PREDEXON_API_KEY!, wallet });
+```
+
+### createEip1193Adapter
+
+Adapts any EIP-1193 provider (MetaMask, WalletConnect, etc.) to the SDK interface. This adapter is **async**.
+
+```typescript
+import { createEip1193Adapter } from '@predexon/trade-sdk';
+
+// Your app handles wallet connection
+const accounts = await provider.request({ method: 'eth_requestAccounts' });
+const address = accounts[0];
+
+const wallet = await createEip1193Adapter({ provider, address });
+```
+
+---
+
+## Solana Adapters
+
+Import Solana adapters from the main entry:
+
+```typescript
+import { createSolanaAdapter, createPrivySolanaAdapter } from '@predexon/trade-sdk';
+```
+
+### createSolanaAdapter
+
+Creates a Solana signer from signing functions. Use this for custom Solana wallet integrations.
+
+```typescript
+import { PredexonSDK, createSolanaAdapter } from '@predexon/trade-sdk';
+import { Keypair, VersionedTransaction } from '@solana/web3.js';
+import nacl from 'tweetnacl';
+
+const keypair = Keypair.fromSecretKey(/* your secret key bytes */);
+
+const solanaSigner = createSolanaAdapter({
+  signSolanaTransaction: async (base64Tx) => {
+    const tx = VersionedTransaction.deserialize(Buffer.from(base64Tx, 'base64'));
+    tx.sign([keypair]);
+    return Buffer.from(tx.serialize()).toString('base64');
+  },
+  signSolanaMessage: async (message) => {
+    const messageBytes = new TextEncoder().encode(message);
+    const signature = nacl.sign.detached(messageBytes, keypair.secretKey);
+    return Buffer.from(signature).toString('base64');
+  },
+});
+
+const sdk = new PredexonSDK({ apiKey: process.env.PREDEXON_API_KEY!, solanaSigner });
+```
+
+#### Required Methods by Operation
+
+| Operation | Required Method |
+|-----------|-----------------|
+| `enableTrading` (Kalshi) | `signSolanaMessage` (only if wallet not already registered) |
+| `placeOrder` (Kalshi) | `signSolanaTransaction` |
+| `redeem` (Kalshi) | `signSolanaTransaction` |
+
+### createPrivySolanaAdapter
+
+Adapts Privy embedded Solana wallets using the Wallet Standard.
+
+```typescript
+import { PredexonSDK, createPrivySolanaAdapter } from '@predexon/trade-sdk';
+import { useSolanaStandardWallets } from '@privy-io/react-auth/solana';
+
+const { wallets } = useSolanaStandardWallets();
+const privyWallet = wallets.find(w => w.name === 'Privy');
+const address = privyWallet.accounts[0].address;
+
+const solanaSigner = createPrivySolanaAdapter(privyWallet, address);
+const sdk = new PredexonSDK({ apiKey: process.env.PREDEXON_API_KEY!, solanaSigner });
+```
+
+---
+
+## Multi-Venue Configuration
+
+To trade on both Polymarket (EVM) and Kalshi (Solana), provide both `wallet` and `solanaSigner`:
+
+```typescript
+import { PredexonSDK } from '@predexon/trade-sdk';
+import { createTurnkeyAdapter } from '@predexon/trade-sdk/server';
+import { createSolanaAdapter } from '@predexon/trade-sdk';
+
+const wallet = createTurnkeyAdapter({ /* ... */ });
+const solanaSigner = createSolanaAdapter({ /* ... */ });
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  wallet,
+  solanaSigner,
+});
+```
+
+---
+
+## Approval Mode Detection
+
+For Polymarket `enableTrading`, the SDK automatically detects your wallet's capabilities:
+
+| Wallet Capability | Auto-Selected Mode | Behavior |
+|-------------------|-------------------|----------|
+| `signTransaction` available | `'sign'` | Wallet signs, server broadcasts |
+| `sendTransaction` only | `'broadcast'` | Wallet signs and broadcasts |
+| Neither | Error | `SigningError` thrown |
+
+You can override auto-detection by explicitly passing `approvals`:
+
+```typescript
+await sdk.enableTrading({
+  core: { venue: 'polymarket', wallet: address },
+  approvals: 'broadcast', // or 'sign', or 'skip'
+});
+```
+
+---
+
+## Type Reference
+
+### EvmWallet
+
+Returned by all EVM adapters. Pass to `PredexonSdkConfig.wallet`.
+
+```typescript
+interface EvmWallet {
+  account: EvmSigner;
+  capabilities?: AdapterCapabilities;
+  extensions?: AdapterExtensions;
+  metadata?: AdapterMetadata;
+}
+```
+
+### EvmSigner
+
+The signing interface for EVM wallets.
+
+```typescript
+interface EvmSigner {
+  getAddress(): Promise<string>;
+  signTypedData(typedData: Eip712TypedData): Promise<string>;
+  signTransaction?(tx: EvmTransactionRequest): Promise<string>;
+  sendTransaction?(tx: EvmTransactionRequest): Promise<string>;
+}
+```
+
+### SolanaSigner
+
+The signing interface for Solana wallets.
+
+```typescript
+interface SolanaSigner {
+  signSolanaTransaction(transactionBase64: string): Promise<string>;
+  signSolanaMessage?(message: string): Promise<string>;
+}
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Use the SDK with your wallet
+  </Card>
+  <Card title="Security" icon="shield" href="/sdk/security">
+    Understand signing security
+  </Card>
+</CardGroup>

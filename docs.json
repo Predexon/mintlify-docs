@@ -219,6 +219,39 @@
         ]
       },
       {
+        "tab": "SDK",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "sdk/overview",
+              "sdk/installation",
+              "sdk/quickstart"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "sdk/configuration",
+              "sdk/wallet-adapters"
+            ]
+          },
+          {
+            "group": "Core API",
+            "pages": [
+              "sdk/core-methods",
+              "sdk/errors"
+            ]
+          },
+          {
+            "group": "Security",
+            "pages": [
+              "sdk/security"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "WebSocket",
         "groups": [
           {

@@ -1,0 +1,84 @@
+---
+title: "Configuration"
+description: "SDK constructor options and configuration"
+---
+
+## Basic Setup
+
+```typescript
+import { PredexonSDK, createViemAdapter } from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  wallet: createViemAdapter(walletClient),
+});
+```
+
+For Kalshi (Solana), use `solanaSigner` instead of `wallet`:
+
+```typescript
+import { PredexonSDK, createSolanaAdapter } from '@predexon/trade-sdk';
+
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  solanaSigner: createSolanaAdapter({
+    signSolanaTransaction: async (base64Tx) => signedBase64,
+    signSolanaMessage: async (message) => signatureBase64,
+  }),
+});
+```
+
+---
+
+## Configuration Reference
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `apiKey` | `string` | Yes | - | Your Predexon API key |
+| `wallet` | `EvmWallet` | No | - | EVM wallet for Polymarket |
+| `solanaSigner` | `SolanaSigner` | No | - | Solana signer for Kalshi |
+
+---
+
+## Advanced Options
+
+These options are rarely needed:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `evmSignerOptions.chainId` | `number` | `137` | EVM chain ID (Polygon) |
+| `evmSignerOptions.enableRawAccess` | `boolean` | `false` | Enable raw signer access |
+| `timeouts.requestMs` | `number` | `30000` | Request timeout in milliseconds |
+
+```typescript
+const sdk = new PredexonSDK({
+  apiKey: process.env.PREDEXON_API_KEY!,
+  wallet: createViemAdapter(walletClient),
+  timeouts: {
+    requestMs: 60000,
+  },
+});
+```
+
+---
+
+## Security
+
+<Info>
+**API key required for all SDK calls.** The API key is sent via the `x-api-key` header on every request.
+</Info>
+
+<Warning>
+**Base URL is hard-locked** to `https://trade.predexon.com` for security. This cannot be overridden. See the [Security](/sdk/security) page for details.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Wallet Adapters" icon="wallet" href="/sdk/wallet-adapters">
+    Configure wallet signing
+  </Card>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Explore SDK methods
+  </Card>
+</CardGroup>

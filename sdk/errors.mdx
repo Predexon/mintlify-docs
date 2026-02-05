@@ -1,0 +1,86 @@
+---
+title: "Errors"
+description: "Error types and handling"
+---
+
+The SDK throws typed errors you can catch and handle specifically.
+
+## Error Classes
+
+```typescript
+import {
+  SdkError,          // Base class
+  ValidationError,   // Invalid input parameters
+  AuthError,         // Missing API key or wallet/signer
+  NetworkError,      // HTTP failures, timeouts, server errors
+  SigningError,      // Wallet signing failed or rejected
+  NotSupportedError, // Operation not supported (e.g., Kalshi limit orders)
+} from '@predexon/trade-sdk';
+```
+
+All errors have a `code` property:
+
+| Error | Code | When |
+|-------|------|------|
+| `ValidationError` | `VALIDATION_ERROR` | Invalid params, wrong amount/size combo, price out of range |
+| `AuthError` | `AUTH_ERROR` | Missing API key, missing wallet/signer in SDK config |
+| `NetworkError` | `NETWORK_ERROR` | HTTP errors, timeouts, server errors, 409 conflicts |
+| `SigningError` | `SIGNING_ERROR` | Wallet rejected signature, missing signing method |
+| `NotSupportedError` | `NOT_SUPPORTED` | Operation unavailable for venue (e.g., Kalshi limit orders) |
+
+## Handling Errors
+
+```typescript
+try {
+  await sdk.placeOrder({
+    core: { venue: 'polymarket', wallet: '0x...', side: 'buy', amount: '10', type: 'market' },
+    flags: { tokenId: '12345...' },
+  });
+} catch (error) {
+  if (error instanceof ValidationError) {
+    // Fix input and retry
+  } else if (error instanceof SigningError) {
+    // User rejected or wallet missing method
+  } else if (error instanceof AuthError) {
+    // Missing API key or wallet config
+  } else if (error instanceof NetworkError) {
+    // Safe to retry (use idempotency key)
+  } else if (error instanceof NotSupportedError) {
+    // Operation not available for this venue/wallet
+  }
+}
+```
+
+## Retryable vs Non-Retryable
+
+| Error | Retryable? | Action |
+|-------|------------|--------|
+| `NetworkError` | Yes | Retry with same idempotency key |
+| `ValidationError` | No | Fix input parameters |
+| `AuthError` | No | Fix API key or wallet setup |
+| `SigningError` | No | User must approve signature |
+| `NotSupportedError` | No | Operation not available |
+
+## Error Cause
+
+Errors preserve the original cause for debugging:
+
+```typescript
+catch (error) {
+  if (error instanceof SigningError) {
+    console.log(error.message);  // "Wallet signing failed"
+    console.log(error.cause);    // Original error from wallet
+  }
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Security" icon="shield" href="/sdk/security">
+    Security architecture
+  </Card>
+  <Card title="Core Methods" icon="code" href="/sdk/core-methods">
+    Full API reference
+  </Card>
+</CardGroup>

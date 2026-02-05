@@ -1,0 +1,36 @@
+---
+title: "Overview"
+description: "Noncustodial TypeScript SDK for trading on prediction markets"
+---
+
+<Info>
+**Request your private beta API key** on [Discord](https://discord.com/invite/dxwzMcs8hX) to start trading with the SDK.
+</Info>
+
+The Predexon Trade SDK is a **noncustodial** TypeScript SDK for trading on prediction markets. All signing happens locally—private keys never leave your environment.
+
+## Architecture
+
+The SDK provides a **single unified client** for two venues:
+- **Polymarket (Polygon)** via Polymarket CLOB
+- **Kalshi (Solana)** via DFlow swap flow
+
+The SDK handles signing locally and coordinates with Predexon APIs for required venue workflows.
+
+## Supported Venues
+
+| Venue | Blockchain | Order Types | Status |
+|-------|------------|-------------|--------|
+| Polymarket | Polygon | Market, Limit | Full support |
+| Kalshi | Solana | Market only | Full support |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/sdk/installation">
+    Install the SDK and set up your project
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/sdk/quickstart">
+    Place your first order in minutes
+  </Card>
+</CardGroup>
